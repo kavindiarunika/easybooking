@@ -5,98 +5,136 @@ import "react-toastify/dist/ReactToastify.css";
 import { backendUrl } from "../../App";
 
 const AddTrending = ({ token }) => {
-  // State
-  const [name, setName] = useState("");
-  const [subname, setSubname] = useState("");
-  const [description, setDescription] = useState("");
-  const [location, setLocation] = useState("");
-  const [highlights, setHighlights] = useState("");
-  const [address, setAddress] = useState("");
-  const [contact, setContact] = useState("");
-  const [availableThings, setAvailableThings] = useState("");
+  const [formDataFields, setFormDataFields] = useState({
+    name: "",
+    description: "",
+    category: "villa",
+    rating: "5",
+    district: "",
+    price: "",
+    location: "",
+    highlights: "",
+    address: "",
+    contact: "",
+    ownerEmail: "",
+    availableThings: "",
+  });
 
-  // Media states
-  const [image, setImage] = useState(null);
-  const [image1, setImage1] = useState(null);
-  const [image2, setImage2] = useState(null);
-  const [image3, setImage3] = useState(null);
-  const [image4, setImage4] = useState(null);
-  const [image5, setImage5] = useState(null);
-  const [image6, setImage6] = useState(null);
-  const [video, setVideo] = useState(null);
+  const [media, setMedia] = useState({
+    mainImage: null,
+    images: [],
+    video: null,
+  });
 
-  // Submit handler
+  // ------------------ HANDLE TEXT INPUT ------------------
+  const handleInputChange = (e) => {
+    setFormDataFields({
+      ...formDataFields,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // ------------------ HANDLE FILE INPUT ------------------
+  const handleFileChange = (e, fieldName) => {
+    // legacy single-file handlers still supported (keeps existing API)
+    setMedia({
+      ...media,
+      [fieldName]: e.target.files[0],
+    });
+  };
+
+  const handleMultipleFiles = (e) => {
+    const files = Array.from(e.target.files || []);
+    setMedia((m) => ({ ...m, images: files }));
+  };
+
+  // ------------------ SUBMIT FORM ------------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!image) {
+    // require main image
+    if (!media.mainImage) {
       toast.error("Main image is required!");
       return;
     }
 
+    // require at least one additional image
+    if (!media.images || media.images.length === 0) {
+      toast.error("At least one additional image is required!");
+      return;
+    }
+
+    const updatedFormData = {
+      ...formDataFields,
+      availableThings: formDataFields.availableThings
+        ? formDataFields.availableThings.split(",").map((i) => i.trim())
+        : [],
+    };
+
     const formData = new FormData();
-    formData.append("name", name);
-    formData.append("subname", subname);
-    formData.append("description", description);
-    formData.append("location", location);
-    formData.append("highlights", highlights);
-    formData.append("address", address);
-    formData.append("contact", contact);
-    formData.append("availableThings", availableThings);
 
-    // Append images
-    formData.append("image", image);
-    if (image1) formData.append("image1", image1);
-    if (image2) formData.append("image2", image2);
-    if (image3) formData.append("image3", image3);
-    if (image4) formData.append("image4", image4);
-    if (image5) formData.append("image5", image5);
-    if (image6) formData.append("image6", image6);
+    // Append text fields
+    Object.entries(updatedFormData).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
 
-    // Append video
-    if (video) formData.append("video", video);
+    // Append media files
+    // - append main image
+    if (media.mainImage) formData.append("mainImage", media.mainImage);
+
+    // - append multiple images under the `images` field
+    if (media.images && media.images.length > 0) {
+      media.images.forEach((file) => formData.append("images", file));
+    }
+
+    // keep supporting legacy single-file fields if present (video)
+    if (media.video) formData.append("video", media.video);
 
     try {
-      const response = await axios.post(`${backendUrl}/api/trending/add`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      const response = await axios.post(
+        `${backendUrl}/api/trending/add`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       if (response.data.success) {
         toast.success("Hotel added successfully!");
 
-        // Reset text fields
-        setName("");
-        setSubname("");
-        setDescription("");
-        setLocation("");
-        setHighlights("");
-        setAddress("");
-        setContact("");
-        setAvailableThings("");
+        // Reset fields
+        setFormDataFields({
+          name: "",
+          description: "",
+          category: "villa",
+          rating: "5",
+          district: "",
+          price: "",
+          location: "",
+          highlights: "",
+          address: "",
+          contact: "",
+          ownerEmail: "",
+          availableThings: "",
+        });
 
-        // Reset media states
-        setImage(null);
-        setImage1(null);
-        setImage2(null);
-        setImage3(null);
-        setImage4(null);
-        setImage5(null);
-        setImage6(null);
-        setVideo(null);
+        setMedia({
+          mainImage: null,
+          images: [],
+          video: null,
+        });
 
-        // Clear file inputs
-        document
-          .querySelectorAll('input[type="file"]')
-          .forEach((input) => (input.value = ""));
+        document.querySelectorAll('input[type="file"]').forEach((input) => {
+          input.value = "";
+        });
       } else {
         toast.error(response.data.message || "Failed to add item.");
       }
     } catch (error) {
       console.error("Error uploading item:", error);
-      const errorMessage = error.response?.data?.message || "Error uploading item";
-      toast.error(errorMessage);
+      toast.error(error.response?.data?.message || "Error uploading item");
     }
   };
 
@@ -105,159 +143,150 @@ const AddTrending = ({ token }) => {
       <h2 className="text-xl font-bold mb-4">Add Hotel Details</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* Basic Text fields */}
-        <div>
-          <label className="block text-gray-700 mb-1">Hotel Name</label>
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            required
-            className="w-full border px-3 py-2 rounded-md outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 mb-1">
-            Tagline / Subtitle (e.g., Luxury Resort, Boutique Hotel)
-          </label>
-          <input
-            type="text"
-            value={subname}
-            onChange={(e) => setSubname(e.target.value)}
-            required
-            className="w-full border px-3 py-2 rounded-md outline-none"
-          />
-        </div>
-
-        <div>
-          <label className="block text-gray-700 mb-1">Full Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-            className="w-full border px-3 py-2 rounded-md outline-none min-h-[80px]"
-          />
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 mb-1">
-              General Location (e.g., City, District)
+        {/* TEXT INPUTS */}
+        {Object.keys(formDataFields).map((key) => (
+          <div key={key}>
+            <label className="block text-gray-700 mb-1 capitalize">
+              {key.replace(/([A-Z])/g, " $1")}
             </label>
-            <input
-              type="text"
-              value={location}
-              onChange={(e) => setLocation(e.target.value)}
-              className="w-full border px-3 py-2 rounded-md outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-1">
-              Key Selling Points / Highlights
-            </label>
-            <input
-              type="text"
-              value={highlights}
-              onChange={(e) => setHighlights(e.target.value)}
-              className="w-full border px-3 py-2 rounded-md outline-none"
-            />
-          </div>
-        </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className="block text-gray-700 mb-1">Full Street Address</label>
-            <input
-              type="text"
-              value={address}
-              onChange={(e) => setAddress(e.target.value)}
-              className="w-full border px-3 py-2 rounded-md outline-none"
-            />
-          </div>
-          <div>
-            <label className="block text-gray-700 mb-1">Contact Phone/Email</label>
-            <input
-              type="text"
-              value={contact}
-              onChange={(e) => setContact(e.target.value)}
-              className="w-full border px-3 py-2 rounded-md outline-none"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label className="block text-gray-700 mb-1">
-            Available Amenities / Facilities (e.g., Spa, Gym, Free Wi-Fi, Pool)
-          </label>
-          <input
-            type="text"
-            value={availableThings}
-            onChange={(e) => setAvailableThings(e.target.value)}
-            className="w-full border px-3 py-2 rounded-md outline-none"
-          />
-        </div>
-
-        {/* Media Uploads */}
-        <div className="space-y-4">
-          <label className="block text-gray-700 font-medium">Media Uploads</label>
-
-          {/* Video Upload */}
-          <div className="border p-3 rounded-md">
-            <label className="block text-gray-700 mb-1 font-semibold">
-              Optional Hotel Promotional Video (.mp4, .mov, etc.)
-            </label>
-            <input
-              type="file"
-              accept="video/*"
-              onChange={(e) => setVideo(e.target.files[0])}
-            />
-          </div>
-
-          {/* Image Uploads */}
-          <div className="border p-3 rounded-md">
-            <label className="block text-gray-700 mb-2 font-semibold">
-              Hotel Images (Main Image is Required)
-            </label>
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage(e.target.files[0])}
+            {key === "category" ? (
+              <select
+                name={key}
+                value={formDataFields[key]}
+                onChange={handleInputChange}
+                className="w-full border px-3 py-2 rounded-md outline-none"
                 required
-              />
+              >
+                <option value="villa">Villa</option>
+                <option value="hotel">Hotel</option>
+                <option value="restaurant">Restaurant</option>
+                <option value="house">House</option>
+              </select>
+            ) : key === "rating" ? (
+              <select
+                name={key}
+                value={formDataFields[key]}
+                onChange={handleInputChange}
+                className="w-full border px-3 py-2 rounded-md outline-none"
+              >
+                <option value="5">5 Star</option>
+                <option value="4">4 Star</option>
+                <option value="3">3 Star</option>
+                <option value="2">2 Star</option>
+                <option value="1">1 Star</option>
+              </select>
+            ) : key === "district" ? (
+              <select
+                name={key}
+                value={formDataFields[key]}
+                onChange={handleInputChange}
+                className="w-full border px-3 py-2 rounded-md outline-none"
+                required
+              >
+                <option value="">Select District</option>
+                <option value="Colombo">Colombo</option>
+                <option value="Galle">Galle</option>
+                <option value="Kandy">Kandy</option>
+                <option value="Jaffna">Jaffna</option>
+                <option value="Matara">Matara</option>
+                <option value="Negombo">Negombo</option>
+                <option value="Anuradhapura">Anuradhapura</option>
+                <option value="Trincomalee">Trincomalee</option>
+                <option value="Batticaloa">Batticaloa</option>
+                <option value="Ampara">Ampara</option>
+                <option value="Nuwara Eliya">Nuwara Eliya</option>
+                <option value="Ratnapura">Ratnapura</option>
+                <option value="Badulla">Badulla</option>
+                <option value="Kurunegala">Kurunegala</option>
+                <option value="Puttalam">Puttalam</option>
+                <option value="Vavuniya">Vavuniya</option>
+                <option value="Mullativu">Mullativu</option>
+                <option value="Monaragala">Monaragala</option>
+                <option value="Matale">Matale</option>
+              </select>
+            ) : key === "price" ? (
               <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage1(e.target.files[0])}
+                type="number"
+                name={key}
+                value={formDataFields[key]}
+                onChange={handleInputChange}
+                className="w-full border px-3 py-2 rounded-md outline-none"
+                required
+                placeholder="Enter price (e.g., 5000)"
+                min="0"
+                step="0.01"
               />
+            ) : (
               <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage2(e.target.files[0])}
-              /> {/* ✅ FIXED LINE */}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage3(e.target.files[0])}
+                type={key === "ownerEmail" ? "email" : "text"}
+                name={key}
+                value={formDataFields[key]}
+                onChange={handleInputChange}
+                className="w-full border px-3 py-2 rounded-md outline-none"
+                required={[
+                  "name",
+                  "description",
+                  "category",
+                  "district",
+                  "price",
+                  "ownerEmail",
+                ].includes(key)}
+                placeholder={
+                  key === "availableThings" ? "Comma separated items" : ""
+                }
               />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage4(e.target.files[0])}
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage5(e.target.files[0])}
-              />
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setImage6(e.target.files[0])}
-              />
-            </div>
+            )}
           </div>
+        ))}
+
+        {/* MAIN IMAGE UPLOAD */}
+        <div className="border p-3 rounded-md bg-blue-50">
+          <label className="block text-gray-700 mb-2 font-semibold">
+            Main Image (Required - Used on Cards)
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setMedia({ ...media, mainImage: e.target.files[0] })
+            }
+            required
+          />
+          <p className="text-sm text-gray-600 mt-2">
+            This image will be displayed on hotel cards.
+          </p>
+        </div>
+
+        {/* ADDITIONAL IMAGES UPLOAD */}
+        <div className="border p-3 rounded-md">
+          <label className="block text-gray-700 mb-2 font-semibold">
+            Additional Hotel Images (Required)
+          </label>
+          <input
+            key="images"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={handleMultipleFiles}
+            required
+          />
+          <p className="text-sm text-gray-500 mt-2">
+            Upload additional images for the gallery. Users can click the "+N"
+            badge to view all.
+          </p>
+        </div>
+
+        {/* VIDEO UPLOAD */}
+        <div className="border p-3 rounded-md">
+          <label className="block text-gray-700 mb-1 font-semibold">
+            Optional Hotel Promotional Video
+          </label>
+          <input
+            type="file"
+            accept="video/*"
+            onChange={(e) => handleFileChange(e, "video")}
+          />
         </div>
 
         <button

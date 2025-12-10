@@ -1,146 +1,229 @@
 import TrendingModel from "../schema/trendingScehema.js";
 import cloudinary from "../cloudinary/cloudinary.js";
+import nodemailer from "nodemailer";
 
-// Helper function to upload files (images or video) to Cloudinary
+// --------------------------------------------------------
+// Helper to upload image/video to Cloudinary
+// --------------------------------------------------------
 const uploadToCloudinary = async (file, resourceType = "image") => {
-    if (!file) return null;
-    try {
-        const result = await cloudinary.uploader.upload(file.path, { 
-            resource_type: resourceType,
-            // Optional: specify a folder for better organization
-            folder: `trending/${resourceType}s`,
-        });
-        return result.secure_url;
-    } catch (error) {
-        // Log the error but return null so the primary process can continue
-        console.error(`Cloudinary upload failed for ${resourceType}:`, error);
-        return null; 
-    }
+  if (!file) return null;
+  try {
+    const result = await cloudinary.uploader.upload(file.path, {
+      resource_type: resourceType,
+      folder: `trending/${resourceType}s`,
+    });
+    return result.secure_url;
+  } catch (error) {
+    console.error(`Cloudinary upload failed for ${resourceType}:`, error);
+    return null;
+  }
 };
 
-
+// --------------------------------------------------------
+// ADD TRENDING CONTROLLER
+// --------------------------------------------------------
 const addtrending = async (req, res) => {
-    try {
-        const {
-            name,
-            subname,
-            description,
-            availableThings,
-            // REMOVED: perPersonPrice and familyPackagePrice
-            location,
-            highlights,
-            address,
-            contact,
-        } = req.body;
+  try {
+    const {
+      name,
+      description,
+      category,
+      rating,
+      district,
+      price,
+      availableThings,
+      location,
+      highlights,
+      address,
+      contact,
+      ownerEmail, // NEW FIELD: Owner Email
+    } = req.body;
 
-        // The optional video file is expected from multer at req.files.video
-        const videoFile = req.files.video?.[0]; 
+    // --------------------- Prepare Image Uploads ---------------------
+    // Collect main image first, then all other images
+    let fileList = [];
 
-        // ✅ Validate required fields
-        if (!name || !subname || !description || !req.files?.image) {
-            return res.status(400).json({ success: false, message: "Missing required fields (Name, Subname, Description, Main Image)" });
-        }
-
-        // 1. Prepare Image Files
-        const imageFiles = [
-            req.files.image?.[0],   // main image (required)
-            req.files.image1?.[0],
-            req.files.image2?.[0],
-            req.files.image3?.[0],
-            req.files.image4?.[0],
-            req.files.image5?.[0],
-            req.files.image6?.[0],
-        ];
-
-        // 2. Upload Images concurrently
-        const imageUrls = await Promise.all(
-            imageFiles.map(file => uploadToCloudinary(file, "image"))
-        );
-        
-        // Ensure required main image was uploaded successfully
-        if (!imageUrls[0]) {
-             return res.status(500).json({ success: false, message: "Main image upload failed to Cloudinary." });
-        }
-        
-        // 3. Upload Video (Optional)
-        let videoUrl = null;
-        if (videoFile) {
-            // Use the helper with resourceType set to "video"
-            videoUrl = await uploadToCloudinary(videoFile, "video");
-            if (!videoUrl) {
-                 console.warn("Optional video upload failed for:", name);
-            }
-        }
-
-        // ✅ Prepare data to save in DB
-        const trendingData = {
-            name,
-            subname,
-            description,
-            videoUrl, // <-- ADDED: Include the optional video URL
-            
-            // Image URLs
-            image: imageUrls[0],
-            image1: imageUrls[1],
-            image2: imageUrls[2],
-            image3: imageUrls[3],
-            image4: imageUrls[4],
-            image5: imageUrls[5],
-            image6: imageUrls[6],
-            
-            location,
-            highlights,
-            address,
-            contact,
-            // Process availableThings from comma-separated string
-            availableThings: availableThings
-                ? availableThings.split(',').map(item => item.trim()).filter(item => item.length > 0)
-                : [],
-            
-            // PRICE FIELDS REMOVED: perPersonPrice and familyPackagePrice are now gone.
-        };
-        
-
-        // ✅ Save to MongoDB
-        const trendingItem = new TrendingModel(trendingData);
-        await trendingItem.save();
-
-        res.json({ success: true, message: "Trending item added successfully" });
-    } catch (error) {
-        console.error("Error adding trending:", error);
-        res.status(500).json({ success: false, message: "Something went wrong" });
+    // Add main image (required)
+    if (req.files?.mainImage?.[0]) {
+      fileList.push(req.files.mainImage[0]);
     }
+
+    // Add additional images
+    if (Array.isArray(req.files?.images)) {
+      fileList.push(...req.files.images);
+    }
+
+    // Also collect legacy single image fields for backward compatibility
+    const explicitFields = [
+      "image",
+      "image1",
+      "image2",
+      "image3",
+      "image4",
+      "image5",
+      "image6",
+    ];
+    explicitFields.forEach((f) => {
+      if (Array.isArray(req.files?.[f])) fileList.push(...req.files[f]);
+    });
+
+    // Validate required main image presence
+    if (fileList.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message:
+          "Missing required fields (Main image and at least one additional image are required).",
+      });
+    }
+
+    const imageUrls = await Promise.all(
+      fileList.map((file) => uploadToCloudinary(file, "image"))
+    );
+
+    if (!imageUrls || imageUrls.length === 0 || !imageUrls[0]) {
+      return res
+        .status(500)
+        .json({ success: false, message: "Main image upload failed." });
+    }
+
+    // --------------------- Optional Video Upload ---------------------
+    const videoFile = req.files.video?.[0];
+    let videoUrl = null;
+    if (videoFile) {
+      videoUrl = await uploadToCloudinary(videoFile, "video");
+      if (!videoUrl) console.warn("Optional video upload failed for:", name);
+    }
+
+    // --------------------- Save Trending Data ---------------------
+    const trendingData = {
+      name,
+      description,
+      category,
+      rating: rating ? parseInt(rating) : 5,
+      district,
+      price: parseFloat(price),
+      videoUrl,
+      // Save array of uploaded image URLs and also populate legacy fields for compatibility
+      images: imageUrls,
+      image: imageUrls[0],
+      image1: imageUrls[1] || null,
+      image2: imageUrls[2] || null,
+      image3: imageUrls[3] || null,
+      image4: imageUrls[4] || null,
+      image5: imageUrls[5] || null,
+      image6: imageUrls[6] || null,
+      location,
+      highlights,
+      address,
+      contact,
+      ownerEmail,
+      availableThings: availableThings
+        ? availableThings.split(",").map((item) => item.trim())
+        : [],
+    };
+
+    const trendingItem = new TrendingModel(trendingData);
+    await trendingItem.save();
+
+    res.json({ success: true, message: "Trending item added successfully" });
+  } catch (error) {
+    console.error("Error adding trending:", error);
+    res.status(500).json({ success: false, message: "Something went wrong" });
+  }
 };
 
-export { addtrending };
-
-
-// The delete function remains unchanged
+// --------------------------------------------------------
+// DELETE TRENDING CONTROLLER
+// --------------------------------------------------------
 const deleteTrendingByName = async (req, res) => {
-    const { name } = req.params;
-
-    try {
-        // Find the trending item by name and delete it
-        const deletedTrending = await TrendingModel.findOneAndDelete({ name });
-
-        if (!deletedTrending) {
-            return res.status(404).json({
-                success: false,
-                message: `Trending item with name "${name}" not found`,
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: `Trending item "${name}" deleted successfully`,
-        });
-    } catch (error) {
-        console.error("Error deleting trending item:", error);
-        res.status(500).json({
-            success: false,
-            message: "Server error while deleting trending item",
-        });
+  const { name } = req.params;
+  try {
+    const deletedTrending = await TrendingModel.findOneAndDelete({ name });
+    if (!deletedTrending) {
+      return res.status(404).json({
+        success: false,
+        message: `Trending item with name "${name}" not found`,
+      });
     }
+    res.json({
+      success: true,
+      message: `Trending item "${name}" deleted successfully`,
+    });
+  } catch (error) {
+    console.error("Error deleting trending item:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error while deleting trending item",
+    });
+  }
 };
 
-export { deleteTrendingByName };
+// --------------------------------------------------------
+// OPTIONAL: Send Booking Email to Owner
+// --------------------------------------------------------
+const sendBooking = async (req, res) => {
+  try {
+    const { hotelName, ownerEmail, booking } = req.body;
+
+    if (!hotelName || !ownerEmail || !booking) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required booking details",
+      });
+    }
+
+    // Format booking details
+    const { name, email, phone, date, guests } = booking;
+
+    // Transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER, // your Gmail
+        pass: process.env.EMAIL_PASS, // app password
+      },
+    });
+
+    // Email content
+    const mailOptions = {
+      from: `Travel Booking <${process.env.EMAIL_USER}>`,
+      to: ownerEmail, // send to hotel owner
+      subject: `New Booking Request - ${hotelName}`,
+      html: `
+        <h2>New Booking Request</h2>
+        <p>A customer has submitted a booking request for your hotel.</p>
+
+        <h3>Hotel Details</h3>
+        <p><strong>Hotel:</strong> ${hotelName}</p>
+
+        <h3>Customer Information</h3>
+        <p><strong>Name:</strong> ${name}</p>
+        <p><strong>Email:</strong> ${email}</p>
+        <p><strong>Phone:</strong> ${phone}</p>
+
+        <h3>Booking Information</h3>
+        <p><strong>Date:</strong> ${date}</p>
+        <p><strong>Guests:</strong> ${guests}</p>
+
+        <br/>
+        <p>Please contact the customer to confirm the booking.</p>
+      `,
+    };
+
+    // Send email
+    await transporter.sendMail(mailOptions);
+
+    res.json({
+      success: true,
+      message: "Booking email sent successfully",
+    });
+  } catch (error) {
+    console.error("Email sending error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error sending booking email",
+    });
+  }
+};
+
+export { addtrending, deleteTrendingByName, sendBooking };

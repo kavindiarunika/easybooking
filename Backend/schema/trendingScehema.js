@@ -1,36 +1,39 @@
 import mongoose from "mongoose";
 
-const trendingSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  subname: { type: String, required: true },
-  description: { type: String, required: true },
+const TrendingSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    description: { type: String, required: true },
+    category: {
+      type: String,
+      enum: ["restaurant", "villa", "hotel", "house"],
+      required: true,
+    },
+    rating: { type: Number, min: 1, max: 5, default: 5 },
+    district: { type: String, required: true },
+    price: { type: Number, required: true },
+    images: [String],
 
-  // New field for the optional video URL (not required)
-  videoUrl: { type: String }, 
+    image: String,
+    image1: String,
+    image2: String,
+    image3: String,
+    image4: String,
+    image5: String,
+    image6: String,
 
-  // Images
-  image: { type: String, required: true },   // Main image
-  image1: { type: String, required: true },
-  image2: { type: String, required: true },
-  image3: { type: String, required: true },
-  image4: { type: String, required: true },
-  image5: { type: String, required: true },
-  image6: { type: String, required: true },
+    videoUrl: String,
 
-  // Optional Info
-  location: { type: String },
-  highlights: { type: String },
-  address: { type: String },
-  contact: { type: String },
+    location: String,
+    highlights: String,
+    address: String,
+    contact: String,
 
-  // Other fields
-  availableThings: [{ type: String }],    // Array of available things
+    ownerEmail: { type: String, required: true }, // ✅ ADDED FOR EMAIL SENDING
 
-  // PRICE FIELDS REMOVED:
-  // perPersonPrice: { type: Number },
-  // familyPackagePrice: { type: String }, 
+    availableThings: [String],
+  },
+  { timestamps: true }
+);
 
-}, { minimize: false, timestamps: true });
-
-const TrendingModel = mongoose.models.Trending || mongoose.model("Trending", trendingSchema);
-export default TrendingModel;
+export default mongoose.model("Trending", TrendingSchema);
