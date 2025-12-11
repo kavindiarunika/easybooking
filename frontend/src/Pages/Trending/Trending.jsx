@@ -1,0 +1,283 @@
+import React, { useContext, useState } from "react";
+import { useParams } from "react-router-dom";
+import { IoArrowBackOutline } from "react-icons/io5";
+import { TravelContext } from "../../Context/TravelContext";
+import {
+  FaMapMarkerAlt,
+  FaStar,
+  FaAddressBook,
+  FaPhoneAlt,
+} from "react-icons/fa";
+import axios from "axios";
+import { BACKEND_URL } from "../../App";
+
+// ---------------- Helper Components ----------------
+const InfoCard = ({ icon, title, value }) => (
+  <div className="flex items-center gap-3 bg-gray-800/50 p-4 rounded-xl shadow hover:bg-gray-800/70 transition w-full">
+    {icon}
+    <div>
+      <p className="font-semibold">{title}</p>
+      <p className="text-blue-200">{value}</p>
+    </div>
+  </div>
+);
+
+const TextInput = ({
+  label,
+  name,
+  value,
+  handleChange,
+  type = "text",
+  readOnly,
+  min,
+  required,
+  placeholder,
+}) => (
+  <div className="flex flex-col">
+    <label className="mb-1 text-gray-200">{label}</label>
+    <input
+      type={type}
+      name={name}
+      value={value}
+      onChange={handleChange}
+      readOnly={readOnly}
+      min={min}
+      placeholder={placeholder}
+      className={`p-2 rounded-md ${
+        readOnly
+          ? "bg-gray-600 text-gray-300 cursor-not-allowed"
+          : "bg-gray-700 text-white focus:outline-none"
+      }`}
+      required={required}
+    />
+  </div>
+);
+
+const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
+  <div className="lg:w-1/3 bg-gray-800/50 p-6 rounded-2xl shadow-lg">
+    <h3 className="text-2xl font-bold mb-6 text-amber-300">Book Your Stay</h3>
+    <form className="space-y-4" onSubmit={handleSubmit}>
+      <TextInput
+        label="Hotel / Resort"
+        name="hotel"
+        value={item.name}
+        readOnly
+      />
+      <TextInput
+        label="Name"
+        name="name"
+        value={booking.name}
+        handleChange={handleChange}
+        required
+      />
+      <TextInput
+        label="Email"
+        name="email"
+        type="email"
+        value={booking.email}
+        handleChange={handleChange}
+        required
+      />
+      <TextInput
+        label="Phone Number"
+        name="phone"
+        type="tel"
+        value={booking.phone}
+        handleChange={handleChange}
+        placeholder="+94 7X XXX XXXX"
+        required
+      />
+      <TextInput
+        label="Date"
+        name="date"
+        type="date"
+        value={booking.date}
+        handleChange={handleChange}
+        required
+      />
+      <TextInput
+        label="Guests"
+        name="guests"
+        type="number"
+        min={1}
+        value={booking.guests}
+        handleChange={handleChange}
+        required
+      />
+
+      <button
+        type="submit"
+        className="w-full bg-amber-400 hover:bg-amber-300 text-gray-900 font-semibold p-3 rounded-md transition"
+      >
+        Book Now
+      </button>
+    </form>
+  </div>
+);
+
+// ---------------- Main Component ----------------
+const Trending = () => {
+  const { navigate, addtrend } = useContext(TravelContext);
+  const { name } = useParams();
+  const item = addtrend.find((trending) => trending.name === name);
+
+  const [booking, setBooking] = useState({
+    name: "",
+    email: "",
+    phone: "",
+    date: "",
+    guests: 1,
+    hotel: item?.name || "",
+  });
+
+  const handleChange = (e) => {
+    setBooking({ ...booking, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Validate form fields
+    if (!booking.name || !booking.email || !booking.phone || !booking.date) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // Ensure we have an owner email to send the booking to
+    if (!item?.ownerEmail) {
+      console.error("Missing ownerEmail on item:", item);
+      alert("Booking cannot be sent because the owner's email is missing.");
+      return;
+    }
+
+    try {
+      // Build payload and log for debugging
+      const payload = {
+        hotelName: item.name,
+        ownerEmail: item.ownerEmail,
+        booking,
+      };
+      console.log("Sending booking payload:", payload);
+
+      const res = await axios.post(
+        `${BACKEND_URL}/api/trending/sendbooking`,
+        payload
+      );
+
+      if (res?.data?.success) {
+        alert("Booking request sent successfully!");
+      } else {
+        alert(res?.data?.message || "Booking request sent (no confirmation)");
+      }
+
+      // Reset form after submission
+      setBooking({
+        name: "",
+        email: "",
+        phone: "",
+        date: "",
+        guests: 1,
+        hotel: item.name,
+      });
+    } catch (error) {
+      console.error("Error sending booking email:", error?.response || error);
+      const serverMsg = error?.response?.data?.message || error?.message;
+      alert(`Failed to send booking: ${serverMsg}`);
+    }
+  };
+
+  if (!item) return <div className="text-white p-10">Loading...</div>;
+
+  return (
+    <div className="bg-gray-900 text-white min-h-screen px-4 sm:px-8 lg:px-16 py-10">
+      <p className="w-full h-24"></p>
+
+      {/* Back & Title */}
+      <div className="flex flex-row items-center gap-6 mb-8">
+        <button
+          onClick={() => navigate("/")}
+          className="flex items-center justify-center text-white hover:text-amber-300 transition"
+        >
+          <IoArrowBackOutline size={28} />
+        </button>
+        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
+          <h1 className="text-2xl sm:text-4xl font-bold text-cyan-400">
+            {item.name}
+          </h1>
+        </div>
+      </div>
+
+      {/* Gallery */}
+      <div className="grid grid-cols-3 grid-rows-2 gap-4 mb-12">
+        {/* Main image - large, takes up 2 cols and 2 rows */}
+        <div className="col-span-2 row-span-2 overflow-hidden rounded-2xl shadow-lg group max-h-96">
+          <img
+            src={item.image || item.image1}
+            alt={`${item.name} main`}
+            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+          />
+        </div>
+
+        {/* Additional images - smaller thumbnails */}
+        {[item.image2, item.image3, item.image4, item.image5].map(
+          (img, i) =>
+            img && (
+              <div
+                key={i}
+                className="overflow-hidden rounded-2xl shadow-lg group max-h-44"
+              >
+                <img
+                  src={img}
+                  alt={`${item.name} ${i + 2}`}
+                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                />
+              </div>
+            )
+        )}
+      </div>
+
+      {/* Two Column Layout */}
+      <div className="flex flex-col lg:flex-row gap-12">
+        {/* Left Side */}
+        <div className="lg:w-2/3 space-y-10">
+          <InfoCard
+            icon={<FaMapMarkerAlt className="text-red-500" />}
+            title="Location"
+            value={item.location}
+          />
+          <InfoCard
+            icon={<FaStar className="text-yellow-400" />}
+            title="Highlights"
+            value={item.highlights}
+          />
+          <InfoCard
+            icon={<FaAddressBook className="text-emerald-400" />}
+            title="Address"
+            value={item.address}
+          />
+          <InfoCard
+            icon={<FaPhoneAlt className="text-red-400" />}
+            title="Contact"
+            value={item.contact}
+          />
+          <div className="bg-gray-800/50 p-4 rounded-xl shadow">
+            <p className="font-semibold">Description</p>
+            <p className="text-blue-200">{item.description}</p>
+          </div>
+        </div>
+
+        {/* Right Side - Booking Form */}
+        <FormSection
+          booking={booking}
+          item={item}
+          handleChange={handleChange}
+          handleSubmit={handleSubmit}
+        />
+      </div>
+
+      <div className="h-20"></div>
+    </div>
+  );
+};
+
+export default Trending;
