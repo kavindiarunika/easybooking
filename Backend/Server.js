@@ -1,10 +1,10 @@
-import express from 'express';
-import cors from 'cors';
-import 'dotenv/config'; 
-import connectDB from './config/mongodb.js';
+import express from "express";
+import cors from "cors";
+import "dotenv/config";
+import connectDB from "./config/mongodb.js";
 
-import trendrouter from './router/trendingRouter.js';
-import loginrouter from './controller/logincontroller.js'; 
+import trendrouter from "./router/trendingRouter.js";
+import loginrouter from "./controller/logincontroller.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -15,9 +15,18 @@ connectDB();
 // -------------------- 2. GLOBAL MIDDLEWARE --------------------
 
 const allowedOrigins = [
-  'http://localhost:5173', 
-  'http://localhost:5237',
- 
+  "http://localhost:5173",
+  "http://localhost:5237",
+
+  // Production domains
+  "https://smartsbooking.com",
+  "http://smartsbooking.com",
+  "https://www.smartsbooking.com",
+  "http://www.smartsbooking.com",
+
+  // Admin panel domains
+  "https://admin.smartsbooking.com",
+  "http://admin.smartsbooking.com",
 ];
 
 app.use(
@@ -29,12 +38,12 @@ app.use(
       } else {
         // Log the error for debugging purposes
         console.error(`CORS Blocked: Origin ${origin} not in allowed list.`);
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error("Not allowed by CORS"));
       }
     },
-    credentials: true, 
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -44,7 +53,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // Debug logger
 app.use((req, res, next) => {
-  console.log('Incoming request:', req.method, req.path);
+  console.log("Incoming request:", req.method, req.path);
   next();
 });
 
@@ -53,15 +62,19 @@ app.use((req, res, next) => {
 // -------------------- 4. ROUTES --------------------
 
 // Login/Admin route
-app.use('/api/admin', loginrouter);
+app.use("/api/admin", loginrouter);
 
 // Protected API routes
-app.use('/api/trending', trendrouter);
+app.use("/api/trending", trendrouter);
 
 // -------------------- 5. ROOT & SERVER START --------------------
 
-app.get('/', (req, res) => res.send('API working.'));
+app.get("/", (req, res) => res.send("API working."));
 
-app.listen(port, () => 
-  console.log(`Server starting on port ${port} in ${process.env.NODE_ENV || 'development'} mode.`)
+app.listen(port, () =>
+  console.log(
+    `Server starting on port ${port} in ${
+      process.env.NODE_ENV || "development"
+    } mode.`
+  )
 );
