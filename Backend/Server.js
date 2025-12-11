@@ -17,13 +17,7 @@ connectDB();
 const allowedOrigins = [
   'http://localhost:5173', 
   'http://localhost:5237',
-  'https://ceejeey.me', 
-  'http://nadevillasandtours.com',
-  'https://nadevillasandtours.com',
-  'http://www.nadevillasandtours.com',
-  'https://www.nadevillasandtours.com',
-  'http://admin.nadevillasandtours.com',
-  'https://admin.nadevillasandtours.com'
+ 
 ];
 
 app.use(
