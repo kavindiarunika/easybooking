@@ -19,14 +19,14 @@ const allowedOrigins = [
   "http://localhost:5237",
 
   // Production domains
-  "https://smartsbooking.com",
-  "http://smartsbooking.com",
-  "https://www.smartsbooking.com",
-  "http://www.smartsbooking.com",
+  "https://smartsbooking.com", 
+  "http://smartsbooking.com", 
+  "https://www.smartsbooking.com", 
+  "http://www.smartsbooking.com", 
 
   // Admin panel domains
-  "https://admin.smartsbooking.com",
-  "http://admin.smartsbooking.com",
+  "https://admin.smartsbooking.com", 
+  "http://admin.smartsbooking.com", 
 ];
 
 app.use(
