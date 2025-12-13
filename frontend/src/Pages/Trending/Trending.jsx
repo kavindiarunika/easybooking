@@ -7,9 +7,11 @@ import {
   FaStar,
   FaAddressBook,
   FaPhoneAlt,
+  FaDollarSign,
 } from "react-icons/fa";
 import axios from "axios";
 import { BACKEND_URL } from "../../App";
+import { FaWhatsapp } from "react-icons/fa";
 
 // ---------------- Helper Components ----------------
 const InfoCard = ({ icon, title, value }) => (
@@ -54,7 +56,14 @@ const TextInput = ({
 );
 
 const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
-  <div className="lg:w-1/3 bg-gray-800/50 p-6 rounded-2xl shadow-lg">
+  <div className="lg:w-1/3">
+    <div>
+    <h1 className="text-blue-500">{item.category} {"  "} Video  Link</h1>  
+
+
+    </div>
+
+  <div className=" bg-gray-800/50  p-6 rounded-xl shadow">
     <h3 className="text-2xl font-bold mb-6 text-amber-300">Book Your Stay</h3>
     <form className="space-y-4" onSubmit={handleSubmit}>
       <TextInput
@@ -88,10 +97,19 @@ const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
         required
       />
       <TextInput
-        label="Date"
-        name="date"
+        label="From"
+        name="fromDate"
         type="date"
-        value={booking.date}
+        value={booking.fromDate}
+        handleChange={handleChange}
+        required
+      />
+
+      <TextInput
+        label="To"
+        name="toDate"
+        type="date"
+        value={booking.toDate}
         handleChange={handleChange}
         required
       />
@@ -113,6 +131,7 @@ const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
       </button>
     </form>
   </div>
+  </div>
 );
 
 // ---------------- Main Component ----------------
@@ -125,7 +144,8 @@ const Trending = () => {
     name: "",
     email: "",
     phone: "",
-    date: "",
+    fromDate: "",
+    toDate: "",
     guests: 1,
     hotel: item?.name || "",
   });
@@ -138,7 +158,13 @@ const Trending = () => {
     e.preventDefault();
 
     // Validate form fields
-    if (!booking.name || !booking.email || !booking.phone || !booking.date) {
+    if (
+      !booking.name ||
+      !booking.email ||
+      !booking.phone ||
+      !booking.fromDate ||
+      !booking.toDate
+    ) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -175,7 +201,8 @@ const Trending = () => {
         name: "",
         email: "",
         phone: "",
-        date: "",
+        fromDate: "",
+        toDate: "",
         guests: 1,
         hotel: item.name,
       });
@@ -260,6 +287,24 @@ const Trending = () => {
             title="Contact"
             value={item.contact}
           />
+          <InfoCard
+            icon={<FaDollarSign className="text-red-400" />}
+            title="Price per person per day(RS.)"
+            value={item.price}
+          />
+          <InfoCard
+            title="Availability"
+            value={
+              <ul className="list-disc list-inside mt-1 ml-4">
+                {item.availableThings.map((thing, index) => (
+                  <li key={index} className="mt-1">
+                    {thing}
+                  </li>
+                ))}
+              </ul>
+            }
+          />
+
           <div className="bg-gray-800/50 p-4 rounded-xl shadow">
             <p className="font-semibold">Description</p>
             <p className="text-blue-200">{item.description}</p>
@@ -276,6 +321,15 @@ const Trending = () => {
       </div>
 
       <div className="h-20"></div>
+
+      <a
+        href={`https://wa.me/${item.contact.replace(/\D/g, "")}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition transform hover:scale-110"
+      >
+        <FaWhatsapp size={28} />
+      </a>
     </div>
   );
 };

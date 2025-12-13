@@ -16,7 +16,7 @@ const Header = () => {
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
         {/* Logo */}
         <Link to="./">
-          <img src={assets.logo} alt="logo" className="w-32" />
+          <img src={assets.logo} alt="logo" className="w-24" />
         </Link>
 
         {/* Navbar Links */}
@@ -25,7 +25,7 @@ const Header = () => {
             {[
               { name: "Home", path: "./" },
               { name: "About Sri Lanka", path: "/", onClick: handleSpecial },
-              { name: "Booking", path: "/villa" },
+              { name: "stays", path: "/villa" },
             ].map((item, index) => (
               <li key={index} className="relative group cursor-pointer pb-1">
                 <NavLink

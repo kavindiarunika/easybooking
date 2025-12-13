@@ -17,7 +17,7 @@ const Footer = () => {
         {/* Logo + About */}
         <div>
           <div className="flex items-center gap-3 mb-4">
-            <img src={assets.logo} alt="logo" className="w-24 sm:w-64 h-auto" />
+            <img src={assets.logo} alt="logo" className="w-24 sm:w-52 h-auto" />
          
           </div>
           <p className="text-gray-300 text-sm leading-relaxed">
@@ -46,20 +46,13 @@ const Footer = () => {
                 About Us
               </Link>
             </li>
-            <li>
-              <Link
-                to="/villa"
-                className="hover:text-green-400 transition-all duration-300"
-              >
-                Luxury Villas
-              </Link>
-            </li>
+          
             <li>
               <Link
                 to="/trending"
                 className="hover:text-green-400 transition-all duration-300"
               >
-                Trending Hotels
+                 Hotels
               </Link>
             </li>
           </ul>
@@ -69,17 +62,15 @@ const Footer = () => {
         <div>
           <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
           <ul className="flex flex-col gap-3 text-sm text-gray-300">
-            <li className="flex items-center gap-2 hover:text-green-400 transition">
-              <FaMapMarkerAlt className="text-green-400" />
-              Colombo, Sri Lanka
-            </li>
+           
+              
             <li className="flex items-center gap-2 hover:text-green-400 transition">
               <FaEnvelope className="text-green-400" />
-              nadevillasandtours21@gmail.com
+             codebuilterit@gmail.com
             </li>
             <li className="flex items-center gap-2 hover:text-green-400 transition">
               <FaPhone className="text-green-400" />
-              +94 71 978 0312
+            076 211 2626
             </li>
           </ul>
         </div>
@@ -115,10 +106,10 @@ const Footer = () => {
 
       {/* Bottom */}
       <div className="border-t border-green-700 mt-12 pt-6 text-center text-sm text-gray-400">
-        © {new Date().getFullYear()} Nadee Villa & Tourism. All rights reserved.
+        © {new Date().getFullYear()} codebuilder (pvt) ltd.
         <br />
         <span className="text-gray-500">
-          Crafted with ❤️ in Sri Lanka — Explore. Dream. Discover.
+       http://Codebuilder.it.com
         </span>
       </div>
     </footer>
