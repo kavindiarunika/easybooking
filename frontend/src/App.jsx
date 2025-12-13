@@ -13,6 +13,7 @@ import "slick-carousel/slick/slick-theme.css";
 
 import Villa from "./Pages/villas/Villa";
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
 
 const App = () => {
