@@ -17,13 +17,13 @@ const AddTrending = ({ token }) => {
     address: "",
     contact: "",
     ownerEmail: "",
+    videoUrl: "",
     availableThings: "",
   });
 
   const [media, setMedia] = useState({
     mainImage: null,
     images: [],
-    video: null,
   });
 
   // ------------------ HANDLE TEXT INPUT ------------------
@@ -87,8 +87,7 @@ const AddTrending = ({ token }) => {
       media.images.forEach((file) => formData.append("images", file));
     }
 
-    // keep supporting legacy single-file fields if present (video)
-    if (media.video) formData.append("video", media.video);
+    // Video URL is included in `formDataFields` and appended above
 
     try {
       const response = await axios.post(
@@ -117,13 +116,13 @@ const AddTrending = ({ token }) => {
           address: "",
           contact: "",
           ownerEmail: "",
+          videoUrl: "",
           availableThings: "",
         });
 
         setMedia({
           mainImage: null,
           images: [],
-          video: null,
         });
 
         document.querySelectorAll('input[type="file"]').forEach((input) => {
@@ -277,16 +276,24 @@ const AddTrending = ({ token }) => {
           </p>
         </div>
 
-        {/* VIDEO UPLOAD */}
+        {/* VIDEO URL */}
         <div className="border p-3 rounded-md">
           <label className="block text-gray-700 mb-1 font-semibold">
-            Optional Hotel Promotional Video
+            Optional Hotel Promotional Video URL
           </label>
-          <input
-            type="file"
-            accept="video/*"
-            onChange={(e) => handleFileChange(e, "video")}
-          />
+          <div>
+            <input
+              type="url"
+              name="videoUrl"
+              value={formDataFields.videoUrl}
+              onChange={handleInputChange}
+              placeholder="https://example.com/video.mp4"
+              className="w-full border px-3 py-2 rounded-md outline-none"
+            />
+          </div>
+          <p className="text-sm text-gray-600 mt-2">
+            Provide a direct video URL (e.g., .mp4) or any valid link.
+          </p>
         </div>
 
         <button

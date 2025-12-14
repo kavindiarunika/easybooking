@@ -86,13 +86,11 @@ const addtrending = async (req, res) => {
         .json({ success: false, message: "Main image upload failed." });
     }
 
-    // --------------------- Optional Video Upload ---------------------
-    const videoFile = req.files.video?.[0];
-    let videoUrl = null;
-    if (videoFile) {
-      videoUrl = await uploadToCloudinary(videoFile, "video");
-      if (!videoUrl) console.warn("Optional video upload failed for:", name);
-    }
+    // --------------------- Optional Video URL (from body) ---------------------
+    // Previously we accepted an uploaded video file. Now we expect a URL string.
+    let videoUrl = req.body.videoUrl || null;
+    if (videoUrl && typeof videoUrl === "string")
+      videoUrl = videoUrl.trim() || null;
 
     // --------------------- Save Trending Data ---------------------
     const trendingData = {

@@ -57,80 +57,74 @@ const TextInput = ({
 
 const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
   <div className="lg:w-1/3">
-    <div>
-    <h1 className="text-blue-500">{item.category} {"  "} Video  Link</h1>  
+    <div className=" bg-gray-800/50  p-6 rounded-xl shadow">
+      <h3 className="text-2xl font-bold mb-6 text-amber-300">Book Your Stay</h3>
+      <form className="space-y-4" onSubmit={handleSubmit}>
+        <TextInput
+          label="Hotel / Resort"
+          name="hotel"
+          value={item.name}
+          readOnly
+        />
+        <TextInput
+          label="Name"
+          name="name"
+          value={booking.name}
+          handleChange={handleChange}
+          required
+        />
+        <TextInput
+          label="Email"
+          name="email"
+          type="email"
+          value={booking.email}
+          handleChange={handleChange}
+          required
+        />
+        <TextInput
+          label="Phone Number"
+          name="phone"
+          type="tel"
+          value={booking.phone}
+          handleChange={handleChange}
+          placeholder="+94 7X XXX XXXX"
+          required
+        />
+        <TextInput
+          label="From"
+          name="fromDate"
+          type="date"
+          value={booking.fromDate}
+          handleChange={handleChange}
+          required
+        />
 
+        <TextInput
+          label="To"
+          name="toDate"
+          type="date"
+          value={booking.toDate}
+          handleChange={handleChange}
+          required
+        />
+        <TextInput
+          label="Guests"
+          name="guests"
+          type="number"
+          min={1}
+          value={booking.guests}
+          handleChange={handleChange}
+          required
+        />
 
+        <button
+          type="submit"
+          className="w-full bg-amber-400 hover:bg-amber-300 text-gray-900 font-semibold p-3 rounded-md transition"
+        >
+          Book Now
+        </button>
+      </form>
     </div>
-
-  <div className=" bg-gray-800/50  p-6 rounded-xl shadow">
-    <h3 className="text-2xl font-bold mb-6 text-amber-300">Book Your Stay</h3>
-    <form className="space-y-4" onSubmit={handleSubmit}>
-      <TextInput
-        label="Hotel / Resort"
-        name="hotel"
-        value={item.name}
-        readOnly
-      />
-      <TextInput
-        label="Name"
-        name="name"
-        value={booking.name}
-        handleChange={handleChange}
-        required
-      />
-      <TextInput
-        label="Email"
-        name="email"
-        type="email"
-        value={booking.email}
-        handleChange={handleChange}
-        required
-      />
-      <TextInput
-        label="Phone Number"
-        name="phone"
-        type="tel"
-        value={booking.phone}
-        handleChange={handleChange}
-        placeholder="+94 7X XXX XXXX"
-        required
-      />
-      <TextInput
-        label="From"
-        name="fromDate"
-        type="date"
-        value={booking.fromDate}
-        handleChange={handleChange}
-        required
-      />
-
-      <TextInput
-        label="To"
-        name="toDate"
-        type="date"
-        value={booking.toDate}
-        handleChange={handleChange}
-        required
-      />
-      <TextInput
-        label="Guests"
-        name="guests"
-        type="number"
-        min={1}
-        value={booking.guests}
-        handleChange={handleChange}
-        required
-      />
-
-      <button
-        type="submit"
-        className="w-full bg-amber-400 hover:bg-amber-300 text-gray-900 font-semibold p-3 rounded-md transition"
-      >
-        Book Now
-      </button>
-    </form>
-  </div>
   </div>
 );
 
@@ -264,6 +258,7 @@ const Trending = () => {
       </div>
 
       {/* Two Column Layout */}
+      {/* Video URL (display only, no embedding) */}
       <div className="flex flex-col lg:flex-row gap-12">
         {/* Left Side */}
         <div className="lg:w-2/3 space-y-10">
@@ -271,6 +266,29 @@ const Trending = () => {
             icon={<FaMapMarkerAlt className="text-red-500" />}
             title="Location"
             value={item.location}
+          />
+          <InfoCard
+            icon={<FaMapMarkerAlt className="text-red-500" />}
+            title="Location"
+            value={item.videoUrl}
+          />
+          <InfoCard
+            icon={<FaMapMarkerAlt className="text-red-500" />}
+            title="Video URL"
+            value={
+              item.videoUrl ? (
+                <a
+                  href={item.videoUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-300 underline"
+                >
+                  {item.videoUrl}
+                </a>
+              ) : (
+                "-"
+              )
+            }
           />
           <InfoCard
             icon={<FaStar className="text-yellow-400" />}

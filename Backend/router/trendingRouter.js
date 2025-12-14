@@ -11,7 +11,7 @@ import TrendingModel from "../schema/trendingScehema.js";
 
 const trendrouter = express.Router();
 
-// ✅ Configure multer to handle all images AND the optional video field
+// ✅ Configure multer to handle all image fields
 // Support mainImage (required), images array (additional images), and legacy single image fields
 const trendinguploadField = upload.fields([
   { name: "mainImage", maxCount: 1 }, // new: separate main image
@@ -23,7 +23,6 @@ const trendinguploadField = upload.fields([
   { name: "image4", maxCount: 1 },
   { name: "image5", maxCount: 1 },
   { name: "image6", maxCount: 1 },
-  { name: "video", maxCount: 1 },
 ]);
 
 // ➕ Add new trending item (admin only)
