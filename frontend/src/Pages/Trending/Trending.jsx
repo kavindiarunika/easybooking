@@ -2,6 +2,8 @@ import React, { useContext, useState } from "react";
 import { useParams } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { TravelContext } from "../../Context/TravelContext";
+
+import { FaYoutube } from "react-icons/fa";
 import {
   FaMapMarkerAlt,
   FaStar,
@@ -133,6 +135,7 @@ const Trending = () => {
   const { navigate, addtrend } = useContext(TravelContext);
   const { name } = useParams();
   const item = addtrend.find((trending) => trending.name === name);
+  console.log("ITEM DATA:", item);
 
   const [booking, setBooking] = useState({
     name: "",
@@ -263,27 +266,35 @@ const Trending = () => {
         {/* Left Side */}
         <div className="lg:w-2/3 space-y-10">
           <InfoCard
-            icon={<FaMapMarkerAlt className="text-red-500" />}
-            title="Location"
-            value={item.location}
-          />
-          <InfoCard
-            icon={<FaMapMarkerAlt className="text-red-500" />}
-            title="Location"
-            value={item.videoUrl}
-          />
-          <InfoCard
-            icon={<FaMapMarkerAlt className="text-red-500" />}
-            title="Video URL"
+            icon={<FaYoutube className="text-red-500" />}
+            title="Property Tour Video"
             value={
               item.videoUrl ? (
                 <a
                   href={item.videoUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-amber-300 underline"
+                  className="text-amber-200 underline"
                 >
                   {item.videoUrl}
+                </a>
+              ) : (
+                "-"
+              )
+            }
+          />
+          <InfoCard
+            icon={<FaMapMarkerAlt className="text-red-500" />}
+            title="Location"
+            value={
+              item.location ? (
+                <a
+                  href={item.location}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-green-200 underline"
+                >
+                  {item.location}
                 </a>
               ) : (
                 "-"

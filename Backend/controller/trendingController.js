@@ -3,10 +3,11 @@ import cloudinary from "../cloudinary/cloudinary.js";
 import nodemailer from "nodemailer";
 
 // --------------------------------------------------------
-// Helper to upload image/video to Cloudinary
+// Helper to upload image to Cloudinary
 // --------------------------------------------------------
 const uploadToCloudinary = async (file, resourceType = "image") => {
   if (!file) return null;
+
   try {
     const result = await cloudinary.uploader.upload(file.path, {
       resource_type: resourceType,
@@ -14,7 +15,7 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
     });
     return result.secure_url;
   } catch (error) {
-    console.error(`Cloudinary upload failed for ${resourceType}:`, error);
+    console.error(`Cloudinary upload failed (${resourceType}):`, error);
     return null;
   }
 };
@@ -24,7 +25,8 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
 // --------------------------------------------------------
 const addtrending = async (req, res) => {
   try {
-    const {
+    // ⚠️ videoUrl MUST be let (we modify it later)
+    let {
       name,
       description,
       category,
@@ -36,25 +38,31 @@ const addtrending = async (req, res) => {
       highlights,
       address,
       contact,
-      ownerEmail, // NEW FIELD: Owner Email
+      ownerEmail,
+      videoUrl, // ✅ FIXED
     } = req.body;
 
-    // --------------------- Prepare Image Uploads ---------------------
-    // Collect main image first, then all other images
+    // --------------------- Clean video URL ---------------------
+    if (videoUrl && typeof videoUrl === "string") {
+      videoUrl = videoUrl.trim();
+      if (videoUrl === "") videoUrl = null;
+    }
+
+    // --------------------- Collect image files ---------------------
     let fileList = [];
 
-    // Add main image (required)
+    // Main image
     if (req.files?.mainImage?.[0]) {
       fileList.push(req.files.mainImage[0]);
     }
 
-    // Add additional images
+    // Multiple images
     if (Array.isArray(req.files?.images)) {
       fileList.push(...req.files.images);
     }
 
-    // Also collect legacy single image fields for backward compatibility
-    const explicitFields = [
+    // Backward compatibility image fields
+    const legacyFields = [
       "image",
       "image1",
       "image2",
@@ -63,34 +71,31 @@ const addtrending = async (req, res) => {
       "image5",
       "image6",
     ];
-    explicitFields.forEach((f) => {
-      if (Array.isArray(req.files?.[f])) fileList.push(...req.files[f]);
+
+    legacyFields.forEach((field) => {
+      if (Array.isArray(req.files?.[field])) {
+        fileList.push(...req.files[field]);
+      }
     });
 
-    // Validate required main image presence
     if (fileList.length === 0) {
       return res.status(400).json({
         success: false,
-        message:
-          "Missing required fields (Main image and at least one additional image are required).",
+        message: "At least one image is required",
       });
     }
 
+    // --------------------- Upload images ---------------------
     const imageUrls = await Promise.all(
       fileList.map((file) => uploadToCloudinary(file, "image"))
     );
 
-    if (!imageUrls || imageUrls.length === 0 || !imageUrls[0]) {
-      return res
-        .status(500)
-        .json({ success: false, message: "Main image upload failed." });
+    if (!imageUrls[0]) {
+      return res.status(500).json({
+        success: false,
+        message: "Image upload failed",
+      });
     }
-
-    // --------------------- Optional Video URL (from body) ---------------------
-    // Previously we accepted an uploaded video file. Now we expect a URL string.
-    let videoUrl = req.body.videoUrl || null;
-    if (videoUrl && typeof videoUrl === "string")
-      videoUrl = videoUrl.trim() || null;
 
     // --------------------- Save Trending Data ---------------------
     const trendingData = {
@@ -99,9 +104,8 @@ const addtrending = async (req, res) => {
       category,
       rating: rating ? parseInt(rating) : 5,
       district,
-      price: parseFloat(price),
-      videoUrl,
-      // Save array of uploaded image URLs and also populate legacy fields for compatibility
+      price: price ? parseFloat(price) : 0,
+      videoUrl, // ✅ saved correctly
       images: imageUrls,
       image: imageUrls[0],
       image1: imageUrls[1] || null,
@@ -123,10 +127,17 @@ const addtrending = async (req, res) => {
     const trendingItem = new TrendingModel(trendingData);
     await trendingItem.save();
 
-    res.json({ success: true, message: "Trending item added successfully" });
+    res.status(201).json({
+      success: true,
+      message: "Trending item added successfully",
+      data: trendingItem,
+    });
   } catch (error) {
     console.error("Error adding trending:", error);
-    res.status(500).json({ success: false, message: "Something went wrong" });
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong while adding trending",
+    });
   }
 };
 
@@ -134,21 +145,24 @@ const addtrending = async (req, res) => {
 // DELETE TRENDING CONTROLLER
 // --------------------------------------------------------
 const deleteTrendingByName = async (req, res) => {
-  const { name } = req.params;
   try {
+    const { name } = req.params;
+
     const deletedTrending = await TrendingModel.findOneAndDelete({ name });
+
     if (!deletedTrending) {
       return res.status(404).json({
         success: false,
-        message: `Trending item with name "${name}" not found`,
+        message: `Trending item "${name}" not found`,
       });
     }
+
     res.json({
       success: true,
       message: `Trending item "${name}" deleted successfully`,
     });
   } catch (error) {
-    console.error("Error deleting trending item:", error);
+    console.error("Error deleting trending:", error);
     res.status(500).json({
       success: false,
       message: "Server error while deleting trending item",
@@ -157,7 +171,7 @@ const deleteTrendingByName = async (req, res) => {
 };
 
 // --------------------------------------------------------
-// OPTIONAL: Send Booking Email to Owner
+// SEND BOOKING EMAIL TO OWNER
 // --------------------------------------------------------
 const sendBooking = async (req, res) => {
   try {
@@ -166,49 +180,42 @@ const sendBooking = async (req, res) => {
     if (!hotelName || !ownerEmail || !booking) {
       return res.status(400).json({
         success: false,
-        message: "Missing required booking details",
+        message: "Missing booking details",
       });
     }
 
-    // Format booking details
-    const { name, email, phone, date, guests } = booking;
+    const { name, email, phone, fromDate, toDate, guests } = booking;
 
-    // Transporter
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, // your Gmail
-        pass: process.env.EMAIL_PASS, // app password
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
       },
     });
 
-    // Email content
     const mailOptions = {
       from: `Travel Booking <${process.env.EMAIL_USER}>`,
-      to: ownerEmail, // send to hotel owner
+      to: ownerEmail,
       subject: `New Booking Request - ${hotelName}`,
       html: `
         <h2>New Booking Request</h2>
-        <p>A customer has submitted a booking request for your hotel.</p>
-
-        <h3>Hotel Details</h3>
         <p><strong>Hotel:</strong> ${hotelName}</p>
 
-        <h3>Customer Information</h3>
+        <h3>Customer Details</h3>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
         <p><strong>Phone:</strong> ${phone}</p>
 
-        <h3>Booking Information</h3>
-        <p><strong>Date:</strong> ${date}</p>
+        <h3>Booking Dates</h3>
+        <p><strong>From:</strong> ${fromDate}</p>
+        <p><strong>To:</strong> ${toDate}</p>
         <p><strong>Guests:</strong> ${guests}</p>
 
-        <br/>
         <p>Please contact the customer to confirm the booking.</p>
       `,
     };
 
-    // Send email
     await transporter.sendMail(mailOptions);
 
     res.json({
