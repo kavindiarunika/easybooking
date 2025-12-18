@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { TravelContext } from "../../Context/TravelContext";
@@ -135,6 +135,16 @@ const Trending = () => {
   const { navigate, addtrend } = useContext(TravelContext);
   const { name } = useParams();
   const item = addtrend.find((trending) => trending.name === name);
+
+  // Ensure the page scrolls to top when navigating to this route or when the
+  // `name` param changes (prevents preserving scroll position from previous page)
+  useEffect(() => {
+    try {
+      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+    } catch (e) {
+      // ignore if window is not available (SSR)
+    }
+  }, [name]);
   console.log("ITEM DATA:", item);
 
   const [booking, setBooking] = useState({
