@@ -123,7 +123,7 @@ const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
           type="submit"
           className="w-full bg-amber-400 hover:bg-amber-300 text-gray-900 font-semibold p-3 rounded-md transition"
         >
-          Book Now
+          make Request
         </button>
       </form>
     </div>
@@ -131,6 +131,14 @@ const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
 );
 
 // ---------------- Main Component ----------------
+const extractYouTubeId = (url) => {
+  if (!url) return null;
+  const regex =
+    /(?:youtube\.com\/(?:watch\?v=|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/;
+  const match = url.match(regex);
+  return match ? match[1] : null;
+};
+
 const Trending = () => {
   const { navigate, addtrend } = useContext(TravelContext);
   const { name } = useParams();
@@ -146,6 +154,12 @@ const Trending = () => {
     }
   }, [name]);
   console.log("ITEM DATA:", item);
+
+  const [showVideo, setShowVideo] = useState(false);
+  const videoId = extractYouTubeId(item?.videoUrl);
+  const thumbnailUrl = videoId
+    ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
+    : null;
 
   const [booking, setBooking] = useState({
     name: "",
@@ -276,18 +290,72 @@ const Trending = () => {
         {/* Left Side */}
         <div className="lg:w-2/3 space-y-10">
           <InfoCard
-            icon={<FaYoutube className="text-red-500" />}
-            title="Property Tour Video"
+          
             value={
               item.videoUrl ? (
-                <a
-                  href={item.videoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-amber-200 underline"
-                >
-                  {item.videoUrl}
-                </a>
+                videoId ? (
+                  <>
+                    <div
+                      role="button"
+                      tabIndex={0}
+                      onClick={() => setShowVideo(true)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") setShowVideo(true);
+                      }}
+                      className="relative w-full max-w-md cursor-pointer rounded-lg overflow-hidden"
+                    >
+                      <img
+                        src={thumbnailUrl}
+                        alt={`${item.name} video thumbnail`}
+                        className="w-full h-auto object-cover rounded-lg shadow-md"
+                      />
+                     
+                    </div>
+
+                    {showVideo && (
+                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
+                        <div className="relative w-full max-w-4xl">
+                          <button
+                            onClick={() => setShowVideo(false)}
+                            className="absolute top-2 right-2 text-white bg-gray-800/60 px-3 py-1 rounded"
+                          >
+                            Close
+                          </button>
+                          <div
+                            style={{
+                              position: "relative",
+                              paddingTop: "56.25%",
+                            }}
+                          >
+                            <iframe
+                              title={`${item.name} video`}
+                              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                              allowFullScreen
+                              style={{
+                                position: "absolute",
+                                top: 0,
+                                left: 0,
+                                width: "100%",
+                                height: "100%",
+                                border: 0,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <a
+                    href={item.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-200 underline"
+                  >
+                    {item.videoUrl}
+                  </a>
+                )
               ) : (
                 "-"
               )

@@ -6,7 +6,7 @@ import Footer from "./Components/Footer";
 import Gallery from "./Pages/Gallery/Gallery";
 import Trending from "./Pages/Trending/Trending";
 import TrendingGallery from "./Pages/TrendingGallery/Gallery";
-import VisitingPlaces from "./Pages/CustomizedPackage/VisitingPlaces";
+import Visitingplaces from "./Pages/VisitingPlaces/Visitingplaces";
 // In your main application file (e.g., src/main.jsx)
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -25,9 +25,10 @@ const App = () => {
         <Route path="/" element={<Home />} />
         <Route path="/gallery" element={<Gallery />} />
         <Route path="/villa" element={<Villa />} />
-        <Route path="/visitingplaces" element={<VisitingPlaces />} />
+      
         <Route path="/trending/:name" element={<Trending />} />
         <Route path="/trending/:name/gallery" element={<TrendingGallery />} />
+        <Route path ='/places' element ={<Visitingplaces/>}/>
       </Routes>
 
       <Footer />

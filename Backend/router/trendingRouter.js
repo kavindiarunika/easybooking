@@ -2,6 +2,7 @@ import express from "express";
 import {
   addtrending,
   deleteTrendingByName,
+  updateTrendingById,
   sendBooking,
 } from "../controller/trendingController.js";
 import upload from "../middleware/multer.js";
@@ -30,6 +31,13 @@ trendrouter.post("/add", trendinguploadField, addtrending);
 
 // ➖ Delete trending item by name
 trendrouter.delete("/delete/:name", verifyToken, deleteTrendingByName);
+// ➕ Update trending item by ID (admin only) — supports multipart/form-data for images
+trendrouter.put(
+  "/update/:id",
+  verifyToken,
+  trendinguploadField,
+  updateTrendingById
+);
 trendrouter.post("/sendbooking", sendBooking);
 
 // 📦 Get all trending items

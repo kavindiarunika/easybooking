@@ -171,6 +171,141 @@ const deleteTrendingByName = async (req, res) => {
 };
 
 // --------------------------------------------------------
+// UPDATE TRENDING CONTROLLER
+// --------------------------------------------------------
+const updateTrendingById = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Accept fields similar to addtrending
+    let {
+      name,
+      description,
+      category,
+      rating,
+      district,
+      price,
+      availableThings,
+      location,
+      highlights,
+      address,
+      contact,
+      ownerEmail,
+      videoUrl,
+      count,
+    } = req.body;
+
+    // Clean and prepare update object
+    const updateData = {};
+
+    if (name !== undefined) updateData.name = name;
+    if (description !== undefined) updateData.description = description;
+    if (category !== undefined) updateData.category = category;
+    if (rating !== undefined)
+      updateData.rating = rating ? parseInt(rating) : undefined;
+    if (district !== undefined) updateData.district = district;
+    if (price !== undefined)
+      updateData.price = price ? parseFloat(price) : undefined;
+    if (location !== undefined) updateData.location = location;
+    if (highlights !== undefined) updateData.highlights = highlights;
+    if (address !== undefined) updateData.address = address;
+    if (contact !== undefined) updateData.contact = contact;
+    if (ownerEmail !== undefined) updateData.ownerEmail = ownerEmail;
+
+    if (videoUrl && typeof videoUrl === "string") {
+      videoUrl = videoUrl.trim();
+      if (videoUrl === "") videoUrl = null;
+      updateData.videoUrl = videoUrl;
+    }
+
+    if (availableThings !== undefined) {
+      updateData.availableThings = Array.isArray(availableThings)
+        ? availableThings
+        : availableThings
+        ? availableThings.split(",").map((i) => i.trim())
+        : [];
+    }
+
+    if (count !== undefined) {
+      const parsedCount = parseInt(count);
+      if (isNaN(parsedCount) || parsedCount < 0) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Invalid 'count' value" });
+      }
+      updateData.count = parsedCount;
+    }
+
+    // --------------------- Handle image uploads (optional) ---------------------
+    let fileList = [];
+
+    if (req.files?.mainImage?.[0]) {
+      fileList.push(req.files.mainImage[0]);
+    }
+
+    if (Array.isArray(req.files?.images)) {
+      fileList.push(...req.files.images);
+    }
+
+    const legacyFields = [
+      "image",
+      "image1",
+      "image2",
+      "image3",
+      "image4",
+      "image5",
+      "image6",
+    ];
+
+    legacyFields.forEach((field) => {
+      if (Array.isArray(req.files?.[field])) {
+        fileList.push(...req.files[field]);
+      }
+    });
+
+    if (fileList.length > 0) {
+      const imageUrls = await Promise.all(
+        fileList.map((file) => uploadToCloudinary(file, "image"))
+      );
+
+      updateData.images = imageUrls;
+      updateData.image = imageUrls[0] || null;
+      updateData.image1 = imageUrls[1] || null;
+      updateData.image2 = imageUrls[2] || null;
+      updateData.image3 = imageUrls[3] || null;
+      updateData.image4 = imageUrls[4] || null;
+      updateData.image5 = imageUrls[5] || null;
+      updateData.image6 = imageUrls[6] || null;
+    }
+
+    // --------------------- Perform update ---------------------
+    const updated = await TrendingModel.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
+
+    if (!updated) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Trending item not found" });
+    }
+
+    res.json({
+      success: true,
+      message: "Trending item updated",
+      data: updated,
+    });
+  } catch (error) {
+    console.error("Error updating trending:", error);
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Server error while updating trending",
+      });
+  }
+};
+
+// --------------------------------------------------------
 // SEND BOOKING EMAIL TO OWNER
 // --------------------------------------------------------
 const sendBooking = async (req, res) => {
@@ -231,4 +366,4 @@ const sendBooking = async (req, res) => {
   }
 };
 
-export { addtrending, deleteTrendingByName, sendBooking };
+export { addtrending, deleteTrendingByName, updateTrendingById, sendBooking };

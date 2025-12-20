@@ -11,6 +11,8 @@ import Sidebar from "./components/Sidebar";
 // Pages
 import AddTrending from "./Pages/Add/AddTrending";
 import DeleteTrending from "./Pages/Delete/DeleteTrending";
+import EditTrending from "./Pages/edit/Edit";
+import AddTraveling from "./Pages/Add/AddTraveling";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -75,6 +77,23 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <DeleteTrending token={token} />
+                    </ProtectedRoute>
+                  }
+                />
+
+                <Route
+                  path="/edittrending"
+                  element={
+                    <ProtectedRoute>
+                      <EditTrending token={token} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addtravellingplaces"
+                  element={
+                    <ProtectedRoute>
+                      <AddTraveling token={token} />
                     </ProtectedRoute>
                   }
                 />

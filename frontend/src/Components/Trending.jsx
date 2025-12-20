@@ -40,7 +40,7 @@ const Trending = () => {
       <div className="flex items-center justify-between mb-12 p-4 rounded-xl shadow-md">
         <h2 className="text-4xl font-bold text-green-200">Book Your Hotel</h2>
         <button
-          onClick={() => navigate("/trending")}
+          onClick={() => navigate("/villa")}
           className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-green-700 transition transform hover:scale-105"
         >
           More <AiOutlineArrowRight />
