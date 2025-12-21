@@ -2,15 +2,42 @@ import express from "express";
 import cors from "cors";
 import "dotenv/config";
 import connectDB from "./config/mongodb.js";
+import path from "path";
+import fs from "fs"; // used to detect uploads folder
 
 import trendrouter from "./router/trendingRouter.js";
 import loginrouter from "./controller/logincontroller.js";
+import travelingplacesroute from "./router/travelingplacesroute.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
 
 // -------------------- 1. DATABASE CONNECTION --------------------
 connectDB();
+
+// -------------------- 1.5 STATIC FILES (uploads) --------------------
+// Serve uploaded images from /uploads
+// Support multiple possible locations where uploads might exist
+const backendUploads = path.join(process.cwd(), "Backend", "uploads");
+const backendNestedUploads = path.join(
+  process.cwd(),
+  "Backend",
+  "Backend",
+  "uploads"
+);
+const cwdUploads = path.join(process.cwd(), "uploads");
+let uploadsStaticDir = null;
+if (fs.existsSync(backendUploads)) uploadsStaticDir = backendUploads;
+else if (fs.existsSync(backendNestedUploads))
+  uploadsStaticDir = backendNestedUploads;
+else if (fs.existsSync(cwdUploads)) uploadsStaticDir = cwdUploads;
+else {
+  // none exist yet; create the canonical Backend/uploads
+  uploadsStaticDir = backendUploads;
+  fs.mkdirSync(uploadsStaticDir, { recursive: true });
+}
+console.log("Serving uploads from:", uploadsStaticDir);
+app.use("/uploads", express.static(uploadsStaticDir));
 
 // -------------------- 2. GLOBAL MIDDLEWARE --------------------
 
@@ -19,14 +46,14 @@ const allowedOrigins = [
   "http://localhost:5237",
 
   // Production domains
-  "https://smartsbooking.com", 
-  "http://smartsbooking.com", 
-  "https://www.smartsbooking.com", 
-  "http://www.smartsbooking.com", 
+  "https://smartsbooking.com",
+  "http://smartsbooking.com",
+  "https://www.smartsbooking.com",
+  "http://www.smartsbooking.com",
 
   // Admin panel domains
-  "https://admin.smartsbooking.com", 
-  "http://admin.smartsbooking.com", 
+  "https://admin.smartsbooking.com",
+  "http://admin.smartsbooking.com",
 ];
 
 app.use(
@@ -66,6 +93,8 @@ app.use("/api/admin", loginrouter);
 
 // Protected API routes
 app.use("/api/trending", trendrouter);
+
+app.use("/api/travelplaces", travelingplacesroute);
 
 // -------------------- 5. ROOT & SERVER START --------------------
 

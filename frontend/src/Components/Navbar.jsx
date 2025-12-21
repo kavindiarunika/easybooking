@@ -26,6 +26,7 @@ const Header = () => {
               { name: "Home", path: "./" },
               { name: "About Sri Lanka", path: "/", onClick: handleSpecial },
               { name: "stays", path: "/villa" },
+              {name:"traveling places", path:"/places" }
               
             ].map((item, index) => (
               <li key={index} className="relative group cursor-pointer pb-1">

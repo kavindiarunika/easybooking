@@ -2,11 +2,26 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// Ensure upload directory exists
-const uploadDir = path.join(process.cwd(), "Backend", "uploads");
-if (!fs.existsSync(uploadDir)) {
+// Determine uploads directory robustly (supports starting server from repo root or from Backend folder)
+const backendUploads = path.join(process.cwd(), "Backend", "uploads");
+const backendNestedUploads = path.join(
+  process.cwd(),
+  "Backend",
+  "Backend",
+  "uploads"
+);
+const cwdUploads = path.join(process.cwd(), "uploads");
+let uploadDir = null;
+if (fs.existsSync(backendUploads)) uploadDir = backendUploads;
+else if (fs.existsSync(backendNestedUploads)) uploadDir = backendNestedUploads;
+else if (fs.existsSync(cwdUploads)) uploadDir = cwdUploads;
+else {
+  // If none exist, create the canonical Backend/uploads
+  uploadDir = backendUploads;
   fs.mkdirSync(uploadDir, { recursive: true });
 }
+// uploadDir now points to the real uploads folder
+console.log("Upload directory set to:", uploadDir);
 
 const storage = multer.diskStorage({
   destination: function (req, file, callback) {

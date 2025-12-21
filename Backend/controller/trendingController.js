@@ -1,9 +1,10 @@
 import TrendingModel from "../schema/trendingScehema.js";
 import cloudinary from "../cloudinary/cloudinary.js";
 import nodemailer from "nodemailer";
+import fs from "fs";
 
 // --------------------------------------------------------
-// Helper to upload image to Cloudinary
+// Helper to upload image to Cloudinary (and remove local file)
 // --------------------------------------------------------
 const uploadToCloudinary = async (file, resourceType = "image") => {
   if (!file) return null;
@@ -13,9 +14,33 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
       resource_type: resourceType,
       folder: `trending/${resourceType}s`,
     });
+
+    // Remove the local file after successful upload
+    try {
+      fs.unlink(file.path, (err) => {
+        if (err) console.warn("Failed to remove local uploaded file:", err);
+      });
+    } catch (e) {
+      console.warn("Cleanup failed:", e);
+    }
+
     return result.secure_url;
   } catch (error) {
     console.error(`Cloudinary upload failed (${resourceType}):`, error);
+
+    // Try to remove local file even if upload failed
+    try {
+      fs.unlink(file.path, (err) => {
+        if (err)
+          console.warn(
+            "Failed to remove local uploaded file after failure:",
+            err
+          );
+      });
+    } catch (e) {
+      console.warn("Cleanup failed:", e);
+    }
+
     return null;
   }
 };
@@ -296,12 +321,10 @@ const updateTrendingById = async (req, res) => {
     });
   } catch (error) {
     console.error("Error updating trending:", error);
-    res
-      .status(500)
-      .json({
-        success: false,
-        message: "Server error while updating trending",
-      });
+    res.status(500).json({
+      success: false,
+      message: "Server error while updating trending",
+    });
   }
 };
 

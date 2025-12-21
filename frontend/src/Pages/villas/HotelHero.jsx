@@ -10,7 +10,7 @@ const HotelHero = () => {
         <img
           src={heroImage[0]} // make sure this points to hero.webp correctly
           alt="Hotel Cover"
-          className="w-full h-full object-cover"
+          className=" h-[800vh] object-cover"
         />
 
         {/* Overlay Text */}
