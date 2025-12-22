@@ -1,45 +1,15 @@
 import TravelPlace from "../schema/travelingSchema.js";
-import path from "path";
-import fs from "fs";
 import cloudinary from "../cloudinary/cloudinary.js";
 
-/* ================= Helper: upload file to Cloudinary and remove local file ================= */
-const uploadToCloudinary = async (file, folder = "travelplaces") => {
+/* Upload image to Cloudinary */
+const uploadImage = async (file, folder) => {
   if (!file) return null;
-  try {
-    const result = await cloudinary.uploader.upload(file.path, {
-      resource_type: "image",
-      folder: folder,
-    });
 
-    // Remove the local file after successful upload
-    try {
-      fs.unlink(file.path, (err) => {
-        if (err) console.warn("Failed to remove local uploaded file:", err);
-      });
-    } catch (e) {
-      console.warn("Cleanup failed:", e);
-    }
+  const result = await cloudinary.uploader.upload(file.path, {
+    folder: folder,
+  });
 
-    return result.secure_url;
-  } catch (error) {
-    console.error("Cloudinary upload failed:", error);
-
-    // Try to remove local file even if upload failed
-    try {
-      fs.unlink(file.path, (err) => {
-        if (err)
-          console.warn(
-            "Failed to remove local uploaded file after failure:",
-            err
-          );
-      });
-    } catch (e) {
-      console.warn("Cleanup failed:", e);
-    }
-
-    return null;
-  }
+  return result.secure_url;
 };
 
 /* ================= CREATE ================= */
@@ -47,72 +17,56 @@ export const createTravelPlace = async (req, res) => {
   try {
     const { name, description, district } = req.body;
 
-    const mainImageFile = req.files?.mainImage?.[0];
-    const imageFiles = req.files?.images || [];
-
-    if (!name || !district || !description) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!name || !description || !district) {
+      return res.status(400).json({ message: "All fields are required" });
     }
 
-    if (!mainImageFile) {
-      return res.status(400).json({ message: "Main image missing" });
+    if (!req.files?.mainImage) {
+      return res.status(400).json({ message: "Main image is required" });
     }
 
-    // Upload main image to Cloudinary
-    const mainImageUrl = await uploadToCloudinary(
-      mainImageFile,
+    // Upload main image
+    const mainImage = await uploadImage(
+      req.files.mainImage[0],
       "travelplaces/main"
     );
-    if (!mainImageUrl) {
-      return res.status(500).json({ message: "Failed to upload main image" });
+
+    // Upload other images
+    let images = [];
+    if (req.files.images) {
+      images = await Promise.all(
+        req.files.images.map((img) =>
+          uploadImage(img, "travelplaces/gallery")
+        )
+      );
     }
 
-    // Upload gallery images (if any)
-    const uploadedImageUrls = await Promise.all(
-      imageFiles.map((f) => uploadToCloudinary(f, "travelplaces/gallery"))
-    );
-
-    const newTravelPlace = new TravelPlace({
+    const travelPlace = new TravelPlace({
       name,
       description,
       district,
-      mainImage: mainImageUrl,
-      images: (uploadedImageUrls || []).filter(Boolean),
+      mainImage,
+      images,
     });
 
-    await newTravelPlace.save();
+    await travelPlace.save();
 
     res.status(201).json({
-      message: "Travel place created successfully",
-      travelPlace: newTravelPlace,
+      message: "Travel place created",
+      travelPlace,
     });
   } catch (error) {
-    console.error("Create travel place error:", error);
-    res.status(500).json({ message: "Internal server error" });
+    console.log(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
 /* ================= READ ================= */
 export const getTravelPlaces = async (req, res) => {
   try {
-    const places = await TravelPlace.find().sort({ createdAt: -1 }).lean();
-
-    // Keep backward compatibility: if stored value is a filename (legacy), prefix with /uploads
-    const transformed = places.map((p) => ({
-      ...p,
-      mainImage: p.mainImage
-        ? p.mainImage.toString().startsWith("http")
-          ? p.mainImage
-          : `/uploads/${p.mainImage}`
-        : null,
-      images: (p.images || []).map((img) =>
-        img.toString().startsWith("http") ? img : `/uploads/${img}`
-      ),
-    }));
-
-    res.status(200).json({ travelPlaces: transformed });
+    const places = await TravelPlace.find().sort({ createdAt: -1 });
+    res.json({ travelPlaces: places });
   } catch (error) {
-    console.error("Fetch travel places error:", error);
-    res.status(500).json({ message: "Failed to fetch travel places" });
+    res.status(500).json({ message: "Failed to load places" });
   }
 };

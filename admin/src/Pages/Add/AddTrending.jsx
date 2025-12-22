@@ -203,6 +203,11 @@ const AddTrending = ({ token }) => {
                 <option value="Mullativu">Mullativu</option>
                 <option value="Monaragala">Monaragala</option>
                 <option value="Matale">Matale</option>
+                <option value="Kegalle">Kegalle</option>
+                <option value="Polonnaruwa">Polonnaruwa</option>
+                <option value="Hambantota">Hambantota</option>
+                <option value="Gampaha">Gampaha</option>
+                <option value="Kalutara">Kalutara</option>
               </select>
             ) : key === "price" ? (
               <input

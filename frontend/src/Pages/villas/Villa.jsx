@@ -104,6 +104,11 @@ const Villa = () => {
     { label: "Mullativu", value: "Mullativu" },
     { label: "Monaragala", value: "Monaragala" },
     { label: "Matale", value: "Matale" },
+    { label: "Kegalle", value: "Kegalle" },
+    { label: "Polonnaruwa", value: "Polonnaruwa" },
+    { label: "Hambantota", value: "Hambantota" },
+    { label: "Gampaha", value: "Gampaha" },
+    { label: "Kalutara", value: "Kalutara" },
   ];
 
   return (

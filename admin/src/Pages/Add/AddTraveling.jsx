@@ -128,6 +128,7 @@ const AddTraveling = () => {
                 <option value="puttalam">Puttalam</option>
                 <option value="kurunegala">Kurunegala</option>
                 <option value="dambulla">Dambulla</option>
+                <option value="kalutara">Kaluthara</option>
                
             </select>
           </div>

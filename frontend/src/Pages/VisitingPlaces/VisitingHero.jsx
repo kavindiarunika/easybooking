@@ -1,7 +1,7 @@
 import React from "react";
 import heroImg from "../../assets/VisitingPlaces/hero.png";
 
-const VisitingHero = () => {
+const VisitingHero = ( ) => {
   return (
     <div
       className="relative w-full h-[600px] bg-cover bg-center flex px-20 items-center justify-between"
