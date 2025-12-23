@@ -8,7 +8,7 @@ const VisitingPlaces = () => {
 
   useEffect(() => {
     axios(`${BACKEND_URL}/api/travelplaces`).then((res) => {
-      setPlaces(res.data.travelPlaces.slice(0, 8));
+      setPlaces(res.data.travelPlaces.slice(0, 6));
     });
   }, [places, setPlaces]);
 
@@ -20,10 +20,10 @@ const VisitingPlaces = () => {
   return (
 
 
-    <div className="ml-8 mt-4">
-          <h2 className="text-4xl font-bold text-green-200 ml-4">Travel Sri Lanka</h2>
+    <div className="ml-2 sm:ml-8 mt-4">
+          <h2 className="text-2xl sm:text-4xl font-bold text-green-200 ml-2 sm:ml-4">Travel Sri Lanka</h2>
 
-    <div className=" grid grid-cols-4 sm:grid-cols-8 ">
+    <div className=" grid grid-cols-3 sm:grid-cols-6 ">
       {places.map((place) => (
         <div key={place._id} className="p-4">
           <div className="rounded-lg shadow-md overflow-hidden text-white">
@@ -31,7 +31,7 @@ const VisitingPlaces = () => {
             <img
               src={getImageUrl(place.mainImage)}
               alt={place.name}
-              className=" fade-in w-full h-48 object-cover border-2 rounded-full hover:scale-105 transform transition-all duration-500 hover:fade-in hover:cursor-pointer "
+              className=" fade-in w-full h-24 sm:h-52 object-cover border-2 rounded-full hover:scale-105 transform transition-all duration-500 hover:fade-in hover:cursor-pointer "
             />
             
             </Link>

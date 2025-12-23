@@ -48,7 +48,7 @@ const Trending = () => {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8">
         {trends.slice(0, 8).map((item, index) => {
           // Build images list: start with main image, then additional images
           const images =

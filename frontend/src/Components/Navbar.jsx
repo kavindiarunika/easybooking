@@ -100,6 +100,15 @@ const Header = () => {
               >
                 Hotels
               </NavLink>
+              <NavLink
+                to="/places"
+                onClick={toggleMenu}
+                className={({ isActive }) =>
+                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                }
+              >
+                Travel Places
+              </NavLink>
 
               <NavLink
                 to="./"

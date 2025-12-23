@@ -2,7 +2,7 @@ import React from "react";
 
 const Filterplaces = ({ district, selectDistrict, onChange }) => {
   return (
-    <div className="bg-black/80 rounded-2xl p-4">
+    <div className="   bg-black/80 rounded-2xl p-4 mb-4 ">
       <h3 className="text-lg font-semibold mb-3 text-green-200">Select District</h3>
 
       {/* All option */}
@@ -18,7 +18,7 @@ const Filterplaces = ({ district, selectDistrict, onChange }) => {
       </label>
 
       {/* District options */}
-      <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-x-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-x-8">
       {district.map((dist, index) => (
         <label
           key={index}

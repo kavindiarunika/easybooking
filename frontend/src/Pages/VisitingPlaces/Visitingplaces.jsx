@@ -73,7 +73,7 @@ const Visitingplaces = () => {
 
       <section className="w-full mx-auto py-10 flex gap-6 px-6">
        
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4  mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4  mx-auto  ">
             {filterplaces.map((place) => (
               <div
                 key={place._id}
@@ -90,7 +90,7 @@ const Visitingplaces = () => {
                   <p className="text-sm text-gray-500 capitalize">
                     {place.district}
                   </p>
-                  <p className="text-gray-700 mt-2">
+                  <p className="hidden sm:block text-gray-700 mt-2">
                     {place.description}
                   </p>
                 </div>
