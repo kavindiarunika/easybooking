@@ -65,26 +65,15 @@ const Visitingplaces = () => {
   };
 
   return (
-    <div className="px-4">
-      <VisitingHero />
-
-      <section className="max-w-6xl mx-auto py-10 flex gap-6">
-        {/* LEFT: RADIO FILTER */}
-        <div className="w-1/5">
-          <h2 className="text-2xl font-semibold mb-4">
-            Explore Visiting Places
-          </h2>
-
-          <Filterplaces
-            district={districts}
+    <div className="">
+      <VisitingHero 
+       district={districts}
             selectDistrict={selectDistrict}
-            onChange={setSelectDistrict}
-          />
-        </div>
+            onChange={setSelectDistrict}/>
 
-        {/* RIGHT: CARDS */}
-        <div className="w-4/5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3  w-[150vh]">
+      <section className="w-full mx-auto py-10 flex gap-6 px-6">
+       
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4  mx-auto">
             {filterplaces.map((place) => (
               <div
                 key={place._id}
@@ -109,7 +98,7 @@ const Visitingplaces = () => {
               </div>
             ))}
           </div>
-        </div>
+    
       </section>
     </div>
   );

@@ -70,3 +70,36 @@ export const getTravelPlaces = async (req, res) => {
     res.status(500).json({ message: "Failed to load places" });
   }
 };
+
+
+
+/*-----------------------------delete-------------------- */
+export const deleteTravelPlace =async(req,res)=>{
+
+ 
+
+  try{
+   const {name} =req.body;
+
+   if(!name){
+    return res.status(400).json({massage:"name is requires"})
+   }
+
+   const place = await TravelPlace.findOne({
+    name:name
+   })
+   if(!place){
+    return res.status(404).json({massage:"place not found"})
+   }
+
+   await TravelPlace.deleteOne ({_id:place._id})
+
+   res.status(200).json({massage:"place delete successfully"})
+
+
+  }
+  catch(error){
+    res.status(500).json({message:"server error"})
+
+  }
+}

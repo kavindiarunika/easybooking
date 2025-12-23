@@ -7,7 +7,7 @@ import Trending from "../../Components/Trending";
 import Packages from "../../Components/Packages";
 import AboutSection from "./VideoSection";
 import Gallery from "../Gallery/Gallery";
-
+import VisitingPlaces from "../../Components/VisitingPlaces";
 
 
 const Home = () => {
@@ -34,6 +34,10 @@ const Home = () => {
      <div className="w-full relative"> 
         <Trending />
       </div>
+     <div className="w-full relative"> 
+        <VisitingPlaces/>
+      </div>
+      
        <div id="special-selection">
         <AboutLankaHome />
       </div>

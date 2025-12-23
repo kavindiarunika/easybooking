@@ -13,6 +13,7 @@ import AddTrending from "./Pages/Add/AddTrending";
 import DeleteTrending from "./Pages/Delete/DeleteTrending";
 import EditTrending from "./Pages/edit/Edit";
 import AddTraveling from "./Pages/Add/AddTraveling";
+import DeletePlaces from "./Pages/Delete/DletePlaces";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -94,6 +95,15 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <AddTraveling token={token} />
+                    </ProtectedRoute>
+                  }
+                />
+            
+                <Route
+                  path="/deletetravellingplaces"
+                  element={
+                    <ProtectedRoute>
+                      <DeletePlaces token={token} />
                     </ProtectedRoute>
                   }
                 />
