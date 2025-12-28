@@ -152,6 +152,14 @@ const addtrending = async (req, res) => {
     const trendingItem = new TrendingModel(trendingData);
     await trendingItem.save();
 
+    // Emit socket event to notify clients about the new trending item
+    try {
+      const io = req.app?.get("io");
+      if (io) io.emit("trendingUpdated", { action: "add", item: trendingItem });
+    } catch (e) {
+      console.warn("Could not emit trendingUpdated (add):", e);
+    }
+
     res.status(201).json({
       success: true,
       message: "Trending item added successfully",
@@ -180,6 +188,14 @@ const deleteTrendingByName = async (req, res) => {
         success: false,
         message: `Trending item "${name}" not found`,
       });
+    }
+
+    // Emit socket event to notify clients about deletion
+    try {
+      const io = req.app?.get("io");
+      if (io) io.emit("trendingUpdated", { action: "delete", name });
+    } catch (e) {
+      console.warn("Could not emit trendingUpdated (delete):", e);
     }
 
     res.json({
@@ -312,6 +328,14 @@ const updateTrendingById = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Trending item not found" });
+    }
+
+    // Emit socket event to notify clients about update
+    try {
+      const io = req.app?.get("io");
+      if (io) io.emit("trendingUpdated", { action: "update", item: updated });
+    } catch (e) {
+      console.warn("Could not emit trendingUpdated (update):", e);
     }
 
     res.json({

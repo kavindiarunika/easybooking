@@ -4,7 +4,9 @@ import{ BACKEND_URL } from "../App";
 import { Link } from "react-router-dom";
 
 const VisitingPlaces = () => {
+
   const [places, setPlaces] = useState([]);
+  
 
   useEffect(() => {
     axios(`${BACKEND_URL}/api/travelplaces`).then((res) => {

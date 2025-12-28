@@ -114,7 +114,7 @@ const Villa = () => {
   return (
     <section className="w-full py-16 px-4 md:px-16 bg-slate-950">
       <p className="w-full h-24"></p>
-      <HotelHero />
+      
 
       {/* Mobile filter toggle button - visible only on small screens */}
       <div className="lg:hidden flex justify-end mb-4">
@@ -283,7 +283,7 @@ const Villa = () => {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredData.length > 0 ? (
               filteredData.map((item, index) => (
                 <div
@@ -311,7 +311,7 @@ const Villa = () => {
                           <img
                             src={images[0] || item.image}
                             alt={item.name}
-                            className="w-full h-64 object-cover rounded-t-3xl group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-48 sm:h-64 object-cover rounded-t-3xl group-hover:scale-110 transition-transform duration-500"
                           />
 
                           {/* Overlay */}
@@ -336,19 +336,20 @@ const Villa = () => {
                   {/* Content */}
                   <div className="p-5 flex flex-col gap-3">
                     {/* Name and Price */}
-                    <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-semibold text-gray-900">
-                        {item.name}
-                      </h3>
-                      <div className="text-green-600 font-bold text-lg">
-                        Rs. {item.price ? item.price.toLocaleString() : "N/A"}
-                      </div>
-                    </div>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+  <h3 className="text-lg font-semibold text-gray-900">
+    {item.name}
+  </h3>
+  <div className="text-green-600 font-bold text-lg">
+    Rs. {item.price ? item.price.toLocaleString() : "N/A"}
+  </div>
+</div>
 
                     {/* Short description */}
-                    <p className="text-gray-600 text-sm">
-                      Enjoy a luxurious stay at {item.name}, equipped with
-                      modern amenities, stunning views, and comfort.
+                    <p className="hidden sm:block text-gray-600 text-sm">
+                     {item.description.length > 100
+                        ? item.description.substring(0, 100) + "..."
+                        : item.description}
                     </p>
 
                     {/* Button */}

@@ -4,10 +4,13 @@ import "dotenv/config";
 import connectDB from "./config/mongodb.js";
 import path from "path";
 import fs from "fs"; // used to detect uploads folder
+import http from "http";
+import { Server as SocketIO } from "socket.io";
 
 import trendrouter from "./router/trendingRouter.js";
 import loginrouter from "./controller/logincontroller.js";
 import travelingplacesroute from "./router/travelingplacesroute.js";
+import safariRouter from "./router/safariRoute.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -78,6 +81,16 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Cache-Control",
+    "no-store, no-cache, must-revalidate, proxy-revalidate"
+  );
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  next();
+});
+
 // Debug logger
 app.use((req, res, next) => {
   console.log("Incoming request:", req.method, req.path);
@@ -96,11 +109,31 @@ app.use("/api/trending", trendrouter);
 
 app.use("/api/travelplaces", travelingplacesroute);
 
+app.use("/api/safari", safariRouter);
+
 // -------------------- 5. ROOT & SERVER START --------------------
 
 app.get("/", (req, res) => res.send("API working."));
 
-app.listen(port, () =>
+// Create HTTP server and attach Socket.IO for real-time updates
+const server = http.createServer(app);
+const io = new SocketIO(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    credentials: true,
+  },
+});
+
+// Make io available to request handlers via req.app.get('io')
+app.set("io", io);
+
+io.on("connection", (socket) => {
+  console.log("Socket connected:", socket.id);
+  socket.on("disconnect", () => console.log("Socket disconnected:", socket.id));
+});
+
+server.listen(port, () =>
   console.log(
     `Server starting on port ${port} in ${
       process.env.NODE_ENV || "development"

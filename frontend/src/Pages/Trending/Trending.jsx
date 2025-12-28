@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { TravelContext } from "../../Context/TravelContext";
 
-import { FaYoutube } from "react-icons/fa";
+
 import {
   FaMapMarkerAlt,
   FaStar,
@@ -243,7 +243,7 @@ const Trending = () => {
       {/* Back & Title */}
       <div className="flex flex-row items-center gap-6 mb-8">
         <button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/villa")}
           className="flex items-center justify-center text-white hover:text-amber-300 transition"
         >
           <IoArrowBackOutline size={28} />
