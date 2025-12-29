@@ -142,7 +142,7 @@ const extractYouTubeId = (url) => {
 const Trending = () => {
   const { navigate, addtrend } = useContext(TravelContext);
   const { name } = useParams();
-  const item = addtrend.find((trending) => trending.name === name);
+  const item = addtrend.find((trending) => trending.name.trim() === decodeURIComponent(name).trim());
 
   // Ensure the page scrolls to top when navigating to this route or when the
   // `name` param changes (prevents preserving scroll position from previous page)
