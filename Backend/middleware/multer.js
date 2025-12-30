@@ -34,8 +34,29 @@ const storage = multer.diskStorage({
   },
 });
 
+// ---------------- FILE FILTER ----------------
+const fileFilter = (req, file, cb) => {
+  const allowed = /jpeg|jpg|png|webp/;
+  const extOk = allowed.test(
+    path.extname(file.originalname).toLowerCase()
+  );
+  const mimeOk = allowed.test(file.mimetype);
+
+  if (extOk && mimeOk) {
+    cb(null, true);
+  } else {
+    cb(new Error("Only image files (jpg, jpeg, png, webp) are allowed"));
+  }
+};
+
+// ---------------- MULTER CONFIG (🔥 FIX) ----------------
 const upload = multer({
   storage,
+  fileFilter,
+  limits: {
+    fileSize: 20 * 1024 * 1024, // ✅ 20 MB per image
+    files: 60,                 // ✅ max total files
+  },
 });
 
 export default upload;
