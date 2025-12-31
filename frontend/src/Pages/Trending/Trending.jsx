@@ -11,8 +11,8 @@ import {
   FaPhoneAlt,
   FaDollarSign,
 } from "react-icons/fa";
-import axios from "axios";
-import { BACKEND_URL } from "../../App";
+import api from "../../api"; 
+
 import { FaWhatsapp } from "react-icons/fa";
 
 // ---------------- Helper Components ----------------
@@ -206,10 +206,8 @@ const Trending = () => {
       };
       console.log("Sending booking payload:", payload);
 
-      const res = await axios.post(
-        `${BACKEND_URL}/api/trending/sendbooking`,
-        payload
-      );
+      const res = await api.post("/api/trending/sendbooking", payload);
+
 
       if (res?.data?.success) {
         alert("Booking request sent successfully!");
