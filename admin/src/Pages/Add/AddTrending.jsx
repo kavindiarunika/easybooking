@@ -5,6 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { backendUrl } from "../../App";
 
 const AddTrending = ({ token }) => {
+  // ---------------- TEXT FIELDS ----------------
   const [formDataFields, setFormDataFields] = useState({
     name: "",
     description: "",
@@ -21,12 +22,20 @@ const AddTrending = ({ token }) => {
     availableThings: "",
   });
 
+  // ---------------- MEDIA ----------------
   const [media, setMedia] = useState({
     mainImage: null,
-    images: [],
+    image: null,
+    image1: null,
+    image2: null,
+    image3: null,
+    image4: null,
+    image5: null,
+    image6: null,
+    otherimages: [],
   });
 
-  // ------------------ HANDLE TEXT INPUT ------------------
+  // ---------------- HANDLERS ----------------
   const handleInputChange = (e) => {
     setFormDataFields({
       ...formDataFields,
@@ -34,63 +43,66 @@ const AddTrending = ({ token }) => {
     });
   };
 
-  // ------------------ HANDLE FILE INPUT ------------------
-  const handleFileChange = (e, fieldName) => {
-    // legacy single-file handlers still supported (keeps existing API)
-    setMedia({
-      ...media,
-      [fieldName]: e.target.files[0],
-    });
+  const handleSingleFile = (e, field) => {
+    setMedia({ ...media, [field]: e.target.files[0] });
   };
 
-  const handleMultipleFiles = (e) => {
-    const files = Array.from(e.target.files || []);
-    setMedia((m) => ({ ...m, images: files }));
+  const handleOtherImages = (e) => {
+    setMedia({ ...media, otherimages: Array.from(e.target.files || []) });
   };
 
-  // ------------------ SUBMIT FORM ------------------
+  // ---------------- SUBMIT ----------------
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // require main image
     if (!media.mainImage) {
-      toast.error("Main image is required!");
+      toast.error("Main image is required");
       return;
     }
-
-    // require at least one additional image
-    if (!media.images || media.images.length === 0) {
-      toast.error("At least one additional image is required!");
-      return;
-    }
-
-    const updatedFormData = {
-      ...formDataFields,
-      availableThings: formDataFields.availableThings
-        ? formDataFields.availableThings.split(",").map((i) => i.trim())
-        : [],
-    };
 
     const formData = new FormData();
 
-    // Append text fields
-    Object.entries(updatedFormData).forEach(([key, value]) => {
-      formData.append(key, value);
+    // text fields
+    Object.entries(formDataFields).forEach(([key, value]) => {
+      if (key === "availableThings") {
+        formData.append(
+          key,
+          value
+            ? value.split(",").map((i) => i.trim())
+            : []
+        );
+      } else {
+        formData.append(key, value);
+      }
     });
 
-    // Append media files
-    // - append main image
-    if (media.mainImage) formData.append("mainImage", media.mainImage);
+    // images (ORDER IS IMPORTANT)
+    formData.append("mainImage", media.mainImage);
 
-    // - append multiple images under the `images` field
-    if (media.images && media.images.length > 0) {
-      media.images.forEach((file) => formData.append("images", file));
+    const imageFields = [
+      "image",
+      "image1",
+      "image2",
+      "image3",
+      "image4",
+      "image5",
+      "image6",
+    ];
+
+    imageFields.forEach((field) => {
+      if (media[field]) {
+        formData.append(field, media[field]);
+      }
+    });
+
+    if (media.otherimages.length > 0) {
+      media.otherimages.forEach((file) => {
+        formData.append("otherimages", file);
+      });
     }
 
-    // Video URL is included in `formDataFields` and appended above
-
     try {
-      const response = await axios.post(
+      const res = await axios.post(
         `${backendUrl}/api/trending/add`,
         formData,
         {
@@ -100,10 +112,10 @@ const AddTrending = ({ token }) => {
         }
       );
 
-      if (response.data.success) {
-        toast.success("Hotel added successfully!");
+      if (res.data.success) {
+        toast.success("Trending item added successfully");
 
-        // Reset fields
+        // reset
         setFormDataFields({
           name: "",
           description: "",
@@ -122,30 +134,34 @@ const AddTrending = ({ token }) => {
 
         setMedia({
           mainImage: null,
-          images: [],
+          image: null,
+          image1: null,
+          image2: null,
+          image3: null,
+          image4: null,
+          image5: null,
+          image6: null,
+          otherimages: [],
         });
 
-        document.querySelectorAll('input[type="file"]').forEach((input) => {
-          input.value = "";
+        document.querySelectorAll('input[type="file"]').forEach((i) => {
+          i.value = "";
         });
-      } else {
-        toast.error(response.data.message || "Failed to add item.");
       }
-    } catch (error) {
-      console.error("Error uploading item:", error);
-      toast.error(error.response?.data?.message || "Error uploading item");
+    } catch (err) {
+      toast.error(err.response?.data?.message || "Upload failed");
     }
   };
 
+  // ---------------- UI ----------------
   return (
-    <div className="p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-xl font-bold mb-4">Add Hotel Details</h2>
+    <div className="p-6 bg-white rounded-lg shadow">
+      <h2 className="text-xl font-bold mb-4">Add Trending Item</h2>
 
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        {/* TEXT INPUTS */}
         {Object.keys(formDataFields).map((key) => (
           <div key={key}>
-            <label className="block text-gray-700 mb-1 capitalize">
+            <label className="block mb-1 capitalize">
               {key.replace(/([A-Z])/g, " $1")}
             </label>
 
@@ -154,8 +170,7 @@ const AddTrending = ({ token }) => {
                 name={key}
                 value={formDataFields[key]}
                 onChange={handleInputChange}
-                className="w-full border px-3 py-2 rounded-md outline-none"
-                required
+                className="border p-2 w-full"
               >
                 <option value="villa">Villa</option>
                 <option value="hotel">Hotel</option>
@@ -167,149 +182,68 @@ const AddTrending = ({ token }) => {
                 name={key}
                 value={formDataFields[key]}
                 onChange={handleInputChange}
-                className="w-full border px-3 py-2 rounded-md outline-none"
+                className="border p-2 w-full"
               >
-                <option value="5">5 Star</option>
-                <option value="4">4 Star</option>
-                <option value="3">3 Star</option>
-                <option value="2">2 Star</option>
-                <option value="1">1 Star</option>
+                {[5, 4, 3, 2, 1].map((r) => (
+                  <option key={r} value={r}>
+                    {r} Star
+                  </option>
+                ))}
               </select>
-            ) : key === "district" ? (
-              <select
-                name={key}
-                value={formDataFields[key]}
-                onChange={handleInputChange}
-                className="w-full border px-3 py-2 rounded-md outline-none"
-                required
-              >
-                <option value="">Select District</option>
-                <option value="Colombo">Colombo</option>
-                <option value="Galle">Galle</option>
-                <option value="Kandy">Kandy</option>
-                <option value="Jaffna">Jaffna</option>
-                <option value="Matara">Matara</option>
-                <option value="Negombo">Negombo</option>
-                <option value="Anuradhapura">Anuradhapura</option>
-                <option value="Trincomalee">Trincomalee</option>
-                <option value="Batticaloa">Batticaloa</option>
-                <option value="Ampara">Ampara</option>
-                <option value="Nuwara Eliya">Nuwara Eliya</option>
-                <option value="Ratnapura">Ratnapura</option>
-                <option value="Badulla">Badulla</option>
-                <option value="Kurunegala">Kurunegala</option>
-                <option value="Puttalam">Puttalam</option>
-                <option value="Vavuniya">Vavuniya</option>
-                <option value="Mullativu">Mullativu</option>
-                <option value="Monaragala">Monaragala</option>
-                <option value="Matale">Matale</option>
-                <option value="Kegalle">Kegalle</option>
-                <option value="Polonnaruwa">Polonnaruwa</option>
-                <option value="Hambantota">Hambantota</option>
-                <option value="Gampaha">Gampaha</option>
-                <option value="Kalutara">Kalutara</option>
-              </select>
-            ) : key === "price" ? (
-              <input
-                type="number"
-                name={key}
-                value={formDataFields[key]}
-                onChange={handleInputChange}
-                className="w-full border px-3 py-2 rounded-md outline-none"
-                required
-                placeholder="Enter price (e.g., 5000)"
-                min="0"
-                step="0.01"
-              />
             ) : (
               <input
                 type={key === "ownerEmail" ? "email" : "text"}
                 name={key}
                 value={formDataFields[key]}
                 onChange={handleInputChange}
-                className="w-full border px-3 py-2 rounded-md outline-none"
-                required={[
-                  "name",
-                  "description",
-                  "category",
-                  "district",
-                  "price",
-                  "ownerEmail",
-                ].includes(key)}
-                placeholder={
-                  key === "availableThings" ? "Comma separated items" : ""
-                }
+                className="border p-2 w-full"
               />
             )}
           </div>
         ))}
 
-        {/* MAIN IMAGE UPLOAD */}
-        <div className="border p-3 rounded-md bg-blue-50">
-          <label className="block text-gray-700 mb-2 font-semibold">
-            Main Image (Required - Used on Cards)
-          </label>
+        {/* MAIN IMAGE */}
+        <div>
+          <label className="font-semibold">Main Image (Required)</label>
           <input
             type="file"
             accept="image/*"
-            onChange={(e) =>
-              setMedia({ ...media, mainImage: e.target.files[0] })
-            }
+            onChange={(e) => handleSingleFile(e, "mainImage")}
             required
           />
-          <p className="text-sm text-gray-600 mt-2">
-            This image will be displayed on hotel cards.
-          </p>
         </div>
 
-        {/* ADDITIONAL IMAGES UPLOAD */}
-        <div className="border p-3 rounded-md">
-          <label className="block text-gray-700 mb-2 font-semibold">
-            Additional Hotel Images (Required)
-          </label>
+        {/* IMAGE 1–6 */}
+        {["image", "image1", "image2", "image3", "image4", "image5", "image6"].map(
+          (f, i) => (
+            <div key={f}>
+              <label>Image {i + 1}</label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => handleSingleFile(e, f)}
+              />
+            </div>
+          )
+        )}
+
+        {/* OTHER IMAGES */}
+        <div>
+          <label>Other Images</label>
           <input
-            key="images"
             type="file"
             accept="image/*"
             multiple
-            onChange={handleMultipleFiles}
-            required
+            onChange={handleOtherImages}
           />
-          <p className="text-sm text-gray-500 mt-2">
-            Upload additional images for the gallery. Users can click the "+N"
-            badge to view all.
-          </p>
         </div>
 
-        {/* VIDEO URL */}
-        <div className="border p-3 rounded-md">
-          <label className="block text-gray-700 mb-1 font-semibold">
-            Optional Hotel Promotional Video URL
-          </label>
-          <div>
-            <input
-              type="url"
-              name="videoUrl"
-              value={formDataFields.videoUrl}
-              onChange={handleInputChange}
-              placeholder="https://example.com/video.mp4"
-              className="w-full border px-3 py-2 rounded-md outline-none"
-            />
-          </div>
-          <p className="text-sm text-gray-600 mt-2">
-            Provide a direct video URL (e.g., .mp4) or any valid link.
-          </p>
-        </div>
-
-        <button
-          type="submit"
-          className="bg-blue-600 text-white px-6 py-2 rounded-md hover:bg-blue-700 mt-4"
-        >
-          Add Hotel
+        <button className="bg-blue-600 text-white py-2 rounded">
+          Add Trending
         </button>
       </form>
 
-      <ToastContainer position="top-center" autoClose={4000} />
+      <ToastContainer position="top-center" />
     </div>
   );
 };

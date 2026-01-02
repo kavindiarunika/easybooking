@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { TravelContext } from "../../Context/TravelContext";
+import { IoIosArrowBack } from "react-icons/io";
+import { MdNavigateNext } from "react-icons/md";
 import {
   AiOutlineArrowRight,
   AiOutlineFilter,
@@ -15,7 +17,14 @@ const Villa = () => {
   const [selectedDistrict, setSelectedDistrict] = useState("all");
   const [filteredData, setFilteredData] = useState([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [pagination, setpagination] = useState(1);
+  const pagenumber = 30;
 
+  const totalPages = Math.ceil(filteredData.length / pagenumber);
+  const indexOfLastItem = pagination * pagenumber;
+  const indexOfFirstitem = indexOfLastItem - pagenumber;
+
+  const currentData = filteredData.slice(indexOfFirstitem, indexOfLastItem);
   // Fetch trending data only if not already in context
   useEffect(() => {
     if (!addtrend || addtrend.length === 0) {
@@ -61,6 +70,20 @@ const Villa = () => {
       setFilteredData(filtered);
     }
   }, [addtrend, selectedCategory, selectedRating, selectedDistrict]);
+
+  // Reset to first page whenever filters change
+  useEffect(() => {
+    setpagination(1);
+  }, [selectedCategory, selectedRating, selectedDistrict]);
+
+  // Ensure current page is within range when filtered data changes
+  useEffect(() => {
+    if (totalPages === 0) {
+      setpagination(1);
+    } else if (pagination > totalPages) {
+      setpagination(totalPages);
+    }
+  }, [totalPages, pagination]);
 
   if (!addtrend || addtrend.length === 0) {
     return <div className="text-white p-10">Loading trending hotels...</div>;
@@ -114,7 +137,6 @@ const Villa = () => {
   return (
     <section className="w-full py-16 px-4 md:px-16 bg-slate-950">
       <p className="w-full h-24"></p>
-      
 
       {/* Mobile filter toggle button - visible only on small screens */}
       <div className="lg:hidden flex justify-end mb-4">
@@ -284,8 +306,8 @@ const Villa = () => {
 
           {/* Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredData.length > 0 ? (
-              filteredData.map((item, index) => (
+            {currentData.length > 0 ? (
+              currentData.map((item, index) => (
                 <div
                   key={index}
                   className="relative bg-gradient-to-br from-green-50 via-green-100 to-white rounded-3xl shadow-lg overflow-hidden group hover:shadow-2xl transition-all duration-500 cursor-pointer"
@@ -336,18 +358,18 @@ const Villa = () => {
                   {/* Content */}
                   <div className="p-5 flex flex-col gap-3">
                     {/* Name and Price */}
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
-  <h3 className="text-lg font-semibold text-gray-900">
-    {item.name}
-  </h3>
-  <div className="text-green-600 font-bold text-lg">
-    Rs. {item.price ? item.price.toLocaleString() : "N/A"}
-  </div>
-</div>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
+                      <h3 className="text-lg font-semibold text-gray-900">
+                        {item.name}
+                      </h3>
+                      <div className="text-green-600 font-bold text-lg">
+                        Rs. {item.price ? item.price.toLocaleString() : "N/A"}
+                      </div>
+                    </div>
 
                     {/* Short description */}
                     <p className="hidden sm:block text-gray-600 text-sm">
-                     {item.description.length > 100
+                      {item.description.length > 100
                         ? item.description.substring(0, 100) + "..."
                         : item.description}
                     </p>
@@ -370,6 +392,54 @@ const Villa = () => {
           </div>
         </div>
       </div>
+
+      {/* Pagination */}
+      {filteredData.length > 0 && totalPages > 1 && (
+        <div className="flex flex-row justify-center items-center mt-8 gap-3">
+          <button
+            onClick={() => setpagination((p) => Math.max(p - 1, 1))}
+            disabled={pagination === 1}
+            className={`text-xl transition ${
+              pagination === 1
+                ? "text-gray-400 "
+                : " text-white hover:bg-green-700"
+            }`}
+          >
+            <IoIosArrowBack />
+          </button>
+
+         
+
+          {Array.from({ length: totalPages }, (_, i) => {
+            const page = i + 1;
+            return (
+              <button
+                key={page}
+                onClick={() => setpagination(page)}
+                className={`px-3 py-1 rounded-lg transition ${
+                  pagination === page
+                    ? "bg-green-600 text-white"
+                    : "bg-gray-700 text-gray-200 hover:bg-gray-600"
+                }`}
+              >
+                {page}
+              </button>
+            );
+          })}
+
+          <button
+            onClick={() => setpagination((p) => Math.min(p + 1, totalPages))}
+            disabled={pagination === totalPages}
+            className={`text-2xl transition ${
+              pagination === totalPages
+                ? "text-gray-400"
+                : " text-white "
+            }`}
+          >
+         <MdNavigateNext />
+          </button>
+        </div>
+      )}
     </section>
   );
 };

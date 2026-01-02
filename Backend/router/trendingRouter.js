@@ -6,14 +6,12 @@ import {
   sendBooking,
 } from "../controller/trendingController.js";
 import upload from "../middleware/multer.js";
-import adminAuth from "../middleware/adminAuth.js";
 import verifyToken from "../middleware/verifyToken.js";
 import TrendingModel from "../schema/trendingScehema.js";
 
 const trendrouter = express.Router();
 
-// ✅ Configure multer to handle all image fields
-// Support mainImage (required), images array (additional images), and legacy single image fields
+
 const trendinguploadField = upload.fields([
   { name: "mainImage", maxCount: 1 }, // new: separate main image
   { name: "images", maxCount: 50 }, // new: multiple additional images
@@ -44,8 +42,7 @@ trendrouter.post("/sendbooking", sendBooking);
 trendrouter.get("/trenddata", async (req, res) => {
   try {
     const trends = await TrendingModel.find();
-    // OPTIONAL: If you want to control which fields are sent back (e.g., exclude large text/images),
-    // you can use .select(). However, this is fine for now.
+   
     res.json(trends);
   } catch (err) {
     console.error("Error fetching trending data:", err);

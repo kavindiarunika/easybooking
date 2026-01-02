@@ -13,7 +13,10 @@ const TrendingSchema = new mongoose.Schema(
     district: { type: String, required: true },
     price: { type: Number, required: true },
     count: { type: Number, default: 0 }, // ✅ added count field
-    images: [String],
+    otherimages:{
+     type:[String],
+          default:[]
+    } ,
 
     image: String,
     image1: String,

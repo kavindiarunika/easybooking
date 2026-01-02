@@ -45,12 +45,11 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
   }
 };
 
-// --------------------------------------------------------
-// ADD TRENDING CONTROLLER
+
+
 // --------------------------------------------------------
 const addtrending = async (req, res) => {
   try {
-    // ⚠️ videoUrl MUST be let (we modify it later)
     let {
       name,
       description,
@@ -64,30 +63,25 @@ const addtrending = async (req, res) => {
       address,
       contact,
       ownerEmail,
-      videoUrl, // ✅ FIXED
+      videoUrl,
     } = req.body;
 
-    // --------------------- Clean video URL ---------------------
+    // ---------- clean video URL ----------
     if (videoUrl && typeof videoUrl === "string") {
       videoUrl = videoUrl.trim();
       if (videoUrl === "") videoUrl = null;
     }
 
-    // --------------------- Collect image files ---------------------
+    // ---------- collect image files ----------
     let fileList = [];
 
-    // Main image
+    // main image
     if (req.files?.mainImage?.[0]) {
       fileList.push(req.files.mainImage[0]);
     }
 
-    // Multiple images
-    if (Array.isArray(req.files?.images)) {
-      fileList.push(...req.files.images);
-    }
-
-    // Backward compatibility image fields
-    const legacyFields = [
+    // image – image6 (KEEP ORDER)
+    const imageFields = [
       "image",
       "image1",
       "image2",
@@ -97,11 +91,16 @@ const addtrending = async (req, res) => {
       "image6",
     ];
 
-    legacyFields.forEach((field) => {
-      if (Array.isArray(req.files?.[field])) {
-        fileList.push(...req.files[field]);
+    imageFields.forEach((field) => {
+      if (req.files?.[field]?.[0]) {
+        fileList.push(req.files[field][0]);
       }
     });
+
+    // other images (NEW)
+    if (Array.isArray(req.files?.otherimages)) {
+      fileList.push(...req.files.otherimages);
+    }
 
     if (fileList.length === 0) {
       return res.status(400).json({
@@ -110,55 +109,56 @@ const addtrending = async (req, res) => {
       });
     }
 
-    // --------------------- Upload images ---------------------
-    const imageUrls = await Promise.all(
+    // ---------- upload ----------
+    const uploadedUrls = await Promise.all(
       fileList.map((file) => uploadToCloudinary(file, "image"))
     );
 
-    if (!imageUrls[0]) {
-      return res.status(500).json({
-        success: false,
-        message: "Image upload failed",
-      });
-    }
+    // ---------- map uploaded images ----------
+    const [
+      mainImage,
+      image,
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
+      image6,
+      ...otherimages // ✅ REST GOES HERE
+    ] = uploadedUrls;
 
-    // --------------------- Save Trending Data ---------------------
-    const trendingData = {
+    // ---------- save ----------
+    const trendingItem = new TrendingModel({
       name,
       description,
       category,
-      rating: rating ? parseInt(rating) : 5,
+      rating: rating ? Number(rating) : 5,
       district,
-      price: price ? parseFloat(price) : 0,
-      videoUrl, // ✅ saved correctly
-      images: imageUrls,
-      image: imageUrls[0],
-      image1: imageUrls[1] || null,
-      image2: imageUrls[2] || null,
-      image3: imageUrls[3] || null,
-      image4: imageUrls[4] || null,
-      image5: imageUrls[5] || null,
-      image6: imageUrls[6] || null,
+      price: price ? Number(price) : 0,
+
+      image: mainImage || image,
+      image1,
+      image2,
+      image3,
+      image4,
+      image5,
+      image6,
+
+      otherimages, // ✅ NEW FIELD
+
+      videoUrl,
       location,
       highlights,
       address,
       contact,
       ownerEmail,
+
       availableThings: availableThings
-        ? availableThings.split(",").map((item) => item.trim())
+        ? availableThings.split(",").map((i) => i.trim())
         : [],
-    };
+    });
 
-    const trendingItem = new TrendingModel(trendingData);
     await trendingItem.save();
-
-    // Emit socket event to notify clients about the new trending item
-    try {
-      const io = req.app?.get("io");
-      if (io) io.emit("trendingUpdated", { action: "add", item: trendingItem });
-    } catch (e) {
-      console.warn("Could not emit trendingUpdated (add):", e);
-    }
 
     res.status(201).json({
       success: true,
@@ -173,6 +173,7 @@ const addtrending = async (req, res) => {
     });
   }
 };
+
 
 // --------------------------------------------------------
 // DELETE TRENDING CONTROLLER
@@ -218,7 +219,6 @@ const updateTrendingById = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Accept fields similar to addtrending
     let {
       name,
       description,
@@ -236,27 +236,23 @@ const updateTrendingById = async (req, res) => {
       count,
     } = req.body;
 
-    // Clean and prepare update object
     const updateData = {};
 
     if (name !== undefined) updateData.name = name;
     if (description !== undefined) updateData.description = description;
     if (category !== undefined) updateData.category = category;
-    if (rating !== undefined)
-      updateData.rating = rating ? parseInt(rating) : undefined;
+    if (rating !== undefined) updateData.rating = Number(rating);
     if (district !== undefined) updateData.district = district;
-    if (price !== undefined)
-      updateData.price = price ? parseFloat(price) : undefined;
+    if (price !== undefined) updateData.price = Number(price);
     if (location !== undefined) updateData.location = location;
     if (highlights !== undefined) updateData.highlights = highlights;
     if (address !== undefined) updateData.address = address;
     if (contact !== undefined) updateData.contact = contact;
     if (ownerEmail !== undefined) updateData.ownerEmail = ownerEmail;
 
-    if (videoUrl && typeof videoUrl === "string") {
-      videoUrl = videoUrl.trim();
-      if (videoUrl === "") videoUrl = null;
-      updateData.videoUrl = videoUrl;
+    if (videoUrl !== undefined) {
+      videoUrl = videoUrl?.trim();
+      updateData.videoUrl = videoUrl === "" ? null : videoUrl;
     }
 
     if (availableThings !== undefined) {
@@ -268,27 +264,25 @@ const updateTrendingById = async (req, res) => {
     }
 
     if (count !== undefined) {
-      const parsedCount = parseInt(count);
+      const parsedCount = Number(count);
       if (isNaN(parsedCount) || parsedCount < 0) {
         return res
           .status(400)
-          .json({ success: false, message: "Invalid 'count' value" });
+          .json({ success: false, message: "Invalid count value" });
       }
       updateData.count = parsedCount;
     }
 
-    // --------------------- Handle image uploads (optional) ---------------------
+    // ---------------- IMAGE HANDLING ----------------
     let fileList = [];
 
+    // mainImage
     if (req.files?.mainImage?.[0]) {
       fileList.push(req.files.mainImage[0]);
     }
 
-    if (Array.isArray(req.files?.images)) {
-      fileList.push(...req.files.images);
-    }
-
-    const legacyFields = [
+    // image -> image6 (KEEP ORDER)
+    const imageFields = [
       "image",
       "image1",
       "image2",
@@ -298,28 +292,48 @@ const updateTrendingById = async (req, res) => {
       "image6",
     ];
 
-    legacyFields.forEach((field) => {
-      if (Array.isArray(req.files?.[field])) {
-        fileList.push(...req.files[field]);
+    imageFields.forEach((field) => {
+      if (req.files?.[field]?.[0]) {
+        fileList.push(req.files[field][0]);
       }
     });
 
+    // otherimages (NEW)
+    if (Array.isArray(req.files?.otherimages)) {
+      fileList.push(...req.files.otherimages);
+    }
+
     if (fileList.length > 0) {
-      const imageUrls = await Promise.all(
+      const uploadedUrls = await Promise.all(
         fileList.map((file) => uploadToCloudinary(file, "image"))
       );
 
-      updateData.images = imageUrls;
-      updateData.image = imageUrls[0] || null;
-      updateData.image1 = imageUrls[1] || null;
-      updateData.image2 = imageUrls[2] || null;
-      updateData.image3 = imageUrls[3] || null;
-      updateData.image4 = imageUrls[4] || null;
-      updateData.image5 = imageUrls[5] || null;
-      updateData.image6 = imageUrls[6] || null;
+      const [
+        mainImage,
+        image,
+        image1,
+        image2,
+        image3,
+        image4,
+        image5,
+        image6,
+        ...otherimages
+      ] = uploadedUrls;
+
+      if (mainImage) updateData.image = mainImage;
+      if (image) updateData.image1 = image;
+      if (image1) updateData.image2 = image1;
+      if (image2) updateData.image3 = image2;
+      if (image3) updateData.image4 = image3;
+      if (image4) updateData.image5 = image4;
+      if (image5) updateData.image6 = image5;
+
+      if (otherimages.length > 0) {
+        updateData.otherimages = otherimages;
+      }
     }
 
-    // --------------------- Perform update ---------------------
+    // ---------------- UPDATE ----------------
     const updated = await TrendingModel.findByIdAndUpdate(id, updateData, {
       new: true,
     });
@@ -330,17 +344,13 @@ const updateTrendingById = async (req, res) => {
         .json({ success: false, message: "Trending item not found" });
     }
 
-    // Emit socket event to notify clients about update
-    try {
-      const io = req.app?.get("io");
-      if (io) io.emit("trendingUpdated", { action: "update", item: updated });
-    } catch (e) {
-      console.warn("Could not emit trendingUpdated (update):", e);
-    }
+    // socket emit
+    const io = req.app?.get("io");
+    if (io) io.emit("trendingUpdated", { action: "update", item: updated });
 
     res.json({
       success: true,
-      message: "Trending item updated",
+      message: "Trending item updated successfully",
       data: updated,
     });
   } catch (error) {
@@ -352,9 +362,6 @@ const updateTrendingById = async (req, res) => {
   }
 };
 
-// --------------------------------------------------------
-// SEND BOOKING EMAIL TO OWNER
-// --------------------------------------------------------
 const sendBooking = async (req, res) => {
   try {
     const { hotelName, ownerEmail, booking } = req.body;
