@@ -14,6 +14,8 @@ import DeleteTrending from "./Pages/Delete/DeleteTrending";
 import EditTrending from "./Pages/edit/Edit";
 import AddTraveling from "./Pages/Add/AddTraveling";
 import DeletePlaces from "./Pages/Delete/DletePlaces";
+import AddSafari from "./Pages/Add/AddSafari";
+import DleteSafari from "./Pages/Delete/DleteSafari";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -104,6 +106,22 @@ function App() {
                   element={
                     <ProtectedRoute>
                       <DeletePlaces token={token} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/addsafari"
+                  element={
+                    <ProtectedRoute>
+                      <AddSafari token={token} />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="/deletesafari"
+                  element={
+                    <ProtectedRoute>
+                      <DleteSafari token={token} />
                     </ProtectedRoute>
                   }
                 />
