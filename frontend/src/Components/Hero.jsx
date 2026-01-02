@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaInstagram, FaTwitter, FaYoutube } from "react-icons/fa";
 import homepageImages from "../assets/HomepageImages/home";
+import { Link } from "react-router-dom";
+import { MdHotel } from "react-icons/md";
+import { RiSafariFill } from "react-icons/ri";
+import { FaCar } from "react-icons/fa";
 
 const Hero = () => {
   const slides = homepageImages;
@@ -51,19 +54,22 @@ const Hero = () => {
         </p>
 
         {/* CTA Button */}
-        <div className="mt-8">
+        <Link to ='/villa'>
+        <div className="mt-8" >
           <button className="bg-white text-black font-semibold py-3 px-6 rounded-full flex items-center gap-3 hover:bg-gray-200 transition">
             Booking Now
             <span className="text-xl">➜</span>
           </button>
         </div>
+        </Link>
       </div>
+      
 
       {/* Social Icons Right */}
       <div className="absolute right-8 top-1/2 -translate-y-1/2 space-y-6 text-xl opacity-90 text-green-400 flex flex-col">
-        <FaInstagram className="hover:text-cyan-400 cursor-pointer transition sm:w-12 w-6 h-auto border-4 border-l-fuchsia-500 rounded-full p-2 hover:border-cyan-400" />
-        <FaTwitter className="hover:text-cyan-400 cursor-pointer transition sm:w-12 w-6 h-auto border-4 border-l-fuchsia-500 rounded-full p-2 hover:border-cyan-400" />
-        <FaYoutube className="hover:text-cyan-400 cursor-pointer transition sm:w-12 w-6 h-auto border-4 border-l-fuchsia-500 rounded-full p-2 hover:border-cyan-400" />
+       <Link to="/villa"><MdHotel className="hover:text-cyan-400 cursor-pointer transition sm:w-12 w-6 h-auto border-4 border-l-fuchsia-500 rounded-full p-2 hover:border-cyan-400" /></Link>
+       <Link to="/vehicle"><FaCar className="hover:text-cyan-400 cursor-pointer transition sm:w-12 w-6 h-auto border-4 border-l-fuchsia-500 rounded-full p-2 hover:border-cyan-400" /></Link>
+       <Link to="/safarihome"><RiSafariFill className="hover:text-cyan-400 cursor-pointer transition sm:w-12 w-6 h-auto border-4 border-l-fuchsia-500 rounded-full p-2 hover:border-cyan-400" /></Link>
       </div>
 
       {/* Explore Bottom Right */}

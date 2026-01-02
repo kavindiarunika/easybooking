@@ -24,9 +24,10 @@ const Header = () => {
           <ul className="hidden sm:flex gap-16 text-xl text-white">
             {[
               { name: "Home", path: "./" },
-              { name: "About Sri Lanka", path: "/", onClick: handleSpecial },
               { name: "stays", path: "/villa" },
-              {name:"traveling places", path:"/places" }
+               {name:"safari" , path:"/safarihome"},
+              {name:"traveling places", path:"/places" },
+             
               
             ].map((item, index) => (
               <li key={index} className="relative group cursor-pointer pb-1">
@@ -101,6 +102,15 @@ const Header = () => {
                 Hotels
               </NavLink>
               <NavLink
+                to="/safarihome"
+                onClick={toggleMenu}
+                className={({ isActive }) =>
+                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                }
+              >
+                Safari
+              </NavLink>
+              <NavLink
                 to="/places"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
@@ -110,16 +120,7 @@ const Header = () => {
                 Travel Places
               </NavLink>
 
-              <NavLink
-                to="./"
-                onClick={() => {
-                  toggleMenu();
-                  handleSpecial();
-                }}
-                className="hover:text-cyan-300"
-              >
-                About Us
-              </NavLink>
+             
             </div>
           </div>
         </div>
