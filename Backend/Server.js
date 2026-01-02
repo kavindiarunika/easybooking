@@ -133,10 +133,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => console.log("Socket disconnected:", socket.id));
 });
 
-server.listen(port, () =>
-  console.log(
-    `Server starting on port ${port} in ${
-      process.env.NODE_ENV || "development"
-    } mode.`
-  )
-);
+server.listen(port, '0.0.0.0', () => {
+  console.log(`✅ Server running on port ${port}`);
+  console.log(`🌐 Accessible at: http://13.49.78.21:${port}`);
+});
