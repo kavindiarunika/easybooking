@@ -32,10 +32,10 @@ export const createTravelPlace = async (req, res) => {
     );
 
     // Upload other images
-    let images = [];
-    if (req.files.images) {
-      images = await Promise.all(
-        req.files.images.map((img) =>
+    let otherimages = [];
+    if (req.files?.otherimages) {
+      otherimages = await Promise.all(
+        req.files.otherimages.map((img) =>
           uploadImage(img, "travelplaces/gallery")
         )
       );
@@ -46,7 +46,7 @@ export const createTravelPlace = async (req, res) => {
       description,
       district,
       mainImage,
-      images,
+      otherimages,
     });
 
     await travelPlace.save();
@@ -71,35 +71,26 @@ export const getTravelPlaces = async (req, res) => {
   }
 };
 
-
-
 /*-----------------------------delete-------------------- */
-export const deleteTravelPlace =async(req,res)=>{
+export const deleteTravelPlace = async (req, res) => {
+  try {
+    const { name } = req.body;
 
- 
+    if (!name) {
+      return res.status(400).json({ massage: "name is requires" });
+    }
 
-  try{
-   const {name} =req.body;
+    const place = await TravelPlace.findOne({
+      name: name,
+    });
+    if (!place) {
+      return res.status(404).json({ massage: "place not found" });
+    }
 
-   if(!name){
-    return res.status(400).json({massage:"name is requires"})
-   }
+    await TravelPlace.deleteOne({ _id: place._id });
 
-   const place = await TravelPlace.findOne({
-    name:name
-   })
-   if(!place){
-    return res.status(404).json({massage:"place not found"})
-   }
-
-   await TravelPlace.deleteOne ({_id:place._id})
-
-   res.status(200).json({massage:"place delete successfully"})
-
-
+    res.status(200).json({ massage: "place delete successfully" });
+  } catch (error) {
+    res.status(500).json({ message: "server error" });
   }
-  catch(error){
-    res.status(500).json({message:"server error"})
-
-  }
-}
+};

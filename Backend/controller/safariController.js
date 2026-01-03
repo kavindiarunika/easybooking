@@ -75,10 +75,10 @@ export const createSfari = async (req, res) => {
       );
     }
 
-    let images = [];
-    if (req.files.images) {
-      images = await Promise.all(
-        req.files.images.map((img) => uploadimage(img, "safari/gallery"))
+    let otherimages = [];
+    if (req.files?.otherimages) {
+      otherimages = await Promise.all(
+        req.files.otherimages.map((img) => uploadimage(img, "safari/gallery"))
       );
     }
 
@@ -98,7 +98,7 @@ export const createSfari = async (req, res) => {
       totalDays,
       email,
       mainImage: mainImage,
-      images: images,
+      otherimages: otherimages,
       shortvideo: shortvideo,
       VehicleType: VehicleType,
       vehicleImage: vehicleImage,
@@ -150,52 +150,48 @@ export const getSafariById = async (req, res) => {
 
 //update safari
 
-export const updateSafari = async(req,res) =>{
+export const updateSafari = async (req, res) => {
+  try {
+    const safari = await safari.findById(req.params.id);
 
-  try{
-
-    const safari =await safari.findById(req.params.id);
-
-    if(!safari){
-      return res.status(404).json({message:"database cannot find"})
+    if (!safari) {
+      return res.status(404).json({ message: "database cannot find" });
     }
     safari.name = req.body.name || safari.name;
-    safari.description =req.body.description ||safari.description;
+    safari.description = req.body.description || safari.description;
     safari.price = req.body.price || safari.price;
-    safari.TeamMembers =req.body.TeamMembers || safari.TeamMembers;
+    safari.TeamMembers = req.body.TeamMembers || safari.TeamMembers;
     safari.whatsapp = req.body.whatsapp || safari.whatsapp;
     safari.totalDays = req.body.totalDays || safari.totalDays;
     safari.email = req.body.email || safari.email;
     safari.VehicleType = req.body.VehicleType || safari.VehicleType;
     safari.GuiderName = req.body.GuiderName || safari.GuiderName;
-    safari.GuiderExperience = req.body.GuiderExperience || safari.GuiderExperience;
+    safari.GuiderExperience =
+      req.body.GuiderExperience || safari.GuiderExperience;
 
-    if(req.body.adventures)safari.adventures = req.body.adventures;
-    if(req.body.includeplaces)safari.includeplaces = req.body.includeplaces;
+    if (req.body.adventures) safari.adventures = req.body.adventures;
+    if (req.body.includeplaces) safari.includeplaces = req.body.includeplaces;
 
-    if(req.files?.mainImage){
+    if (req.files?.mainImage) {
       safari.mainImage = req.files.mainImage[0].path;
     }
-    if(req.files?.images){
-      safari.imzges = req.files.images.map((img) =>img.path);
+    if (req.files?.otherimages) {
+      safari.otherimages = req.files.otherimages.map((img) => img.path);
     }
 
+    if (req.files?.vehicleImage) {
+      safari.vehicleImage = req.files.vehicleImage.map((img) => img.path);
+    }
 
-     if(req.files?.vehicleImage){
-         safari.vehicleImage = req.files.vehicleImage.map((img) =>img.path)
-            }
-    
-            if(req.files?.GuiderImage){
-              safari.GuiderImage = req.files.GuiderImage[0].path;
-            }
-     if(req.files?.shortvideo){
-       safari.shortvideo = req.files.shortvideo[0].path;
-     }
+    if (req.files?.GuiderImage) {
+      safari.GuiderImage = req.files.GuiderImage[0].path;
+    }
+    if (req.files?.shortvideo) {
+      safari.shortvideo = req.files.shortvideo[0].path;
+    }
 
-     await safari.save();
-
-  }
-  catch(error){
+    await safari.save();
+  } catch (error) {
     console.error("updateSafari error:", error);
   }
-}
+};

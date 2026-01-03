@@ -48,9 +48,7 @@ const Trending = () => {
 
         setaddtrend(scheduledData);
       })
-      .catch((err) =>
-        console.error("Failed to fetch trending hotels:", err)
-      );
+      .catch((err) => console.error("Failed to fetch trending hotels:", err));
   }, [setaddtrend]);
 
   const trends = Array.isArray(addtrend) ? addtrend : [];
@@ -66,10 +64,8 @@ const Trending = () => {
   return (
     <section className="w-full py-16 px-4 md:px-16">
       {/* Header */}
-      <div className="flex items-center justify-between mb-12 p-4 rounded-xl shadow-md">
-        <h2 className="text-4xl font-bold text-green-200">
-          Book Your Hotel
-        </h2>
+      <div className="flex flex-row items-center justify-between mb-12 p-4 rounded-xl shadow-md ">
+        <h2 className="text-2xl sm:text-4xl font-bold text-green-200">Book Your Hotel</h2>
         <button
           onClick={() => navigate("/villa")}
           className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700 transition"
@@ -87,16 +83,14 @@ const Trending = () => {
             className="cursor-pointer rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl hover:scale-105 transition bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200"
           >
             <img
-              src={item.image}
+              src={item.mainImage || item.image || item.image1}
               alt={item.name}
               className="w-full h-52 object-cover"
             />
 
             <div className="p-4">
               <div className="flex justify-between mb-4">
-                <span className="font-semibold text-lg">
-                  {item.name}
-                </span>
+                <span className="font-semibold text-lg">{item.name}</span>
                 <span className="text-green-600 font-bold">
                   Rs. {item.price?.toLocaleString() || "N/A"}
                 </span>

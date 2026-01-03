@@ -10,7 +10,7 @@ const travelingplacesroute = express.Router();
 
 const travelingPlace = upload.fields([
   { name: "mainImage", maxCount: 1 },
-  { name: "images", maxCount: 10 },
+  { name: "otherimages", maxCount: 10 },
 ]);
 
 // Create

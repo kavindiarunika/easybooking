@@ -317,21 +317,22 @@ const Villa = () => {
                   <div className="relative">
                     {(() => {
                       const images =
-                        item.images && item.images.length
-                          ? item.images
+                        item.otherimages && item.otherimages.length
+                          ? [
+                              item.mainImage || item.image,
+                              ...item.otherimages,
+                            ].filter(Boolean)
                           : [
-                              item.image,
+                              item.mainImage || item.image,
                               item.image1,
                               item.image2,
                               item.image3,
                               item.image4,
-                              item.image5,
-                              item.image6,
                             ].filter(Boolean);
                       return (
                         <>
                           <img
-                            src={images[0] || item.image}
+                            src={images[0]}
                             alt={item.name}
                             className="w-full h-48 sm:h-64 object-cover rounded-t-3xl group-hover:scale-110 transition-transform duration-500"
                           />
@@ -408,8 +409,6 @@ const Villa = () => {
             <IoIosArrowBack />
           </button>
 
-         
-
           {Array.from({ length: totalPages }, (_, i) => {
             const page = i + 1;
             return (
@@ -431,12 +430,10 @@ const Villa = () => {
             onClick={() => setpagination((p) => Math.min(p + 1, totalPages))}
             disabled={pagination === totalPages}
             className={`text-2xl transition ${
-              pagination === totalPages
-                ? "text-gray-400"
-                : " text-white "
+              pagination === totalPages ? "text-gray-400" : " text-white "
             }`}
           >
-         <MdNavigateNext />
+            <MdNavigateNext />
           </button>
         </div>
       )}

@@ -12,7 +12,7 @@ const safariSchema = new mongoose.Schema(
     totalDays: { type: Number, required: true },
     email: { type: String, required: true },
     mainImage: { type: String, required: true },
-    images: { type: [String] },
+    otherimages: { type: [String] },
     shortvideo: { type: String },
     VehicleType: { type: String, required: true },
     vehicleImage: { type: [String], required: true },

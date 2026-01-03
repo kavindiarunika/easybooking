@@ -45,8 +45,6 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
   }
 };
 
-
-
 // --------------------------------------------------------
 const addtrending = async (req, res) => {
   try {
@@ -81,15 +79,7 @@ const addtrending = async (req, res) => {
     }
 
     // image – image6 (KEEP ORDER)
-    const imageFields = [
-      "image",
-      "image1",
-      "image2",
-      "image3",
-      "image4",
-      "image5",
-      "image6",
-    ];
+    const imageFields = ["image", "image1", "image2", "image3", "image4"];
 
     imageFields.forEach((field) => {
       if (req.files?.[field]?.[0]) {
@@ -122,8 +112,7 @@ const addtrending = async (req, res) => {
       image2,
       image3,
       image4,
-      image5,
-      image6,
+
       ...otherimages // ✅ REST GOES HERE
     ] = uploadedUrls;
 
@@ -136,21 +125,13 @@ const addtrending = async (req, res) => {
       district,
       price: price ? Number(price) : 0,
 
+      // store mainImage explicitly and keep `image` for compatibility
+      mainImage: mainImage || image || null,
       image: mainImage || image,
       image1,
       image2,
       image3,
       image4,
-      image5,
-      image6,
-
-      otherimages, // ✅ NEW FIELD
-
-      videoUrl,
-      location,
-      highlights,
-      address,
-      contact,
       ownerEmail,
 
       availableThings: availableThings
@@ -173,7 +154,6 @@ const addtrending = async (req, res) => {
     });
   }
 };
-
 
 // --------------------------------------------------------
 // DELETE TRENDING CONTROLLER
@@ -282,15 +262,7 @@ const updateTrendingById = async (req, res) => {
     }
 
     // image -> image6 (KEEP ORDER)
-    const imageFields = [
-      "image",
-      "image1",
-      "image2",
-      "image3",
-      "image4",
-      "image5",
-      "image6",
-    ];
+    const imageFields = ["image", "image1", "image2", "image3", "image4"];
 
     imageFields.forEach((field) => {
       if (req.files?.[field]?.[0]) {
@@ -308,25 +280,17 @@ const updateTrendingById = async (req, res) => {
         fileList.map((file) => uploadToCloudinary(file, "image"))
       );
 
-      const [
-        mainImage,
-        image,
-        image1,
-        image2,
-        image3,
-        image4,
-        image5,
-        image6,
-        ...otherimages
-      ] = uploadedUrls;
+      const [mainImage, image, image1, image2, image3, image4, ...otherimages] =
+        uploadedUrls;
 
-      if (mainImage) updateData.image = mainImage;
+      if (mainImage) {
+        updateData.mainImage = mainImage;
+        updateData.image = mainImage; // keep backward compatibility
+      }
       if (image) updateData.image1 = image;
       if (image1) updateData.image2 = image1;
       if (image2) updateData.image3 = image2;
       if (image3) updateData.image4 = image3;
-      if (image4) updateData.image5 = image4;
-      if (image5) updateData.image6 = image5;
 
       if (otherimages.length > 0) {
         updateData.otherimages = otherimages;

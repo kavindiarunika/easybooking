@@ -22,7 +22,7 @@ const AddSafari = () => {
   });
 
   const [mainImage, setMainImage] = useState(null);
-  const [images, setImages] = useState([]);
+  const [otherimages, setOtherimages] = useState([]);
   const [shortVideo, setShortVideo] = useState(null);
   const [vehicleImages, setVehicleImages] = useState([]);
   const [guiderImage, setGuiderImage] = useState(null); // Fixed: proper useState
@@ -78,7 +78,7 @@ const AddSafari = () => {
     if (guiderImage) data.append("GuiderImage", guiderImage);
 
     vehicleImages.forEach((img) => data.append("vehicleImage", img));
-    images.forEach((img) => data.append("images", img));
+    otherimages.forEach((img) => data.append("otherimages", img));
 
     // Debugging: log FormData entries and file state
     for (let pair of data.entries()) {
@@ -86,7 +86,7 @@ const AddSafari = () => {
     }
     console.log("mainImage state:", mainImage);
     console.log("vehicleImages length:", vehicleImages.length);
-    console.log("images length:", images.length);
+    console.log("otherimages length:", otherimages.length);
 
     try {
       toast.loading("Uploading safari package...");
@@ -110,7 +110,7 @@ const AddSafari = () => {
         GuiderExperience: "",
       });
       setMainImage(null);
-      setImages([]);
+      setOtherimages([]);
       setShortVideo(null);
       setVehicleImages([]);
       setGuiderImage(null);
@@ -323,7 +323,7 @@ const AddSafari = () => {
             type="file"
             accept="image/*"
             multiple
-            onChange={(e) => setImages(Array.from(e.target.files))}
+            onChange={(e) => setOtherimages(Array.from(e.target.files))}
             className="w-full p-3 border border-gray-300 rounded"
           />
         </div>

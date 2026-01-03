@@ -146,9 +146,7 @@ const EditTrending = ({ token }) => {
     });
 
     if (media.otherimages.length > 0) {
-      media.otherimages.forEach((file) =>
-        fd.append("otherimages", file)
-      );
+      media.otherimages.forEach((file) => fd.append("otherimages", file));
     }
 
     try {
@@ -237,11 +235,34 @@ const EditTrending = ({ token }) => {
               ))}
 
               {/* IMAGE INPUTS */}
-              <input type="file" onChange={(e)=>handleSingleFile(e,"mainImage")} />
-              {["image","image1","image2","image3","image4","image5","image6"].map((f,i)=>(
-                <input key={f} type="file" onChange={(e)=>handleSingleFile(e,f)} />
+              {/* Main image (card image) */}
+              <label className="mr-4 text-black">Main Image (card image)</label>
+              <input
+                type="file"
+                name="mainImage"
+                onChange={(e) => handleSingleFile(e, "mainImage")}
+              />
+
+              {/* Image 1 – Image 4 (additional side images) */}
+              {["image1", "image2", "image3", "image4"].map((field) => (
+                <div key={field}>
+                  <label className="mr-4 text-black">{field}</label>
+                  <input
+                    type="file"
+                    name={field}
+                    onChange={(e) => handleSingleFile(e, field)}
+                  />
+                </div>
               ))}
-              <input type="file" multiple onChange={handleOtherImages} />
+
+              {/* Other images */}
+              <label className="mr-4 text-black">Other Images</label>
+              <input
+                type="file"
+                name="otherimages"
+                multiple
+                onChange={handleOtherImages}
+              />
 
               <div className="flex gap-3">
                 <button className="bg-green-600 text-white px-4 py-2 rounded">

@@ -11,7 +11,7 @@ const AddTraveling = () => {
   });
 
   const [mainImage, setMainImage] = useState(null);
-  const [images, setImages] = useState([]);
+  const [otherimages, setOtherimages] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const changeHandle = (e) => {
@@ -31,16 +31,13 @@ const AddTraveling = () => {
     data.append("description", formData.description);
     data.append("district", formData.district);
     data.append("mainImage", mainImage);
-    images.forEach((img) => data.append("images", img));
+    otherimages.forEach((img) => data.append("otherimages", img));
 
     try {
       setLoading(true);
       toast.loading("Uploading travel place...");
 
-      await axios.post(
-        `${backendUrl}/api/travelplaces/addtravelplace`,
-        data
-      );
+      await axios.post(`${backendUrl}/api/travelplaces/addtravelplace`, data);
 
       toast.dismiss();
       toast.success("Travel place added successfully");
@@ -115,21 +112,20 @@ const AddTraveling = () => {
               <option value="nuwaraeliya">Nuwara Eliya</option>
               <option value="jaffna">Jaffna</option>
               <option value="matale">Matale</option>
-                <option value="trincomalee">Trincomalee</option>    
-                <option value="anuradhapura">Anuradhapura</option>
-                <option value="polonnaruwa">Polonnaruwa</option>
-                <option value="hambantota">Hambantota</option>
-                <option value="badulla">Badulla</option>
-                <option value="monaragala">Monaragala</option>
-                <option value="gampaha">Gampaha</option>
-                <option value="kalutara">Kalutara</option>
-                <option value="ratnapura">Ratnapura</option>
-                <option value="kegalle">Kegalle</option>
-                <option value="puttalam">Puttalam</option>
-                <option value="kurunegala">Kurunegala</option>
-                <option value="dambulla">Dambulla</option>
-                <option value="kalutara">Kaluthara</option>
-               
+              <option value="trincomalee">Trincomalee</option>
+              <option value="anuradhapura">Anuradhapura</option>
+              <option value="polonnaruwa">Polonnaruwa</option>
+              <option value="hambantota">Hambantota</option>
+              <option value="badulla">Badulla</option>
+              <option value="monaragala">Monaragala</option>
+              <option value="gampaha">Gampaha</option>
+              <option value="kalutara">Kalutara</option>
+              <option value="ratnapura">Ratnapura</option>
+              <option value="kegalle">Kegalle</option>
+              <option value="puttalam">Puttalam</option>
+              <option value="kurunegala">Kurunegala</option>
+              <option value="dambulla">Dambulla</option>
+              <option value="kalutara">Kaluthara</option>
             </select>
           </div>
 
@@ -156,7 +152,7 @@ const AddTraveling = () => {
               type="file"
               accept="image/*"
               multiple
-              onChange={(e) => setImages([...e.target.files])}
+              onChange={(e) => setOtherimages([...e.target.files])}
               className="w-full text-gray-700"
             />
           </div>

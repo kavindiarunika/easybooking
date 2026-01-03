@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import{ BACKEND_URL } from "../App";
+import { AiOutlineArrowRight } from "react-icons/ai";
 import { Link } from "react-router-dom";
 
 const VisitingPlaces = () => {
@@ -22,8 +23,17 @@ const VisitingPlaces = () => {
   return (
 
 
-    <div className="ml-2 sm:ml-8 mt-4">
+    <div className="ml-2 sm:ml-8 mt-4 mr-4 sm:mr-16">
+      <div className="flex flex-row justify-between items-center">
           <h2 className="text-2xl sm:text-4xl font-bold text-green-200 ml-2 sm:ml-4">Travel Sri Lanka</h2>
+            <button
+                    onClick={() => navigate("/places")}
+                    className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl font-medium hover:bg-green-700 transition transform hover:scale-105"
+                  >
+                    More <AiOutlineArrowRight />
+                  </button>
+        </div>
+        
 
     <div className=" grid grid-cols-3 sm:grid-cols-6 ">
       {places.map((place) => (
@@ -51,3 +61,4 @@ const VisitingPlaces = () => {
 };
 
 export default VisitingPlaces;
+

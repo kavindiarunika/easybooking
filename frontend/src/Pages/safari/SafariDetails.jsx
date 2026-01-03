@@ -68,9 +68,9 @@ const SafariDetails = () => {
               className="w-full h-[45vh] rounded-xl object-cover"
             />
 
-            {safari.images?.length > 0 && (
+            {safari.otherimages?.length > 0 && (
               <div className="grid grid-cols-2 gap-4">
-                {safari.images.map((img, index) => (
+                {safari.otherimages.map((img, index) => (
                   <img
                     key={index}
                     src={img}

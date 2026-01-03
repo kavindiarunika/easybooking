@@ -31,7 +31,7 @@ const AboutSection = () => {
       <p className="w-full h-12"></p>
     
       {/* Header */}
-      <div className="text-center mb-12">
+      <div className="text-center mb-4 sm:mb-12">
         <h2 className="text-4xl font-bold text-gray-100 mb-4">About Our Service</h2>
         <p className="text-yellow-100 text-lg max-w-2xl mx-auto">
           We help you book hotels easily, find the best places to stay, and make your travel experience unforgettable.
@@ -39,7 +39,7 @@ const AboutSection = () => {
       </div>
 
       {/* Features Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-8">
 
         {features.map((feature, index) => (
           <div
@@ -48,7 +48,7 @@ const AboutSection = () => {
           >
             <div className="mb-4">{feature.icon}</div>
             <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
-            <p className="text-gray-600">{feature.description}</p>
+            <p className=" hidden md:block text-gray-600 ">{feature.description}</p>
           </div>
         ))}
       </div>

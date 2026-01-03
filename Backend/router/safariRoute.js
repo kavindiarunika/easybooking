@@ -11,7 +11,7 @@ const safariRouter = express.Router();
 
 const uplodImage = upload.fields([
   { name: "mainImage", maxCount: 1 },
-  { name: "images", maxCount: 10 },
+  { name: "otherimages", maxCount: 10 },
   { name: "shortvideo", maxCount: 1 },
   { name: "vehicleImage", maxCount: 10 },
   { name: "GuiderImage", maxCount: 1 },

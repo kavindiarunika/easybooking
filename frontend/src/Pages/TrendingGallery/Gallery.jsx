@@ -22,10 +22,10 @@ const Gallery = () => {
           return;
         }
         const imgs =
-          item.images && item.images.length
-            ? item.images
+          item.otherimages && item.otherimages.length
+            ? item.otherimages
             : [
-                item.image,
+                item.mainImage || item.image,
                 item.image1,
                 item.image2,
                 item.image3,

@@ -2,22 +2,21 @@ import React, { useContext, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { IoArrowBackOutline } from "react-icons/io5";
 import { TravelContext } from "../../Context/TravelContext";
-
-
+import { CiSaveDown1 } from "react-icons/ci";
+import { IoMdClose } from "react-icons/io";
 import {
   FaMapMarkerAlt,
   FaStar,
   FaAddressBook,
   FaPhoneAlt,
   FaDollarSign,
+  FaWhatsapp,
 } from "react-icons/fa";
-import api from "../../api"; 
-
-import { FaWhatsapp } from "react-icons/fa";
+import api from "../../api";
 
 // ---------------- Helper Components ----------------
 const InfoCard = ({ icon, title, value }) => (
-  <div className="flex items-center gap-3 bg-gray-800/50 p-4 rounded-xl shadow hover:bg-gray-800/70 transition w-full">
+  <div className="flex items-center gap-3 bg-gray-800/50 p-4 rounded-xl shadow w-full">
     {icon}
     <div>
       <p className="font-semibold">{title}</p>
@@ -35,7 +34,6 @@ const TextInput = ({
   readOnly,
   min,
   required,
-  placeholder,
 }) => (
   <div className="flex flex-col">
     <label className="mb-1 text-gray-200">{label}</label>
@@ -46,87 +44,13 @@ const TextInput = ({
       onChange={handleChange}
       readOnly={readOnly}
       min={min}
-      placeholder={placeholder}
+      required={required}
       className={`p-2 rounded-md ${
         readOnly
           ? "bg-gray-600 text-gray-300 cursor-not-allowed"
-          : "bg-gray-700 text-white focus:outline-none"
+          : "bg-gray-700 text-white"
       }`}
-      required={required}
     />
-  </div>
-);
-
-const FormSection = ({ booking, item, handleChange, handleSubmit }) => (
-  <div className="lg:w-1/3">
-    <div className=" bg-gray-800/50  p-6 rounded-xl shadow">
-      <h3 className="text-2xl font-bold mb-6 text-amber-300">Book Your Stay</h3>
-      <form className="space-y-4" onSubmit={handleSubmit}>
-        <TextInput
-          label="Hotel / Resort"
-          name="hotel"
-          value={item.name}
-          readOnly
-        />
-        <TextInput
-          label="Name"
-          name="name"
-          value={booking.name}
-          handleChange={handleChange}
-          required
-        />
-        <TextInput
-          label="Email"
-          name="email"
-          type="email"
-          value={booking.email}
-          handleChange={handleChange}
-          required
-        />
-        <TextInput
-          label="Phone Number"
-          name="phone"
-          type="tel"
-          value={booking.phone}
-          handleChange={handleChange}
-          placeholder="+94 7X XXX XXXX"
-          required
-        />
-        <TextInput
-          label="From"
-          name="fromDate"
-          type="date"
-          value={booking.fromDate}
-          handleChange={handleChange}
-          required
-        />
-
-        <TextInput
-          label="To"
-          name="toDate"
-          type="date"
-          value={booking.toDate}
-          handleChange={handleChange}
-          required
-        />
-        <TextInput
-          label="Guests"
-          name="guests"
-          type="number"
-          min={1}
-          value={booking.guests}
-          handleChange={handleChange}
-          required
-        />
-
-        <button
-          type="submit"
-          className="w-full bg-amber-400 hover:bg-amber-300 text-gray-900 font-semibold p-3 rounded-md transition"
-        >
-          make Request
-        </button>
-      </form>
-    </div>
   </div>
 );
 
@@ -142,25 +66,26 @@ const extractYouTubeId = (url) => {
 const Trending = () => {
   const { navigate, addtrend } = useContext(TravelContext);
   const { name } = useParams();
-  const item = addtrend.find((trending) => trending.name.trim() === decodeURIComponent(name).trim());
 
-  // Ensure the page scrolls to top when navigating to this route or when the
-  // `name` param changes (prevents preserving scroll position from previous page)
+  const item = addtrend.find(
+    (t) => t.name.trim() === decodeURIComponent(name).trim()
+  );
+
   useEffect(() => {
-    try {
-      window.scrollTo({ top: 0, left: 0, behavior: "auto" });
-    } catch (e) {
-      // ignore if window is not available (SSR)
-    }
+    window.scrollTo({ top: 0 });
   }, [name]);
-  console.log("ITEM DATA:", item);
 
   const [showVideo, setShowVideo] = useState(false);
-  const videoId = extractYouTubeId(item?.videoUrl);
+  const [showMoreImages, setShowMoreImages] = useState(false);
+
+  if (!item) return <div className="text-white p-10">Loading...</div>;
+
+  const videoId = extractYouTubeId(item.videoUrl);
   const thumbnailUrl = videoId
     ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`
     : null;
 
+  // ---------------- Booking ----------------
   const [booking, setBooking] = useState({
     name: "",
     email: "",
@@ -168,54 +93,30 @@ const Trending = () => {
     fromDate: "",
     toDate: "",
     guests: 1,
-    hotel: item?.name || "",
+    hotel: item.name,
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setBooking({ ...booking, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Validate form fields
-    if (
-      !booking.name ||
-      !booking.email ||
-      !booking.phone ||
-      !booking.fromDate ||
-      !booking.toDate
-    ) {
-      alert("Please fill in all required fields.");
-      return;
-    }
-
-    // Ensure we have an owner email to send the booking to
-    if (!item?.ownerEmail) {
-      console.error("Missing ownerEmail on item:", item);
-      alert("Booking cannot be sent because the owner's email is missing.");
+    if (!item.ownerEmail) {
+      alert("Owner email missing");
       return;
     }
 
     try {
-      // Build payload and log for debugging
       const payload = {
         hotelName: item.name,
         ownerEmail: item.ownerEmail,
         booking,
       };
-      console.log("Sending booking payload:", payload);
 
       const res = await api.post("/api/trending/sendbooking", payload);
 
-
-      if (res?.data?.success) {
-        alert("Booking request sent successfully!");
-      } else {
-        alert(res?.data?.message || "Booking request sent (no confirmation)");
-      }
-
-      // Reset form after submission
+      if (res.data.success) alert("Booking request sent!");
       setBooking({
         name: "",
         email: "",
@@ -225,157 +126,113 @@ const Trending = () => {
         guests: 1,
         hotel: item.name,
       });
-    } catch (error) {
-      console.error("Error sending booking email:", error?.response || error);
-      const serverMsg = error?.response?.data?.message || error?.message;
-      alert(`Failed to send booking: ${serverMsg}`);
+    } catch (err) {
+      alert("Booking failed");
     }
   };
 
-  if (!item) return <div className="text-white p-10">Loading...</div>;
-
   return (
-    <div className="bg-gray-900 text-white min-h-screen px-4 sm:px-8 lg:px-16 py-10">
-      <p className="w-full h-24"></p>
-
-      {/* Back & Title */}
-      <div className="flex flex-row items-center gap-6 mb-8">
+    <div className="bg-gray-900 text-white min-h-screen px-6 py-10">
+      <p className="h-30 w-full"></p>
+      {/* Back */}
+      <div className=" flex flex-row  gap-4">
         <button
           onClick={() => navigate("/villa")}
-          className="flex items-center justify-center text-white hover:text-amber-300 transition"
+          className="flex items-center gap-2 mb-6"
         >
-          <IoArrowBackOutline size={28} />
+          <IoArrowBackOutline size={26} />
         </button>
-        <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-          <h1 className="text-2xl sm:text-4xl font-bold text-cyan-400">
-            {item.name}
-          </h1>
-        </div>
+
+        <h1 className="text-3xl font-bold text-cyan-400 mb-6">{item.name}</h1>
       </div>
 
-      {/* Gallery */}
-      <div className="grid grid-cols-3 grid-rows-2 gap-4 mb-12">
-        {/* Main image - large, takes up 2 cols and 2 rows */}
-        <div className="col-span-2 row-span-2 overflow-hidden rounded-2xl shadow-lg group max-h-96">
-          <img
-            src={item.image || item.image1}
-            alt={`${item.name} main`}
-            className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-          />
-        </div>
+      {/* ================= GALLERY ================= */}
+      <div className="mb-10">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
+          {/* MAIN IMAGE */}
+          <div className="col-span-2 row-span-2 aspect-[16/9] rounded-xl overflow-hidden  relative">
 
-        {/* Additional images - smaller thumbnails */}
-        {[item.image2, item.image3, item.image4, item.image5].map(
-          (img, i) =>
-            img && (
+         
+            <img
+              src={item.mainImage || item.image || item.image1}
+              alt="main"
+              className="w-full h-[50vh] sm:h-[80vh] object-cover"
+            />
+          </div>
+
+          {/* SIDE IMAGES */}
+          {[item.image1, item.image2, item.image3, item.image4]
+            .filter(Boolean)
+            .map((img, i) => (
               <div
                 key={i}
-                className="overflow-hidden rounded-2xl shadow-lg group max-h-44"
+                className="aspect-[16/9] rounded-xl overflow-hidden bg-gray-100"
               >
                 <img
                   src={img}
-                  alt={`${item.name} ${i + 2}`}
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                  alt={`img-${i + 1}`}
+                  className="w-full h-[10vh] sm:h-[50vh] object-cover"
                 />
               </div>
-            )
+            ))}
+     {item.otherimages?.length > 0 && (
+            <div className="absolute top-[60vh] right-20 text-center text-green-400 font-bold text-sm  sm:text-xl hover:text-amber-300">
+              <button
+                onClick={() => setShowMoreImages(!showMoreImages)}
+                className="h-[10vh] sm:h-[20vh] p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
+              >
+                {showMoreImages ? "Hide Photos" : "View More Photos"}
+                <CiSaveDown1 className="inline ml-2 w-4 h-4 sm:w-12 sm:h-12" />
+              </button>
+            </div>
+          )}
+          {/* VIEW MORE BUTTON */}
+        
+        </div>
+
+        {/* FULLSCREEN GALLERY MODAL */}
+        {showMoreImages && (
+          <div className="sm:fixed inset-0 bg-black/70 z-50 flex  p-0 sm:p-4 ">
+            <div className="bg-gray-900 rounded-lg w-full max-w-[95vw] sm:max-w-3xl md:max-w-6xl max-h-[90vh] overflow-y-auto mx-auto px-3 sm:px-0">
+              {/* CLOSE BUTTON */}
+              <div className="flex justify-center sm:justify-end p-3 sm:p-2 border-b border-gray-700 sticky top-0 bg-gray-900 z-10">
+                <button
+                  aria-label="Close gallery"
+                  onClick={() => setShowMoreImages(false)}
+                  className="text-white bg-red-500 hover:bg-red-600 px-3 py-2 rounded-lg text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-red-400"
+                >
+                  <IoMdClose size={22} />
+                </button>
+              </div>
+
+              {/* IMAGES GRID */}
+              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-2 p-3 sm:p-4 justify-items-center">
+                {item.otherimages.map((src, idx) => (
+                  <div
+                    key={idx}
+                    className="w-full rounded overflow-hidden bg-gray-800 flex justify-center p-2"
+                  >
+                    <img
+                      src={src}
+                      alt={`other-${idx}`}
+                      className="w-full max-w-[92%] max-h-[60vh] h-auto object-contain"
+                    />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
-      {/* Two Column Layout */}
-      {/* Video URL (display only, no embedding) */}
-      <div className="flex flex-col lg:flex-row gap-12">
-        {/* Left Side */}
-        <div className="lg:w-2/3 space-y-10">
-          <InfoCard
-          
-            value={
-              item.videoUrl ? (
-                videoId ? (
-                  <>
-                    <div
-                      role="button"
-                      tabIndex={0}
-                      onClick={() => setShowVideo(true)}
-                      onKeyDown={(e) => {
-                        if (e.key === "Enter") setShowVideo(true);
-                      }}
-                      className="relative w-full max-w-md cursor-pointer rounded-lg overflow-hidden"
-                    >
-                      <img
-                        src={thumbnailUrl}
-                        alt={`${item.name} video thumbnail`}
-                        className="w-full h-auto object-cover rounded-lg shadow-md"
-                      />
-                     
-                    </div>
-
-                    {showVideo && (
-                      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70">
-                        <div className="relative w-full max-w-4xl">
-                          <button
-                            onClick={() => setShowVideo(false)}
-                            className="absolute top-2 right-2 text-white bg-gray-800/60 px-3 py-1 rounded"
-                          >
-                            Close
-                          </button>
-                          <div
-                            style={{
-                              position: "relative",
-                              paddingTop: "56.25%",
-                            }}
-                          >
-                            <iframe
-                              title={`${item.name} video`}
-                              src={`https://www.youtube.com/embed/${videoId}?autoplay=1`}
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                              style={{
-                                position: "absolute",
-                                top: 0,
-                                left: 0,
-                                width: "100%",
-                                height: "100%",
-                                border: 0,
-                              }}
-                            />
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </>
-                ) : (
-                  <a
-                    href={item.videoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-amber-200 underline"
-                  >
-                    {item.videoUrl}
-                  </a>
-                )
-              ) : (
-                "-"
-              )
-            }
-          />
+      {/* ================= CONTENT ================= */}
+      <div className="grid lg:grid-cols-3 gap-10">
+        {/* LEFT */}
+        <div className="lg:col-span-2 space-y-6">
           <InfoCard
             icon={<FaMapMarkerAlt className="text-red-500" />}
             title="Location"
-            value={
-              item.location ? (
-                <a
-                  href={item.location}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-green-200 underline"
-                >
-                  {item.location}
-                </a>
-              ) : (
-                "-"
-              )
-            }
+            value={item.location}
           />
           <InfoCard
             icon={<FaStar className="text-yellow-400" />}
@@ -383,55 +240,102 @@ const Trending = () => {
             value={item.highlights}
           />
           <InfoCard
-            icon={<FaAddressBook className="text-emerald-400" />}
+            icon={<FaAddressBook className="text-green-400" />}
             title="Address"
             value={item.address}
           />
           <InfoCard
-            icon={<FaPhoneAlt className="text-red-400" />}
+            icon={<FaPhoneAlt className="text-blue-400" />}
             title="Contact"
             value={item.contact}
           />
           <InfoCard
-            icon={<FaDollarSign className="text-red-400" />}
-            title="Price per person per day(RS.)"
+            icon={<FaDollarSign className="text-emerald-400" />}
+            title="Price (Rs.)"
             value={item.price}
           />
-          <InfoCard
-            title="Availability"
-            value={
-              <ul className="list-disc list-inside mt-1 ml-4">
-                {item.availableThings.map((thing, index) => (
-                  <li key={index} className="mt-1">
-                    {thing}
-                  </li>
-                ))}
-              </ul>
-            }
-          />
 
-          <div className="bg-gray-800/50 p-4 rounded-xl shadow">
-            <p className="font-semibold">Description</p>
+          <div className="bg-gray-800/50 p-4 rounded-xl">
+            <h3 className="font-semibold mb-2">Description</h3>
             <p className="text-blue-200">{item.description}</p>
           </div>
+
+          {/* VIDEO */}
+          {videoId && (
+            <div className="cursor-pointer" onClick={() => setShowVideo(true)}>
+              <img src={thumbnailUrl} alt="video" className="rounded-xl" />
+            </div>
+          )}
         </div>
 
-        {/* Right Side - Booking Form */}
-        <FormSection
-          booking={booking}
-          item={item}
-          handleChange={handleChange}
-          handleSubmit={handleSubmit}
-        />
+        {/* RIGHT - BOOKING */}
+        <div className="bg-gray-800/50 p-6 rounded-xl">
+          <h3 className="text-xl font-bold mb-4 text-amber-300">
+            Book Your Stay
+          </h3>
+
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <TextInput
+              label="Name"
+              name="name"
+              value={booking.name}
+              handleChange={handleChange}
+              required
+            />
+            <TextInput
+              label="Email"
+              name="email"
+              type="email"
+              value={booking.email}
+              handleChange={handleChange}
+              required
+            />
+            <TextInput
+              label="Phone"
+              name="phone"
+              value={booking.phone}
+              handleChange={handleChange}
+              required
+            />
+            <TextInput
+              label="From"
+              name="fromDate"
+              type="date"
+              value={booking.fromDate}
+              handleChange={handleChange}
+              required
+            />
+            <TextInput
+              label="To"
+              name="toDate"
+              type="date"
+              value={booking.toDate}
+              handleChange={handleChange}
+              required
+            />
+            <TextInput
+              label="Guests"
+              name="guests"
+              type="number"
+              min={1}
+              value={booking.guests}
+              handleChange={handleChange}
+              required
+            />
+
+            <button className="w-full bg-amber-400 text-gray-900 p-3 rounded-lg font-semibold">
+              Make Request
+            </button>
+          </form>
+        </div>
       </div>
 
-      <div className="h-20"></div>
-
+      {/* WHATSAPP */}
       <a
         href={`https://wa.me/${item.contact.replace(/\D/g, "")}`}
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 z-50 bg-green-500 hover:bg-green-600 text-white p-4 rounded-full shadow-lg transition transform hover:scale-110"
+        className="fixed bottom-6 right-6 bg-green-500 p-4 rounded-full"
       >
         <FaWhatsapp size={28} />
       </a>

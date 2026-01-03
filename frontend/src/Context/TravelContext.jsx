@@ -141,14 +141,18 @@ export const TravelContextProvider = ({ children }) => {
   const normalizeItemImages = (item) => {
     const copy = { ...item };
 
-    // Normalize images array if present
-    if (Array.isArray(copy.images) && copy.images.length > 0) {
-      copy.images = copy.images
+    // Normalize otherimages array if present
+    if (Array.isArray(copy.otherimages) && copy.otherimages.length > 0) {
+      copy.otherimages = copy.otherimages
         .map((img) => normalizeImage(img))
         .filter(Boolean);
     }
 
-    // Normalize legacy image fields
+    // Normalize mainImage and legacy image fields
+    if (copy.mainImage) {
+      copy.mainImage = normalizeImage(copy.mainImage);
+    }
+
     [
       "image",
       "image1",

@@ -6,7 +6,7 @@ const travelSchema = new mongoose.Schema(
     description: { type: String, required: true },
     district: { type: String, required: true },
     mainImage: { type: String, required: true },
-    images: { type: [String], default: [] },
+    otherimages: { type: [String], default: [] },
   },
   { timestamps: true }
 );

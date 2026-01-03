@@ -34,7 +34,7 @@ const Home = () => {
      <div className="w-full relative"> 
         <Trending />
       </div>
-     <div className="w-full relative"> 
+     <div className="w-full relative "> 
         <VisitingPlaces/>
       </div>
       

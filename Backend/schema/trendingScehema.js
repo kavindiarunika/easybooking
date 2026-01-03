@@ -13,18 +13,19 @@ const TrendingSchema = new mongoose.Schema(
     district: { type: String, required: true },
     price: { type: Number, required: true },
     count: { type: Number, default: 0 }, // ✅ added count field
-    otherimages:{
-     type:[String],
-          default:[]
-    } ,
+    otherimages: {
+      type: [String],
+      default: [],
+    },
+
+    // primary image uploaded by admin; also stored as `image` for backward compatibility
+    mainImage: String,
 
     image: String,
     image1: String,
     image2: String,
     image3: String,
     image4: String,
-    image5: String,
-    image6: String,
 
     videoUrl: String,
 

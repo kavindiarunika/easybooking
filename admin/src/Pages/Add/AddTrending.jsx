@@ -67,9 +67,7 @@ const AddTrending = ({ token }) => {
       if (key === "availableThings") {
         formData.append(
           key,
-          value
-            ? value.split(",").map((i) => i.trim())
-            : []
+          value ? value.split(",").map((i) => i.trim()) : []
         );
       } else {
         formData.append(key, value);
@@ -77,10 +75,10 @@ const AddTrending = ({ token }) => {
     });
 
     // images (ORDER IS IMPORTANT)
+    // mainImage acts as the card/primary image
     formData.append("mainImage", media.mainImage);
 
     const imageFields = [
-      "image",
       "image1",
       "image2",
       "image3",
@@ -102,15 +100,11 @@ const AddTrending = ({ token }) => {
     }
 
     try {
-      const res = await axios.post(
-        `${backendUrl}/api/trending/add`,
-        formData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+      const res = await axios.post(`${backendUrl}/api/trending/add`, formData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       if (res.data.success) {
         toast.success("Trending item added successfully");
@@ -204,7 +198,9 @@ const AddTrending = ({ token }) => {
 
         {/* MAIN IMAGE */}
         <div>
-          <label className="font-semibold">Main Image (Required)</label>
+          <label className="font-semibold mr-4">
+            Main Image (big display; used as card image when provided)
+          </label>
           <input
             type="file"
             accept="image/*"
@@ -214,22 +210,20 @@ const AddTrending = ({ token }) => {
         </div>
 
         {/* IMAGE 1–6 */}
-        {["image", "image1", "image2", "image3", "image4", "image5", "image6"].map(
-          (f, i) => (
-            <div key={f}>
-              <label>Image {i + 1}</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => handleSingleFile(e, f)}
-              />
-            </div>
-          )
-        )}
+        {["image", "image1", "image2", "image3", "image4"].map((f, i) => (
+          <div key={f}>
+            <label className="mr-4 ">Image {i + 1}</label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={(e) => handleSingleFile(e, f)}
+            />
+          </div>
+        ))}
 
         {/* OTHER IMAGES */}
         <div>
-          <label>Other Images</label>
+          <label className="mr-4">Other Images</label>
           <input
             type="file"
             accept="image/*"
