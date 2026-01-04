@@ -16,7 +16,7 @@ import AddTraveling from "./Pages/Add/AddTraveling";
 import DeletePlaces from "./Pages/Delete/DletePlaces";
 import AddSafari from "./Pages/Add/AddSafari";
 import DleteSafari from "./Pages/Delete/DleteSafari";
-import EditSafari from "./Pages/edit/EditSafari";
+import EditSafariPage from "./Pages/edit/EditSafariPage";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -101,7 +101,7 @@ function App() {
                     </ProtectedRoute>
                   }
                 />
-            
+
                 <Route
                   path="/deletetravellingplaces"
                   element={
@@ -130,7 +130,16 @@ function App() {
                   path="/editsafari"
                   element={
                     <ProtectedRoute>
-                      <EditSafari token={token} />
+                      <EditSafariPage token={token} />
+                    </ProtectedRoute>
+                  }
+                />
+                {/* Support direct links like /admin/safari/edit/:id */}
+                <Route
+                  path="/admin/safari/edit/:id"
+                  element={
+                    <ProtectedRoute>
+                      <EditSafariPage token={token} />
                     </ProtectedRoute>
                   }
                 />

@@ -6,7 +6,7 @@ import path from "path";
 import fs from "fs"; // used to detect uploads folder
 import http from "http";
 import { Server as SocketIO } from "socket.io";
-
+import vehicleRouter from "./router/vehicleRoute.js";
 import trendrouter from "./router/trendingRouter.js";
 import loginrouter from "./controller/logincontroller.js";
 import travelingplacesroute from "./router/travelingplacesroute.js";
@@ -15,12 +15,10 @@ import safariRouter from "./router/safariRoute.js";
 const app = express();
 const port = process.env.PORT || 4000;
 
-// -------------------- 1. DATABASE CONNECTION --------------------
+
 connectDB();
 
-// -------------------- 1.5 STATIC FILES (uploads) --------------------
-// Serve uploaded images from /uploads
-// Support multiple possible locations where uploads might exist
+
 const backendUploads = path.join(process.cwd(), "Backend", "uploads");
 const backendNestedUploads = path.join(
   process.cwd(),
@@ -97,9 +95,6 @@ app.use((req, res, next) => {
   next();
 });
 
-// -------------------- 3. JWT AUTHENTICATION MIDDLEWARE --------------------
-
-// -------------------- 4. ROUTES --------------------
 
 // Login/Admin route
 app.use("/api/admin", loginrouter);
@@ -111,7 +106,7 @@ app.use("/api/travelplaces", travelingplacesroute);
 
 app.use("/api/safari", safariRouter);
 
-// -------------------- 5. ROOT & SERVER START --------------------
+app.use("/api/vehicle", vehicleRouter);
 
 app.get("/", (req, res) => res.send("API working."));
 

@@ -2,13 +2,13 @@ import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Hero from "../../Components/Hero";
 import Title from "../../Components/Title";
-import AboutLankaHome from "../About/AboutLankaHome";
+
 import Trending from "../../Components/Trending";
 import Packages from "../../Components/Packages";
 import AboutSection from "./VideoSection";
 import Gallery from "../Gallery/Gallery";
 import VisitingPlaces from "../../Components/VisitingPlaces";
-
+import Safari from '../../Components/Safari'
 
 const Home = () => {
   const location = useLocation();
@@ -37,10 +37,11 @@ const Home = () => {
      <div className="w-full relative "> 
         <VisitingPlaces/>
       </div>
-      
-       <div id="special-selection">
-        <AboutLankaHome />
+     <div className="w-full relative "> 
+        <Safari/>
       </div>
+      
+      
      
      
       <Title text1={"Gallery"} text2={"Section"} />

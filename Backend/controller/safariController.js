@@ -28,12 +28,6 @@ export const createSfari = async (req, res) => {
       GuiderExperience,
     } = req.body;
 
-    // Debugging: log incoming request info to help find missing files
-    console.log("--- createSfari incoming ---");
-    console.log("content-type:", req.headers["content-type"]);
-    console.log("body keys:", Object.keys(req.body || {}));
-    console.log("files keys:", Object.keys(req.files || {}));
-
     if (
       !name ||
       !description ||
@@ -152,46 +146,87 @@ export const getSafariById = async (req, res) => {
 
 export const updateSafari = async (req, res) => {
   try {
-    const safari = await safari.findById(req.params.id);
+    const safariDoc = await safari.findById(req.params.id);
 
-    if (!safari) {
+    if (!safariDoc) {
       return res.status(404).json({ message: "database cannot find" });
     }
-    safari.name = req.body.name || safari.name;
-    safari.description = req.body.description || safari.description;
-    safari.price = req.body.price || safari.price;
-    safari.TeamMembers = req.body.TeamMembers || safari.TeamMembers;
-    safari.whatsapp = req.body.whatsapp || safari.whatsapp;
-    safari.totalDays = req.body.totalDays || safari.totalDays;
-    safari.email = req.body.email || safari.email;
-    safari.VehicleType = req.body.VehicleType || safari.VehicleType;
-    safari.GuiderName = req.body.GuiderName || safari.GuiderName;
-    safari.GuiderExperience =
-      req.body.GuiderExperience || safari.GuiderExperience;
 
-    if (req.body.adventures) safari.adventures = req.body.adventures;
-    if (req.body.includeplaces) safari.includeplaces = req.body.includeplaces;
+    safariDoc.name = req.body.name || safariDoc.name;
+    safariDoc.description = req.body.description || safariDoc.description;
+    safariDoc.price = req.body.price || safariDoc.price;
+    safariDoc.TeamMembers = req.body.TeamMembers || safariDoc.TeamMembers;
+    safariDoc.whatsapp = req.body.whatsapp || safariDoc.whatsapp;
+    safariDoc.totalDays = req.body.totalDays || safariDoc.totalDays;
+    safariDoc.email = req.body.email || safariDoc.email;
+    safariDoc.VehicleType = req.body.VehicleType || safariDoc.VehicleType;
+    safariDoc.GuiderName = req.body.GuiderName || safariDoc.GuiderName;
+    safariDoc.GuiderExperience =
+      req.body.GuiderExperience || safariDoc.GuiderExperience;
+
+    if (req.body.adventures) safariDoc.adventures = req.body.adventures;
+    if (req.body.includeplaces)
+      safariDoc.includeplaces = req.body.includeplaces;
 
     if (req.files?.mainImage) {
-      safari.mainImage = req.files.mainImage[0].path;
+      safariDoc.mainImage = req.files.mainImage[0].path;
     }
     if (req.files?.otherimages) {
-      safari.otherimages = req.files.otherimages.map((img) => img.path);
+      safariDoc.otherimages = req.files.otherimages.map((img) => img.path);
     }
 
     if (req.files?.vehicleImage) {
-      safari.vehicleImage = req.files.vehicleImage.map((img) => img.path);
+      safariDoc.vehicleImage = req.files.vehicleImage.map((img) => img.path);
     }
 
     if (req.files?.GuiderImage) {
-      safari.GuiderImage = req.files.GuiderImage[0].path;
+      safariDoc.GuiderImage = req.files.GuiderImage[0].path;
     }
     if (req.files?.shortvideo) {
-      safari.shortvideo = req.files.shortvideo[0].path;
+      safariDoc.shortvideo = req.files.shortvideo[0].path;
     }
 
-    await safari.save();
+    await safariDoc.save();
+
+    return res.status(200).json({ message: "safari updated" });
   } catch (error) {
     console.error("updateSafari error:", error);
+    return res
+      .status(500)
+      .json({ message: "server error", error: error.message });
   }
 };
+
+
+
+  // Delete safari by id
+  export const deleteSafari = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const deleted = await safari.findByIdAndDelete(id);
+      if (!deleted)
+        return res.status(404).json({ message: "Safari not found" });
+      return res.status(200).json({ message: "safari deleted" });
+    } catch (error) {
+      console.error("deleteSafari error:", error);
+      return res
+        .status(500)
+        .json({ message: "server error", error: error.message });
+    }
+  };
+  try {
+    const { name } = req.query; // ✅ CORRECT
+
+    if (!name) {
+      return res.status(400).json({ message: "Name query is required" });
+    }
+
+    const safaris = await safari.find({
+      name: { $regex: name.trim(), $options: "i" },
+    });
+
+    res.status(200).json(safaris);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+
