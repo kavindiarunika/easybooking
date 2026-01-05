@@ -214,8 +214,11 @@ export const updateSafari = async (req, res) => {
         .json({ message: "server error", error: error.message });
     }
   };
+  
+  // Search safari by name
+export const searchSafari = async (req, res) => {
   try {
-    const { name } = req.query; // ✅ CORRECT
+    const { name } = req.query;
 
     if (!name) {
       return res.status(400).json({ message: "Name query is required" });
@@ -225,8 +228,10 @@ export const updateSafari = async (req, res) => {
       name: { $regex: name.trim(), $options: "i" },
     });
 
-    res.status(200).json(safaris);
+    return res.status(200).json(safaris);
   } catch (error) {
-    res.status(500).json({ message: "Server error" });
+    console.error("searchSafari error:", error);
+    return res.status(500).json({ message: "Server error" });
   }
+};
 

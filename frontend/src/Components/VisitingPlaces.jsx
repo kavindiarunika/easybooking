@@ -3,8 +3,10 @@ import axios from "axios";
 import{ BACKEND_URL } from "../App";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const VisitingPlaces = () => {
+  const navigate = useNavigate();
 
   const [places, setPlaces] = useState([]);
   

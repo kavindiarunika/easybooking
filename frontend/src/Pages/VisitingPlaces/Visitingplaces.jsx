@@ -3,8 +3,12 @@ import React, { useEffect, useState } from "react";
 import VisitingHero from "./VisitingHero";
 import axios from "axios";
 import Filterplaces from "./Filterplaces";
+import { useNavigate } from "react-router-dom";
 
 const Visitingplaces = () => {
+
+  const navigate = useNavigate();
+
   const [places, setPlaces] = useState([]);
   const [filterplaces, setFilterplaces] = useState([]);
   const [selectDistrict, setSelectDistrict] = useState(""); // "" = All
@@ -39,13 +43,15 @@ const Visitingplaces = () => {
     axios
       .get(`${backendUrl}/api/travelplaces`)
       .then((res) => {
-        setPlaces(res.data.travelPlaces);
-        setFilterplaces(res.data.travelPlaces); // show all initially
+        // Ensure res.data.travelPlaces exists before setting
+        const data = res.data.travelPlaces || [];
+        setPlaces(data);
+        setFilterplaces(data);
       })
       .catch((err) => {
         console.log("Error loading places", err);
       });
-  }, []);
+  }, [backendUrl]); // Added backendUrl to dependency array
 
   // Filter places when radio changes
   useEffect(() => {
@@ -61,7 +67,10 @@ const Visitingplaces = () => {
   const getImageUrl = (path) => {
     if (!path) return "";
     if (path.startsWith("http")) return path;
-    return `${backendUrl}/${path}`;
+    // Clean slashes to avoid "http://localhost:4000//uploads/image.jpg"
+    const cleanPath = path.startsWith("/") ? path.substring(1) : path;
+    const cleanBase = backendUrl.endsWith("/") ? backendUrl : `${backendUrl}/`;
+    return `${cleanBase}${cleanPath}`;
   };
 
   return (
@@ -74,9 +83,10 @@ const Visitingplaces = () => {
       <section className="w-full mx-auto py-10 flex gap-6 px-6">
        
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4  mx-auto  ">
-            {filterplaces.map((place) => (
+            {filterplaces && filterplaces.map((place) => (
               <div
                 key={place._id}
+                onClick={() => navigate(`/place-details/${place._id}`)}
                 className="bg-white rounded-lg shadow-md overflow-hidden"
               >
                 <img

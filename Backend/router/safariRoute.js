@@ -4,9 +4,9 @@ import {
   updateSafari,
   getAllsafari,
   getSafariById,
-  SearchById,
+  deleteSafari,
+  searchSafari 
 } from "../controller/safariController.js";
-import { deleteSafari } from "../controller/safariController.js";
 import upload from "../middleware/multer.js";
 
 const safariRouter = express.Router();
@@ -19,12 +19,13 @@ const uplodImage = upload.fields([
   { name: "GuiderImage", maxCount: 1 },
 ]);
 
+
+safariRouter.get("/search", searchSafari); 
+
 safariRouter.post("/addsafari", uplodImage, createSfari);
 safariRouter.get("/allsafari", getAllsafari);
 safariRouter.get("/safari/:id", getSafariById);
 safariRouter.put("/updatesafari/:id", uplodImage, updateSafari);
 safariRouter.delete("/deletesafari/:id", deleteSafari);
-
-safariRouter.get("/search", SearchById);
 
 export default safariRouter;
