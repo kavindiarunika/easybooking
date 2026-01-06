@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import VisitingHero from "./VisitingHero";
 import axios from "axios";
@@ -5,6 +6,7 @@ import Filterplaces from "./Filterplaces";
 import { useNavigate } from "react-router-dom";
 
 const Visitingplaces = () => {
+
   const navigate = useNavigate();
 
   const [places, setPlaces] = useState([]);
@@ -53,7 +55,6 @@ const Visitingplaces = () => {
 
   // Filter places when radio changes
   useEffect(() => {
-    if (!places) return; // Guard clause
     if (selectDistrict === "") {
       setFilterplaces(places);
     } else {
@@ -64,56 +65,50 @@ const Visitingplaces = () => {
   }, [selectDistrict, places]);
 
   const getImageUrl = (path) => {
-    // 1. Safety Guard: If path is null, undefined, or not a string, stop here.
-    if (!path || typeof path !== "string") {
-      return "https://via.placeholder.com/400x300?text=No+Image+Available";
-    }
-
-    // 2. If it's already a full URL (like an external link), return it.
-    if (path.startsWith("http")) {
-      return path;
-    }
-
-    // 3. Clean the path string safely.
-    // We use String(path) just to be 100% sure it's a string before calling .replace
-    const cleanPath = path.replace(/^\//, "");
-
+    if (!path) return "";
+    if (path.startsWith("http")) return path;
+    // Clean slashes to avoid "http://localhost:4000//uploads/image.jpg"
+    const cleanPath = path.startsWith("/") ? path.substring(1) : path;
     const cleanBase = backendUrl.endsWith("/") ? backendUrl : `${backendUrl}/`;
     return `${cleanBase}${cleanPath}`;
   };
 
   return (
     <div className="">
-      <VisitingHero
-        district={districts}
-        selectDistrict={selectDistrict}
-        onChange={setSelectDistrict}
-      />
+      <VisitingHero 
+       district={districts}
+            selectDistrict={selectDistrict}
+            onChange={setSelectDistrict}/>
 
       <section className="w-full mx-auto py-10 flex gap-6 px-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4  mx-auto  ">
-          {filterplaces &&
-            filterplaces.map((place) => (
+       
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4  mx-auto  ">
+            {filterplaces && filterplaces.map((place) => (
               <div
-                key={place?._id}
-                onClick={() => navigate(`/place-details/${place?._id}`)}
+                key={place._id}
+                onClick={() => navigate(`/place-details/${place._id}`)}
+                className="bg-white rounded-lg shadow-md overflow-hidden"
               >
                 <img
-                  src={getImageUrl(place?.mainImage)}
-                  alt={place?.name || "Travel Place"}
+                  src={getImageUrl(place.mainImage)}
+                  alt={place.name}
+                  className="w-full h-48 object-cover"
                 />
-                <div className="p-4">
-                  {/* The ?. prevents crashing if name is missing */}
-                  <h3 className="text-lg font-semibold">
-                    {place?.name || "Unnamed Place"}
-                  </h3>
 
-                  {/* The || "" provides a fallback if description is missing */}
-                  <p>{place?.description || ""}</p>
+                <div className="p-4">
+                  <h3 className="text-lg font-semibold">{place.name}</h3>
+                  <p className="text-sm text-gray-500 capitalize">
+                    {place.district}
+                  </p>
+                  <p className="hidden sm:block text-gray-700 mt-2">
+                    {place.description}
+                  </p>
                 </div>
+
               </div>
             ))}
-        </div>
+          </div>
+    
       </section>
     </div>
   );
