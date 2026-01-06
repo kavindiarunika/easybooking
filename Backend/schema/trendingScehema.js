@@ -6,7 +6,7 @@ const TrendingSchema = new mongoose.Schema(
     description: { type: String, required: true },
     category: {
       type: String,
-      enum: ["restaurant", "villa", "hotel", "house"],
+      enum: ["hotel", "restaurant", "villa", "house"],
       required: true,
     },
     rating: { type: Number, min: 1, max: 5, default: 5 },

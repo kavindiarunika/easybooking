@@ -70,53 +70,86 @@ const addtrending = async (req, res) => {
       if (videoUrl === "") videoUrl = null;
     }
 
-    // ---------- collect image files ----------
-    let fileList = [];
+    // ---------- upload images per field (robust mapping) ----------
+    // Upload each declared field individually so missing legacy fields don't
+    // shift subsequent uploads into wrong slots (prevents otherimages becoming image4)
 
-    // main image
-    if (req.files?.mainImage?.[0]) {
-      fileList.push(req.files.mainImage[0]);
-    }
+    const mainImageUrl = req.files?.mainImage?.[0]
+      ? await uploadToCloudinary(req.files.mainImage[0], "image")
+      : null;
 
-    // image – image6 (KEEP ORDER)
-    const imageFields = ["image", "image1", "image2", "image3", "image4"];
+    const imageUrl = req.files?.image?.[0]
+      ? await uploadToCloudinary(req.files.image[0], "image")
+      : null;
 
-    imageFields.forEach((field) => {
-      if (req.files?.[field]?.[0]) {
-        fileList.push(req.files[field][0]);
+    const image1Url = req.files?.image1?.[0]
+      ? await uploadToCloudinary(req.files.image1[0], "image")
+      : null;
+
+    const image2Url = req.files?.image2?.[0]
+      ? await uploadToCloudinary(req.files.image2[0], "image")
+      : null;
+
+    const image3Url = req.files?.image3?.[0]
+      ? await uploadToCloudinary(req.files.image3[0], "image")
+      : null;
+
+    const image4Url = req.files?.image4?.[0]
+      ? await uploadToCloudinary(req.files.image4[0], "image")
+      : null;
+
+    const otherimagesUrls = Array.isArray(req.files?.otherimages)
+      ? (
+          await Promise.all(
+            req.files.otherimages.map((file) =>
+              uploadToCloudinary(file, "image")
+            )
+          )
+        ).filter(Boolean)
+      : [];
+
+    // Debug logging to inspect incoming files and uploads
+    try {
+      console.log(
+        "addtrending: incoming files keys:",
+        Object.keys(req.files || {})
+      );
+      if (Array.isArray(req.files?.otherimages)) {
+        console.log(
+          "addtrending: otherimages filenames:",
+          req.files.otherimages.map((f) => f.originalname)
+        );
       }
-    });
-
-    // other images (NEW)
-    if (Array.isArray(req.files?.otherimages)) {
-      fileList.push(...req.files.otherimages);
+      console.log("addtrending: uploaded image urls counts", {
+        main: !!mainImageUrl,
+        image: !!imageUrl,
+        image1: !!image1Url,
+        image2: !!image2Url,
+        image3: !!image3Url,
+        image4: !!image4Url,
+        otherimages: otherimagesUrls.length,
+      });
+    } catch (e) {
+      console.warn("addtrending: logging failed", e);
     }
 
-    if (fileList.length === 0) {
+    // Ensure at least one image exists across all fields
+    if (
+      !mainImageUrl &&
+      !imageUrl &&
+      !image1Url &&
+      !image2Url &&
+      !image3Url &&
+      !image4Url &&
+      otherimagesUrls.length === 0
+    ) {
       return res.status(400).json({
         success: false,
         message: "At least one image is required",
       });
     }
 
-    // ---------- upload ----------
-    const uploadedUrls = await Promise.all(
-      fileList.map((file) => uploadToCloudinary(file, "image"))
-    );
-
-    // ---------- map uploaded images ----------
-    const [
-      mainImage,
-      image,
-      image1,
-      image2,
-      image3,
-      image4,
-
-      ...otherimages // ✅ REST GOES HERE
-    ] = uploadedUrls;
-
-    // ---------- save ----------
+    // ---------- save (now include `otherimages`) ----------
     const trendingItem = new TrendingModel({
       name,
       description,
@@ -126,12 +159,13 @@ const addtrending = async (req, res) => {
       price: price ? Number(price) : 0,
 
       // store mainImage explicitly and keep `image` for compatibility
-      mainImage: mainImage || image || null,
-      image: mainImage || image,
-      image1,
-      image2,
-      image3,
-      image4,
+      mainImage: mainImageUrl || imageUrl || null,
+      image: mainImageUrl || imageUrl || null,
+      image1: image1Url || null,
+      image2: image2Url || null,
+      image3: image3Url || null,
+      image4: image4Url || null,
+      otherimages: otherimagesUrls,
       ownerEmail,
 
       availableThings: availableThings
@@ -140,6 +174,14 @@ const addtrending = async (req, res) => {
     });
 
     await trendingItem.save();
+
+    // Emit socket event so clients can refresh in real-time
+    try {
+      const io = req.app?.get("io");
+      if (io) io.emit("trendingUpdated", { action: "add", item: trendingItem });
+    } catch (e) {
+      console.warn("Could not emit trendingUpdated (add):", e);
+    }
 
     res.status(201).json({
       success: true,
@@ -253,48 +295,55 @@ const updateTrendingById = async (req, res) => {
       updateData.count = parsedCount;
     }
 
-    // ---------------- IMAGE HANDLING ----------------
-    let fileList = [];
+    // ---------------- IMAGE HANDLING (robust per-field uploads) ----------------
 
-    // mainImage
-    if (req.files?.mainImage?.[0]) {
-      fileList.push(req.files.mainImage[0]);
+    const mainImageUrl = req.files?.mainImage?.[0]
+      ? await uploadToCloudinary(req.files.mainImage[0], "image")
+      : null;
+
+    const imageUrl = req.files?.image?.[0]
+      ? await uploadToCloudinary(req.files.image[0], "image")
+      : null;
+
+    const image1Url = req.files?.image1?.[0]
+      ? await uploadToCloudinary(req.files.image1[0], "image")
+      : null;
+
+    const image2Url = req.files?.image2?.[0]
+      ? await uploadToCloudinary(req.files.image2[0], "image")
+      : null;
+
+    const image3Url = req.files?.image3?.[0]
+      ? await uploadToCloudinary(req.files.image3[0], "image")
+      : null;
+
+    const image4Url = req.files?.image4?.[0]
+      ? await uploadToCloudinary(req.files.image4[0], "image")
+      : null;
+
+    const otherimagesUrls = Array.isArray(req.files?.otherimages)
+      ? (
+          await Promise.all(
+            req.files.otherimages.map((file) =>
+              uploadToCloudinary(file, "image")
+            )
+          )
+        ).filter(Boolean)
+      : [];
+
+    // Apply updates only for the fields that were uploaded
+    if (mainImageUrl) {
+      updateData.mainImage = mainImageUrl;
+      updateData.image = mainImageUrl; // keep backward compatibility
     }
+    if (imageUrl) updateData.image1 = imageUrl;
+    if (image1Url) updateData.image2 = image1Url;
+    if (image2Url) updateData.image3 = image2Url;
+    if (image3Url) updateData.image4 = image3Url;
 
-    // image -> image6 (KEEP ORDER)
-    const imageFields = ["image", "image1", "image2", "image3", "image4"];
-
-    imageFields.forEach((field) => {
-      if (req.files?.[field]?.[0]) {
-        fileList.push(req.files[field][0]);
-      }
-    });
-
-    // otherimages (NEW)
-    if (Array.isArray(req.files?.otherimages)) {
-      fileList.push(...req.files.otherimages);
-    }
-
-    if (fileList.length > 0) {
-      const uploadedUrls = await Promise.all(
-        fileList.map((file) => uploadToCloudinary(file, "image"))
-      );
-
-      const [mainImage, image, image1, image2, image3, image4, ...otherimages] =
-        uploadedUrls;
-
-      if (mainImage) {
-        updateData.mainImage = mainImage;
-        updateData.image = mainImage; // keep backward compatibility
-      }
-      if (image) updateData.image1 = image;
-      if (image1) updateData.image2 = image1;
-      if (image2) updateData.image3 = image2;
-      if (image3) updateData.image4 = image3;
-
-      if (otherimages.length > 0) {
-        updateData.otherimages = otherimages;
-      }
+    if (otherimagesUrls.length > 0) {
+      // overwrite otherimages if the update supplied other images
+      updateData.otherimages = otherimagesUrls;
     }
 
     // ---------------- UPDATE ----------------

@@ -30,3 +30,22 @@
     opacity: 1;
   }
 }
+/* Desktop gap */
+.slick-slider .slick-slide {
+  padding: 0 12px;
+}
+
+.slick-slider .slick-list {
+  margin: 0 -12px;
+}
+
+/* Mobile gap */
+@media (max-width: 640px) {
+  .slick-slider .slick-slide {
+    padding: 0 6px !important;
+  }
+
+  .slick-slider .slick-list {
+    margin: 0 -6px !important;
+  }
+}

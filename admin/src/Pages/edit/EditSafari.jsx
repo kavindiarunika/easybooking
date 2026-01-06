@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
+import { safa } from "../../assets/safari";
 
 const EditSafari = ({ safariId: propSafariId }) => {
   const { id: paramId } = useParams();
@@ -13,6 +14,8 @@ const EditSafari = ({ safariId: propSafariId }) => {
     name: "",
     description: "",
     price: "",
+    category: "",
+    type: [],
     adventures: [],
     includeplaces: [],
     TeamMembers: "",
@@ -29,6 +32,7 @@ const EditSafari = ({ safariId: propSafariId }) => {
   const [vehicleImages, setVehicleImages] = useState([]);
   const [guiderImage, setGuiderImage] = useState(null);
   const [shortVideo, setShortVideo] = useState(null);
+  const [categoryType, setCategoryType] = useState("");
 
   useEffect(() => {
     if (!safariId) return;
@@ -42,6 +46,8 @@ const EditSafari = ({ safariId: propSafariId }) => {
           name: response.data.name || "",
           description: response.data.description || "",
           price: response.data.price || "",
+          category: response.data.category || "",
+          type: response.data.type || [],
           adventures: response.data.adventures || [],
           includeplaces: response.data.includeplaces || [],
           TeamMembers: response.data.TeamMembers || "",
@@ -52,6 +58,7 @@ const EditSafari = ({ safariId: propSafariId }) => {
           GuiderName: response.data.GuiderName || "",
           GuiderExperience: response.data.GuiderExperience || "",
         });
+        setCategoryType(response.data.category || "");
       } catch (error) {
         toast.error("Error fetching safari data");
       }
@@ -69,8 +76,28 @@ const EditSafari = ({ safariId: propSafariId }) => {
 
     setSafariData({
       ...safariData,
-      [name]: value.split(",").map((item) => item.trim()),
+      [name]: value
+        .split(",")
+        .map((item) => item.trim())
+        .filter((item) => item),
     });
+  };
+
+  const handleTypeChange = (e) => {
+    const { value, checked } = e.target;
+    if (checked) {
+      setSafariData({ ...safariData, type: [...safariData.type, value] });
+    } else {
+      setSafariData({
+        ...safariData,
+        type: safariData.type.filter((t) => t !== value),
+      });
+    }
+  };
+
+  const handleCategoryChange = (e) => {
+    setCategoryType(e.target.value);
+    setSafariData({ ...safariData, category: e.target.value, type: [] });
   };
   const handlesumbit = async (e) => {
     e.preventDefault();
@@ -80,6 +107,7 @@ const EditSafari = ({ safariId: propSafariId }) => {
     data.append("name", safariData.name);
     data.append("description", safariData.description);
     data.append("price", safariData.price);
+    data.append("category", safariData.category);
     data.append("TeamMembers", safariData.TeamMembers);
     data.append("whatsapp", safariData.whatsapp);
     data.append("totalDays", safariData.totalDays);
@@ -92,6 +120,7 @@ const EditSafari = ({ safariId: propSafariId }) => {
     safariData.includeplaces.forEach((item) =>
       data.append("includeplaces", item)
     );
+    safariData.type.forEach((t) => data.append("type", t));
 
     if (mainImage) data.append("mainImage", mainImage);
     if (guiderImage) data.append("guiderImage", guiderImage);
@@ -150,6 +179,50 @@ const EditSafari = ({ safariId: propSafariId }) => {
               className="w-full p-3 border border-gray-300 rounded"
             />
           </div>
+
+          {/* Category and Type Selection */}
+          <div className="col-span-2">
+            <label>Category:</label>
+            <select
+              name="category"
+              value={safariData.category}
+              onChange={handleCategoryChange}
+              className="w-full md:w-64 h-12 px-4 border-2 border-slate-300 rounded-xl text-black"
+            >
+              <option value="">Select a category</option>
+              {Object.keys(safa).map((key) => (
+                <option key={key} value={key}>
+                  {key.charAt(0).toUpperCase() + key.slice(1)}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          {/* Type Checkboxes */}
+          {safariData.category && safa[safariData.category]?.type && (
+            <div className="col-span-2">
+              <label className="block text-gray-700 font-medium mb-3">
+                Select Types:
+              </label>
+              <div className="flex flex-wrap gap-3">
+                {safa[safariData.category].type.map((t, idx) => (
+                  <label
+                    key={idx}
+                    className="flex items-center gap-2 bg-gray-100 px-3 py-1 rounded-lg cursor-pointer"
+                  >
+                    <input
+                      type="checkbox"
+                      value={t}
+                      checked={safariData.type.includes(t)}
+                      onChange={handleTypeChange}
+                      className="accent-blue-500"
+                    />
+                    {t}
+                  </label>
+                ))}
+              </div>
+            </div>
+          )}
           {/*---------------description--------------- */}
           <div>
             <label>TeamMembers:</label>

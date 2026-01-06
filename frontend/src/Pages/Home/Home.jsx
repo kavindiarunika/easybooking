@@ -30,7 +30,7 @@ const Home = () => {
     
       <Hero />
 
-     <AboutSection/>
+    
      <div className="w-full relative"> 
         <Trending />
       </div>
@@ -40,10 +40,7 @@ const Home = () => {
      <div className="w-full relative "> 
         <Safari/>
       </div>
-      
-      
-     
-     
+       <AboutSection/>
       <Title text1={"Gallery"} text2={"Section"} />
       <div id="gallery-section">
         <Gallery />

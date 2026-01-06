@@ -151,8 +151,6 @@ const Trending = () => {
         <div className="grid grid-cols-3 sm:grid-cols-4 gap-4">
           {/* MAIN IMAGE */}
           <div className="col-span-2 row-span-2 aspect-[16/9] rounded-xl overflow-hidden  relative">
-
-         
             <img
               src={item.mainImage || item.image || item.image1}
               alt="main"
@@ -175,7 +173,7 @@ const Trending = () => {
                 />
               </div>
             ))}
-     {item.otherimages?.length > 0 && (
+          {Array.isArray(item.otherimages) && item.otherimages.length > 0 && (
             <div className="absolute top-[60vh] right-20 text-center text-green-400 font-bold text-sm  sm:text-xl hover:text-amber-300">
               <button
                 onClick={() => setShowMoreImages(!showMoreImages)}
@@ -187,11 +185,10 @@ const Trending = () => {
             </div>
           )}
           {/* VIEW MORE BUTTON */}
-        
         </div>
 
         {/* FULLSCREEN GALLERY MODAL */}
-        {showMoreImages && (
+        {showMoreImages && Array.isArray(item.otherimages) && (
           <div className="sm:fixed inset-0 bg-black/70 z-50 flex  p-0 sm:p-4 ">
             <div className="bg-gray-900 rounded-lg w-full max-w-[95vw] sm:max-w-3xl md:max-w-6xl max-h-[90vh] overflow-y-auto mx-auto px-3 sm:px-0">
               {/* CLOSE BUTTON */}
@@ -207,18 +204,20 @@ const Trending = () => {
 
               {/* IMAGES GRID */}
               <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-2 p-3 sm:p-4 justify-items-center">
-                {item.otherimages.map((src, idx) => (
-                  <div
-                    key={idx}
-                    className="w-full rounded overflow-hidden bg-gray-800 flex justify-center p-2"
-                  >
-                    <img
-                      src={src}
-                      alt={`other-${idx}`}
-                      className="w-full max-w-[92%] max-h-[60vh] h-auto object-contain"
-                    />
-                  </div>
-                ))}
+                {(Array.isArray(item.otherimages) ? item.otherimages : []).map(
+                  (src, idx) => (
+                    <div
+                      key={idx}
+                      className="w-full rounded overflow-hidden bg-gray-800 flex justify-center p-2"
+                    >
+                      <img
+                        src={src}
+                        alt={`other-${idx}`}
+                        className="w-full max-w-[92%] max-h-[60vh] h-auto object-contain"
+                      />
+                    </div>
+                  )
+                )}
               </div>
             </div>
           </div>
@@ -331,14 +330,16 @@ const Trending = () => {
       </div>
 
       {/* WHATSAPP */}
-      <a
-        href={`https://wa.me/${item.contact.replace(/\D/g, "")}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="fixed bottom-6 right-6 bg-green-500 p-4 rounded-full"
-      >
-        <FaWhatsapp size={28} />
-      </a>
+      {item?.contact && (
+        <a
+          href={`https://wa.me/${item.contact.replace(/\D/g, "")}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 bg-green-500 p-4 rounded-full"
+        >
+          <FaWhatsapp size={28} />
+        </a>
+      )}
     </div>
   );
 };

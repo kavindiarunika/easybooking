@@ -16,6 +16,8 @@ export const createSfari = async (req, res) => {
       description,
       price,
       adventures,
+      category,
+      type,
       includeplaces,
       TeamMembers,
       whatsapp,
@@ -31,6 +33,8 @@ export const createSfari = async (req, res) => {
     if (
       !name ||
       !description ||
+      !category ||
+      !type ||
       !price ||
       !adventures ||
       !includeplaces ||
@@ -86,6 +90,8 @@ export const createSfari = async (req, res) => {
       description,
       price,
       adventures,
+      category,
+      type,
       includeplaces,
       TeamMembers,
       whatsapp,
@@ -156,6 +162,7 @@ export const updateSafari = async (req, res) => {
     safariDoc.description = req.body.description || safariDoc.description;
     safariDoc.price = req.body.price || safariDoc.price;
     safariDoc.TeamMembers = req.body.TeamMembers || safariDoc.TeamMembers;
+    safariDoc.category = req.body.category || safariDoc.category;
     safariDoc.whatsapp = req.body.whatsapp || safariDoc.whatsapp;
     safariDoc.totalDays = req.body.totalDays || safariDoc.totalDays;
     safariDoc.email = req.body.email || safariDoc.email;
@@ -165,6 +172,7 @@ export const updateSafari = async (req, res) => {
       req.body.GuiderExperience || safariDoc.GuiderExperience;
 
     if (req.body.adventures) safariDoc.adventures = req.body.adventures;
+    if (req.body.type) safariDoc.type = req.body.type;
     if (req.body.includeplaces)
       safariDoc.includeplaces = req.body.includeplaces;
 

@@ -30,8 +30,7 @@ const AddTrending = ({ token }) => {
     image2: null,
     image3: null,
     image4: null,
-    image5: null,
-    image6: null,
+    
     otherimages: [],
   });
 
@@ -83,8 +82,7 @@ const AddTrending = ({ token }) => {
       "image2",
       "image3",
       "image4",
-      "image5",
-      "image6",
+      "image",
     ];
 
     imageFields.forEach((field) => {
@@ -133,8 +131,7 @@ const AddTrending = ({ token }) => {
           image2: null,
           image3: null,
           image4: null,
-          image5: null,
-          image6: null,
+        
           otherimages: [],
         });
 
@@ -178,7 +175,7 @@ const AddTrending = ({ token }) => {
                 onChange={handleInputChange}
                 className="border p-2 w-full"
               >
-                {[5, 4, 3, 2, 1].map((r) => (
+                {[ 5,4, 3, 2, 1].map((r) => (
                   <option key={r} value={r}>
                     {r} Star
                   </option>

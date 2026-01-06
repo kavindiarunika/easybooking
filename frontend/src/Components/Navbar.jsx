@@ -25,7 +25,7 @@ const Header = () => {
             {[
               { name: "Home", path: "./" },
               { name: "stays", path: "/villa" },
-               {name:"safari" , path:"/safarihome"},
+               {name:"GoTrip" , path:"/safarihome"},
               {name:"traveling places", path:"/places" },
              
               
@@ -108,7 +108,7 @@ const Header = () => {
                   isActive ? "text-cyan-300" : "hover:text-cyan-300"
                 }
               >
-                Safari
+                GoTrip
               </NavLink>
               <NavLink
                 to="/places"

@@ -7,7 +7,7 @@ import {
   AiOutlineFilter,
   AiOutlineClose,
 } from "react-icons/ai";
-import HotelHero from "./HotelHero";
+
 import axios from "axios";
 
 const Villa = () => {

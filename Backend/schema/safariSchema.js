@@ -6,6 +6,8 @@ const safariSchema = new mongoose.Schema(
     description: { type: String, required: true },
     price: { type: Number, required: true },
     adventures: { type: [String], required: true },
+    category: { type: String, required: true },
+    type:{ type: [String], required: true },
     includeplaces: { type: [String], required: true },
     TeamMembers: { type: Number, required: true },
     whatsapp: { type: String, required: true },
