@@ -12,7 +12,7 @@ const Login = ({ settoken }) => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
     try {
-      const response = await axios.post(`${backendUrl}/admin/login`, { email, password });
+      const response = await axios.post(`${backendUrl}/api/admin/login`, { email, password });
 
       if (response.data.success) {
         settoken(response.data.token);
