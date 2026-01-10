@@ -5,7 +5,8 @@ import {
   getAllsafari,
   getSafariById,
   deleteSafari,
-  searchSafari 
+  searchSafari,
+  getSafariByEmail,
 } from "../controller/safariController.js";
 import upload from "../middleware/multer.js";
 
@@ -19,8 +20,8 @@ const uplodImage = upload.fields([
   { name: "GuiderImage", maxCount: 1 },
 ]);
 
-
-safariRouter.get("/search", searchSafari); 
+safariRouter.get("/search", searchSafari);
+safariRouter.get("/safari", getSafariByEmail);
 
 safariRouter.post("/addsafari", uplodImage, createSfari);
 safariRouter.get("/allsafari", getAllsafari);

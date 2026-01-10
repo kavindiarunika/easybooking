@@ -40,7 +40,10 @@ const AddSafari = () => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value.split(",").map((item) => item.trim()).filter(item => item),
+      [name]: value
+        .split(",")
+        .map((item) => item.trim())
+        .filter((item) => item),
     });
   };
 
@@ -50,7 +53,10 @@ const AddSafari = () => {
     if (checked) {
       setFormData({ ...formData, type: [...formData.type, value] });
     } else {
-      setFormData({ ...formData, type: formData.type.filter((t) => t !== value) });
+      setFormData({
+        ...formData,
+        type: formData.type.filter((t) => t !== value),
+      });
     }
   };
 
@@ -78,8 +84,12 @@ const AddSafari = () => {
     data.append("GuiderExperience", formData.GuiderExperience);
 
     // Append arrays
-    formData.adventures.forEach((adventure) => data.append("adventures", adventure));
-    formData.includeplaces.forEach((place) => data.append("includeplaces", place));
+    formData.adventures.forEach((adventure) =>
+      data.append("adventures", adventure)
+    );
+    formData.includeplaces.forEach((place) =>
+      data.append("includeplaces", place)
+    );
     formData.type.forEach((t) => data.append("type", t));
 
     // Append files
@@ -124,12 +134,16 @@ const AddSafari = () => {
     } catch (error) {
       toast.dismiss();
       console.error(error);
-      toast.error(error.response?.data?.message || "Error adding safari package");
+      toast.error(
+        error.response?.data?.message || "Error adding safari package"
+      );
     }
   };
 
   // Get the types for the selected category
-  const selectedCategoryTypes = categoryType ? safa[categoryType]?.type || [] : [];
+  const selectedCategoryTypes = categoryType
+    ? safa[categoryType]?.type || []
+    : [];
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
@@ -139,10 +153,15 @@ const AddSafari = () => {
         Add Safari Package
       </h1>
 
-      <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <form
+        onSubmit={handleSubmit}
+        className="grid grid-cols-1 md:grid-cols-2 gap-6"
+      >
         {/* Package Name */}
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Package Name:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Package Name:
+          </label>
           <input
             type="text"
             name="name"
@@ -155,7 +174,9 @@ const AddSafari = () => {
 
         {/* Price */}
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Price (₹):</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Price (₹):
+          </label>
           <input
             type="number"
             name="price"
@@ -168,14 +189,16 @@ const AddSafari = () => {
 
         {/* Category Select + Dynamic Types */}
         <div className="md:col-span-2">
-          <label className="block text-gray-700 font-medium mb-2">Category:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Category:
+          </label>
           <select
             name="category"
             value={formData.category}
             onChange={(e) => {
               setCategoryType(e.target.value);
               handleData(e); // Updates formData.category
-              setFormData(prev => ({ ...prev, type: [] })); // Reset types when category changes
+              setFormData((prev) => ({ ...prev, type: [] })); // Reset types when category changes
             }}
             className="w-full md:w-64 h-12 px-4 border-2 border-slate-300 rounded-xl text-black focus:outline-none focus:border-blue-500"
             required
@@ -183,7 +206,8 @@ const AddSafari = () => {
             <option value="">Select a category</option>
             {Object.keys(safa).map((key) => (
               <option key={key} value={key}>
-                {key.charAt(0).toUpperCase() + key.slice(1)} {/* Nicer display */}
+                {key.charAt(0).toUpperCase() + key.slice(1)}{" "}
+                {/* Nicer display */}
               </option>
             ))}
           </select>
@@ -196,7 +220,10 @@ const AddSafari = () => {
               </label>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {selectedCategoryTypes.map((t, index) => (
-                  <label key={index} className="flex items-center space-x-2 cursor-pointer">
+                  <label
+                    key={index}
+                    className="flex items-center space-x-2 cursor-pointer"
+                  >
                     <input
                       type="checkbox"
                       value={t}
@@ -214,7 +241,9 @@ const AddSafari = () => {
 
         {/* Description */}
         <div className="md:col-span-2">
-          <label className="block text-gray-700 font-medium mb-2">Description:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Description:
+          </label>
           <textarea
             name="description"
             value={formData.description}
@@ -227,7 +256,9 @@ const AddSafari = () => {
 
         {/* Other fields... (kept same for brevity, but corrected) */}
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Total Days:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Total Days:
+          </label>
           <input
             type="number"
             name="totalDays"
@@ -239,7 +270,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">WhatsApp Number:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            WhatsApp Number:
+          </label>
           <input
             type="text"
             name="whatsapp"
@@ -263,15 +296,51 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Vehicle Type:</label>
-          <input
-            type="text"
-            name="VehicleType"
+          <label className="block text-gray-700 font-medium mb-2">
+            Vehicle Type:
+          </label>
+          <select
+            className="w-full p-3 border border-gray-300 rounded"
+            name={"VehicleType"}
             value={formData.VehicleType}
             onChange={handleData}
-            className="w-full p-3 border border-gray-300 rounded"
-            required
-          />
+          >
+            <option value="Car">Car</option>
+            <option value="SUV">SUV</option>
+            <option value="Jeep">Jeep</option>
+            <option value="Van">Van</option>
+            <option value="MiniBus">Mini Bus</option>
+            <option value="Bus">Bus</option>
+            <option value="Pickup">Pickup Truck</option>
+            <option value="Truck">Truck</option>
+
+            {/* Two / Three Wheel */}
+            <option value="Motorbike">Motorbike</option>
+            <option value="Scooter">Scooter</option>
+            <option value="Bicycle">Bicycle</option>
+            <option value="ElectricBike">Electric Bike</option>
+            <option value="TukTuk">Tuk Tuk</option>
+            <option value="ATV">ATV / Quad Bike</option>
+
+            {/* Water Vehicles */}
+            <option value="Boat">Boat</option>
+            <option value="SpeedBoat">Speed Boat</option>
+            <option value="JetSki">Jet Ski</option>
+            <option value="Canoe">Canoe</option>
+            <option value="Kayak">Kayak</option>
+            <option value="Yacht">Yacht</option>
+
+            {/* Special / Travel Use */}
+            <option value="SafariJeep">Safari Jeep</option>
+            <option value="CamperVan">Camper Van</option>
+            <option value="Caravan">Caravan</option>
+            <option value="LuxuryCar">Luxury Car</option>
+            <option value="OffRoad">Off Road Vehicle</option>
+
+            {/* Air (optional – only if you plan to support later) */}
+            <option value="Helicopter">Helicopter</option>
+            <option value="HotAirBalloon">Hot Air Balloon</option>
+          </select>
         </div>
 
         <div>
@@ -303,7 +372,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Guide Name:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Guide Name:
+          </label>
           <input
             type="text"
             name="GuiderName"
@@ -314,7 +385,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Guide Experience (years):</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Guide Experience (years):
+          </label>
           <input
             type="number"
             name="GuiderExperience"
@@ -325,7 +398,9 @@ const AddSafari = () => {
         </div>
 
         <div className="md:col-span-2">
-          <label className="block text-gray-700 font-medium mb-2">Team Members (count):</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Team Members (count):
+          </label>
           <input
             type="number"
             name="TeamMembers"
@@ -337,7 +412,9 @@ const AddSafari = () => {
 
         {/* File Uploads */}
         <div className="md:col-span-2">
-          <label className="block text-gray-700 font-medium mb-2">Main Image *:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Main Image *:
+          </label>
           <input
             type="file"
             accept="image/*"
@@ -348,7 +425,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Additional Images:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Additional Images:
+          </label>
           <input
             type="file"
             accept="image/*"
@@ -359,7 +438,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Vehicle Images:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Vehicle Images:
+          </label>
           <input
             type="file"
             accept="image/*"
@@ -370,7 +451,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Guide Image:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Guide Image:
+          </label>
           <input
             type="file"
             accept="image/*"
@@ -380,7 +463,9 @@ const AddSafari = () => {
         </div>
 
         <div>
-          <label className="block text-gray-700 font-medium mb-2">Short Promo Video:</label>
+          <label className="block text-gray-700 font-medium mb-2">
+            Short Promo Video:
+          </label>
           <input
             type="file"
             accept="video/*"

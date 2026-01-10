@@ -2,46 +2,66 @@ import TrendingModel from "../schema/trendingScehema.js";
 import cloudinary from "../cloudinary/cloudinary.js";
 import nodemailer from "nodemailer";
 import fs from "fs";
+import jwt from "jsonwebtoken";
 
 // --------------------------------------------------------
 // Helper to upload image to Cloudinary (and remove local file)
+// Adds retry logic and safer file cleanup to avoid ENOENT errors
 // --------------------------------------------------------
 const uploadToCloudinary = async (file, resourceType = "image") => {
   if (!file) return null;
 
-  try {
-    const result = await cloudinary.uploader.upload(file.path, {
-      resource_type: resourceType,
-      folder: `trending/${resourceType}s`,
-    });
-
-    // Remove the local file after successful upload
-    try {
-      fs.unlink(file.path, (err) => {
-        if (err) console.warn("Failed to remove local uploaded file:", err);
-      });
-    } catch (e) {
-      console.warn("Cleanup failed:", e);
-    }
-
-    return result.secure_url;
-  } catch (error) {
-    console.error(`Cloudinary upload failed (${resourceType}):`, error);
-
-    // Try to remove local file even if upload failed
-    try {
-      fs.unlink(file.path, (err) => {
-        if (err)
-          console.warn(
-            "Failed to remove local uploaded file after failure:",
-            err
-          );
-      });
-    } catch (e) {
-      console.warn("Cleanup failed:", e);
-    }
-
+  const maxAttempts = 3;
+  // If the uploaded file is missing for any reason, bail early
+  if (!fs.existsSync(file.path)) {
+    console.warn(
+      "uploadToCloudinary: file not found, skipping:",
+      file.path,
+      file?.originalname
+    );
     return null;
+  }
+
+  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    try {
+      const result = await cloudinary.uploader.upload(file.path, {
+        resource_type: resourceType,
+        folder: `trending/${resourceType}s`,
+      });
+
+      // Remove the local file after successful upload (if it still exists)
+      try {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      } catch (e) {
+        console.warn("Failed to remove local uploaded file:", e);
+      }
+
+      return result.secure_url;
+    } catch (error) {
+      console.error(
+        `Cloudinary upload failed (${resourceType}) attempt ${attempt}:`,
+        error
+      );
+
+      // Try to remove local file if it still exists to avoid disk growth
+      try {
+        if (fs.existsSync(file.path)) {
+          fs.unlinkSync(file.path);
+        }
+      } catch (e) {
+        console.warn("Failed to remove local uploaded file after failure:", e);
+      }
+
+      if (attempt < maxAttempts) {
+        // small backoff before retrying
+        await new Promise((r) => setTimeout(r, 500 * attempt));
+        continue;
+      }
+
+      return null;
+    }
   }
 };
 
@@ -63,6 +83,34 @@ const addtrending = async (req, res) => {
       ownerEmail,
       videoUrl,
     } = req.body;
+
+    // If ownerEmail not provided, try to infer from token (done earlier before save)
+    // But before creating, ensure vendor doesn't already have a profile (one per vendor rule)
+    try {
+      if (!ownerEmail) {
+        const authHeader = req.headers?.authorization;
+        if (authHeader && authHeader.startsWith("Bearer ")) {
+          const token = authHeader.split(" ")[1];
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          if (decoded && decoded.email) ownerEmail = decoded.email;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+
+    if (ownerEmail) {
+      const existing = await TrendingModel.findOne({ ownerEmail });
+      if (existing) {
+        return res
+          .status(409)
+          .json({
+            success: false,
+            message:
+              "A stay profile already exists for this account. Use update instead.",
+          });
+      }
+    }
 
     // ---------- clean video URL ----------
     if (videoUrl && typeof videoUrl === "string") {
@@ -149,14 +197,43 @@ const addtrending = async (req, res) => {
       });
     }
 
+    // If owner email wasn't supplied explicitly, try to infer it from a Bearer token
+    if (!ownerEmail) {
+      const authHeader = req.headers?.authorization;
+      if (authHeader && authHeader.startsWith("Bearer ")) {
+        try {
+          const token = authHeader.split(" ")[1];
+          const decoded = jwt.verify(token, process.env.JWT_SECRET);
+          if (decoded && decoded.email) ownerEmail = decoded.email;
+        } catch (e) {
+          // ignore token parse errors — ownerEmail stays undefined
+          console.warn(
+            "Could not decode token for ownerEmail inference:",
+            e.message
+          );
+        }
+      }
+    }
+
+    // helper - safely parse numbers with fallback to default when invalid
+    const toNumberSafe = (val, fallback) => {
+      try {
+        if (val === undefined || val === null || val === "") return fallback;
+        const n = Number(val);
+        return Number.isFinite(n) ? n : fallback;
+      } catch (e) {
+        return fallback;
+      }
+    };
+
     // ---------- save (now include `otherimages`) ----------
     const trendingItem = new TrendingModel({
       name,
       description,
       category,
-      rating: rating ? Number(rating) : 5,
+      rating: toNumberSafe(rating, 5),
       district,
-      price: price ? Number(price) : 0,
+      price: toNumberSafe(price, 0),
 
       // store mainImage explicitly and keep `image` for compatibility
       mainImage: mainImageUrl || imageUrl || null,
@@ -168,9 +245,33 @@ const addtrending = async (req, res) => {
       otherimages: otherimagesUrls,
       ownerEmail,
 
-      availableThings: availableThings
-        ? availableThings.split(",").map((i) => i.trim())
-        : [],
+      // Normalize availableThings: accept string (comma separated), array, or JSON-encoded array
+      availableThings: (() => {
+        try {
+          if (!availableThings) return [];
+          if (Array.isArray(availableThings))
+            return availableThings.map((i) => String(i).trim()).filter(Boolean);
+          if (typeof availableThings === "string") {
+            // Try JSON parse first (in case client sent JSON string)
+            try {
+              const parsed = JSON.parse(availableThings);
+              if (Array.isArray(parsed))
+                return parsed.map((i) => String(i).trim()).filter(Boolean);
+            } catch (e) {
+              // not JSON, fall back to comma split
+            }
+            return availableThings
+              .split(",")
+              .map((i) => i.trim())
+              .filter(Boolean);
+          }
+
+          // other types (numbers, objects) — convert to string
+          return [String(availableThings)];
+        } catch (e) {
+          return [];
+        }
+      })(),
     });
 
     await trendingItem.save();
@@ -204,14 +305,22 @@ const deleteTrendingByName = async (req, res) => {
   try {
     const { name } = req.params;
 
-    const deletedTrending = await TrendingModel.findOneAndDelete({ name });
+    // find first to check ownership
+    const item = await TrendingModel.findOne({ name });
+    if (!item) {
+      return res
+        .status(404)
+        .json({ success: false, message: `Trending item "${name}" not found` });
+    }
 
-    if (!deletedTrending) {
-      return res.status(404).json({
+    if (req.user?.role !== "admin" && req.user?.email !== item.ownerEmail) {
+      return res.status(403).json({
         success: false,
-        message: `Trending item "${name}" not found`,
+        message: "Not authorized to delete this item",
       });
     }
+
+    const deletedTrending = await TrendingModel.findOneAndDelete({ name });
 
     // Emit socket event to notify clients about deletion
     try {
@@ -240,6 +349,24 @@ const deleteTrendingByName = async (req, res) => {
 const updateTrendingById = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // ensure the caller owns this resource (or is admin)
+    const existingItem = await TrendingModel.findById(id);
+    if (!existingItem) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Trending item not found" });
+    }
+
+    if (
+      req.user?.role !== "admin" &&
+      req.user?.email !== existingItem.ownerEmail
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to update this item",
+      });
+    }
 
     let {
       name,

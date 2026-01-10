@@ -42,10 +42,10 @@
 /* Mobile gap */
 @media (max-width: 640px) {
   .slick-slider .slick-slide {
-    padding: 0 6px !important;
+    padding: 0 20px !important;
   }
 
   .slick-slider .slick-list {
-    margin: 0 -6px !important;
+    margin: 0 -20px !important;
   }
 }

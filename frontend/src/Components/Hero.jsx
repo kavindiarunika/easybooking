@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import homepageImages from "../assets/HomepageImages/home";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { MdHotel } from "react-icons/md";
 import { RiSafariFill } from "react-icons/ri";
 import { FaCar } from "react-icons/fa";
@@ -9,6 +9,7 @@ import { FaCar } from "react-icons/fa";
 const Hero = () => {
   const slides = homepageImages;
   const [index, setIndex] = useState(0);
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -53,7 +54,7 @@ const Hero = () => {
         </p>
 
         {/* CTA BUTTON (MOBILE IMPROVED) */}
-        <Link to="/villa" className="mt-8 w-full sm:w-auto">
+        <Link to="/vendor/register" className="mt-8 w-full sm:w-auto">
           <button className="
             w-auto sm:w-auto bg-white text-black font-semibold py-2 px-4 sm:py-4 sm:px-8 text-base sm:text-lg rounded-full
             flex items-center justify-center gap-3
@@ -61,7 +62,7 @@ const Hero = () => {
             transition
             active:scale-95
           ">
-            Booking Now
+            Register Now
             <span className="text-xl">➜</span>
           </button>
         </Link>

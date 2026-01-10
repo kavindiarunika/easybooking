@@ -281,13 +281,48 @@ const EditSafari = ({ safariId: propSafariId }) => {
           {/*---------------vehicleType--------------- */}
           <div>
             <label>vehicleType:</label>
-            <input
-              type="text"
-              name="vehicleType"
+            <select 
+              name="VehicleType"
               value={safariData.VehicleType}
               onChange={handledata}
               className="w-full p-3 border border-gray-300 rounded"
-            />
+            >
+              <option value="Car">Car</option>
+              <option value="SUV">SUV</option>
+              <option value="Jeep">Jeep</option>
+              <option value="Van">Van</option>
+              <option value="MiniBus">Mini Bus</option>
+              <option value="Bus">Bus</option>
+              <option value="Pickup">Pickup Truck</option>
+              <option value="Truck">Truck</option>
+
+              {/* Two / Three Wheel */}
+              <option value="Motorbike">Motorbike</option>
+              <option value="Scooter">Scooter</option>
+              <option value="Bicycle">Bicycle</option>
+              <option value="ElectricBike">Electric Bike</option>
+              <option value="TukTuk">Tuk Tuk</option>
+              <option value="ATV">ATV / Quad Bike</option>
+
+              {/* Water Vehicles */}
+              <option value="Boat">Boat</option>
+              <option value="SpeedBoat">Speed Boat</option>
+              <option value="JetSki">Jet Ski</option>
+              <option value="Canoe">Canoe</option>
+              <option value="Kayak">Kayak</option>
+              <option value="Yacht">Yacht</option>
+
+              {/* Special / Travel Use */}
+              <option value="SafariJeep">Safari Jeep</option>
+              <option value="CamperVan">Camper Van</option>
+              <option value="Caravan">Caravan</option>
+              <option value="LuxuryCar">Luxury Car</option>
+              <option value="OffRoad">Off Road Vehicle</option>
+
+              {/* Air (optional – only if you plan to support later) */}
+              <option value="Helicopter">Helicopter</option>
+              <option value="HotAirBalloon">Hot Air Balloon</option>
+            </select>
           </div>
           {/*---------------guidername----------------- */}
           <div>

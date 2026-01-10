@@ -11,6 +11,9 @@ import trendrouter from "./router/trendingRouter.js";
 import loginrouter from "./controller/logincontroller.js";
 import travelingplacesroute from "./router/travelingplacesroute.js";
 import safariRouter from "./router/safariRoute.js";
+import vendorrouter from './router/vendorRouter.js'
+import helmet from "helmet";
+
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -58,6 +61,25 @@ const allowedOrigins = [
 ];
 
 app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: [
+          "'self'",
+          "http://localhost:4000",
+          "ws://localhost:4000",
+          "https://sandbox.payhere.lk",
+          "https://www.payhere.lk",
+          "https://www.google-analytics.com",
+          "https://www.paypal.com",
+          "https://www.sandbox.paypal.com",
+        ],
+      },
+    },
+  })
+);
+app.use(
   cors({
     origin: (origin, callback) => {
       // Allow requests with no origin (like mobile apps or curl) or if the origin is in our allowed list
@@ -81,8 +103,8 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use((req, res, next) => {
   res.setHeader(
-    "Cache-Control",
-    "no-store, no-cache, must-revalidate, proxy-revalidate"
+    "Content-Security-Policy",
+    "connect-src 'self' http://localhost:4000 ws://localhost:4000 https://sandbox.payhere.lk https://www.payhere.lk https://www.google-analytics.com https://www.paypal.com https://www.sandbox.paypal.com"
   );
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
@@ -107,6 +129,8 @@ app.use("/api/travelplaces", travelingplacesroute);
 app.use("/api/safari", safariRouter);
 
 app.use("/api/vehicle", vehicleRouter);
+
+app.use("/api/vendor", vendorrouter);
 
 app.get("/", (req, res) => res.send("API working."));
 

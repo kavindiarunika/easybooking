@@ -215,8 +215,8 @@ const Villa = () => {
 
         {/* Mobile filter panel (overlay) */}
         {mobileFiltersOpen && (
-          <div className="fixed inset-0 z-50 flex items-start justify-end bg-black/40 lg:hidden">
-            <div className="w-11/12 max-w-xs bg-gray-800 rounded-2xl p-6 m-4 shadow-lg overflow-y-auto">
+          <div className="absolute top-4 right-1 inset-0 z-50 flex items-start justify-end bg-black/40 lg:hidden">
+            <div className="w-6/12 max-w-xs bg-gray-800 rounded-2xl p-6 m-4 shadow-lg overflow-y-auto">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-white text-xl font-bold">Filters</h2>
                 <button
@@ -228,8 +228,8 @@ const Villa = () => {
               </div>
 
               {/* Reuse filter content */}
-              <div className="mb-8">
-                <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
+              <div className=" mb-8">
+                <h3 className=" text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
                   District
                 </h3>
                 <div className="space-y-2 max-h-48 overflow-y-auto">
