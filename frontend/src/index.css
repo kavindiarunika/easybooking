@@ -1,0 +1,88 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap");
+@import "tailwindcss";
+
+* {
+  font-family: "Outfit", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+.inter-regular {
+  font-family: "Inter", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+}
+.prata-regular {
+  font-family: "Prata", serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.fade-in {
+  opacity: 0;
+  animation: fadeInAnimation 1s forwards;
+  animation-delay: var(--delay);
+}
+
+@keyframes fadeInAnimation {
+  to {
+    opacity: 1;
+  }
+}
+/* ================================
+   SLICK SLIDER – SAFE GAP SYSTEM
+   Works on Desktop, Android, iOS
+================================ */
+
+/* Ensure proper sizing */
+.slick-slider {
+  width: 100%;
+}
+
+/* Prevent iOS flex/transform bugs */
+.slick-track {
+  display: flex !important;
+}
+
+.slick-slide {
+  height: auto !important;
+}
+
+/* Desktop & default gap */
+.slick-slider .slick-slide {
+  box-sizing: border-box;
+  padding: 0 12px;
+}
+
+/* Mobile gap (safe for iOS Safari) */
+@media (max-width: 640px) {
+  .slick-slider .slick-slide {
+    padding: 0 16px;
+  }
+}
+
+/* Safari / iOS fixes for transformed children (prevent overlap / escape of rounded corners) */
+/* Prevent transformed children (scale/translate) from escaping rounded parents on iOS Safari */
+.card-safari-fix {
+  overflow: hidden; /* keep existing behavior */
+  -webkit-mask-image: -webkit-radial-gradient(
+    white,
+    black
+  ); /* forces proper clipping on iOS */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
+
+/* Ensure images don't create overflow due to transforms */
+.card-safari-fix img {
+  display: block;
+  width: 100%;
+  height: auto;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+}
