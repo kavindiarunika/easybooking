@@ -7,6 +7,7 @@ const Home = () => {
         {name:"stays payments" , path:"/staypaid"},
         {name:"GoTrip payments" , path:"/safaripaid"},
         {name:"Advertisment" , path:"/ads"},
+        {name:"Vendor Register" , path:"/vendors"},
     ]
 
     

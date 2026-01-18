@@ -554,7 +554,7 @@ const VendorManage = ({ token }) => {
                           )}
                           <h5 className="font-semibold text-gray-800">{stay.name}</h5>
                           <p className="text-sm text-gray-500">{stay.location}</p>
-                          <p className="text-sm text-green-600 font-medium">₹{stay.price}</p>
+                          <p className="text-sm text-green-600 font-medium">Rs.{stay.price}</p>
                         </div>
                       ))}
                     </div>
@@ -605,7 +605,7 @@ const VendorManage = ({ token }) => {
                           )}
                           <h5 className="font-semibold text-gray-800">{vehicle.name}</h5>
                           <p className="text-sm text-gray-500">{vehicle.type}</p>
-                          <p className="text-sm text-purple-600 font-medium">₹{vehicle.pricePerDay}/day</p>
+                          <p className="text-sm text-purple-600 font-medium">Rs.{vehicle.pricePerDay}/day</p>
                         </div>
                       ))}
                     </div>

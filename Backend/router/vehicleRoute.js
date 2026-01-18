@@ -1,4 +1,4 @@
-import { addVehicle } from "../controller/vehicleController.js";
+import { addVehicle, getVehicleProfile, updateVehicle, getAllVehicles } from "../controller/vehicleController.js";
 import express from "express";
 import upload from "../middleware/multer.js";
 
@@ -11,5 +11,8 @@ const vehicleField = upload.fields([
 
 import verifyToken from "../middleware/verifyToken.js";
 vehicleRouter.post("/addvehicle", vehicleField, verifyToken, addVehicle);
+vehicleRouter.get("/profile", verifyToken, getVehicleProfile);
+vehicleRouter.put("/update/:id", vehicleField, verifyToken, updateVehicle);
+vehicleRouter.get("/all", getAllVehicles);
 
 export default vehicleRouter;

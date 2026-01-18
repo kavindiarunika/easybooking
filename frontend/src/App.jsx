@@ -20,6 +20,8 @@ import { useLocation } from "react-router-dom";
 import GoTrip from "./Pages/vendor/VendorCategory/GoTrip";
 import Stays from "./Pages/vendor/VendorCategory/Stays";
 import Vehicle from "./Pages/vendor/VendorCategory/Vehicle";
+import VendorDashboard from "./Pages/vendor/VendorDashboard";
+import GoTripDashboard from "./Pages/vendor/GoTripDashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -47,14 +49,8 @@ const App = () => {
         <Route path="/vehicle" element={<VehicleCard />} />
         <Route path="/vendor/register" element={<Register />} />
 
-        <Route
-          path="/vendor/dashboard-stays"
-          element={
-            <ProtectedRoute allowedRole="vendor" allowedCategory="stays">
-              <Stays />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/vendor/dashboard-stays" element={<VendorDashboard />} />
+        <Route path="/vendor/dashboard-gotrip" element={<GoTripDashboard />} />
         <Route
           path="/vendor/dashboard-ontrip"
           element={

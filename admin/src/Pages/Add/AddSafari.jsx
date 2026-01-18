@@ -187,7 +187,7 @@ const AddSafari = ({ token }) => {
         {/* Price */}
         <div>
           <label className="block text-gray-700 font-medium mb-2">
-            Price (₹):
+            Price (Rs):
           </label>
           <input
             type="number"

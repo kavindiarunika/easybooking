@@ -53,18 +53,15 @@ const Hero = () => {
           {current.subtitle}
         </p>
 
-        {/* CTA BUTTON (MOBILE IMPROVED) */}
-        <Link to="/vendor/register" className="mt-8 w-full sm:w-auto">
-          <button className="
-            w-auto sm:w-auto bg-white text-black font-semibold py-2 px-4 sm:py-4 sm:px-8 text-base sm:text-lg rounded-full
-            flex items-center justify-center gap-3
-            hover:bg-gray-200
-            transition
-            active:scale-95
-          ">
+        <Link to="/vendor/register">
+          <motion.button
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="mt-6 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-full shadow-lg hover:from-cyan-600 hover:to-blue-700 hover:scale-105 transition-all duration-300"
+          >
             Register Now
-            <span className="text-xl">➜</span>
-          </button>
+          </motion.button>
         </Link>
       </div>
 

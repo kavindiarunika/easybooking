@@ -1,10 +1,11 @@
 import React from "react";
 import { useState } from "react";
-import { assets } from "../../assets/Assest";
 import axios from "axios";
 import { BACKEND_URL } from "../../App.jsx";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
+import { FaHotel, FaEnvelope, FaPhone, FaLock, FaBuilding, FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
+import { assets } from "../../assets/Assest";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ const Register = () => {
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   // Forgot password states
   const [showForgotPassword, setShowForgotPassword] = useState(false);
@@ -24,7 +26,11 @@ const Register = () => {
 
   const [formData, setformData] = useState({
     email: "",
-    category: "",
+    phone: "",
+    packageName: "",
+    hotelName: "",
+    hotelType: "",
+    vehicleType: "",
     password: "",
   });
 
@@ -49,34 +55,27 @@ const Register = () => {
       );
 
       if (response.data.success && response.data.token) {
-        // Auto-verified flow: set token and navigate to respective vendor dashboard
-        const { token, category } = response.data;
+        const { token } = response.data;
         localStorage.setItem("vendorToken", token);
-        localStorage.setItem("vendorCategory", category);
-
-        toast.success("Registration successful. Redirecting...");
-
-        switch (category) {
-          case "stays":
-            navigate("/vendor/dashboard-stays", {
-              state: { openCreate: true },
-            });
-            break;
-          case "ontrip":
-            navigate("/vendor/dashboard-ontrip", {
-              state: { openCreate: true },
-            });
-            break;
-          case "vehicle_rent":
-            navigate("/vendor/dashboard-vehicles", {
-              state: { openCreate: true },
-            });
-            break;
-          default:
-            navigate("/");
+        
+        // Determine category and redirect accordingly
+        const selectedCategory = formData.hotelName;
+        const isGoTrip = ["car", "van", "safari-jeep", "tuktuk"].includes(selectedCategory);
+        
+        if (isGoTrip) {
+          localStorage.setItem("vendorCategory", "gotrip");
+          toast.success("Registration successful. Redirecting to GoTrip Dashboard...");
+          navigate("/vendor/dashboard-gotrip", {
+            state: { openCreate: true },
+          });
+        } else {
+          localStorage.setItem("vendorCategory", "stays");
+          toast.success("Registration successful. Redirecting to Stays Dashboard...");
+          navigate("/vendor/dashboard-stays", {
+            state: { openCreate: true },
+          });
         }
       } else if (response.data.success) {
-        // fallback (legacy OTP flow) — show OTP form
         toast.success(
           "Vendor registered successfully. OTP sent to your email."
         );
@@ -127,26 +126,19 @@ const Register = () => {
       if (response.data.success && response.data.token) {
         const { token, category } = response.data;
 
-        // Store session info
         localStorage.setItem("vendorToken", token);
-        localStorage.setItem("vendorCategory", category);
-
-        toast.success("Login successful");
-
-        // Use navigate based on the category stored in MongoDB
-        switch (category) {
-          case "stays":
-            navigate("/vendor/dashboard-stays");
-            break;
-          case "ontrip":
-            navigate("/vendor/dashboard-ontrip");
-            break;
-          case "vehicle_rent":
-            navigate("/vendor/dashboard-vehicles");
-            break;
-          default:
-            toast.error("Unknown vendor category");
-            break;
+        
+        // Determine dashboard based on category
+        const isGoTrip = ["car", "van", "safari-jeep", "tuktuk"].includes(category);
+        
+        if (isGoTrip) {
+          localStorage.setItem("vendorCategory", "gotrip");
+          toast.success("Login successful");
+          navigate("/vendor/dashboard-gotrip");
+        } else {
+          localStorage.setItem("vendorCategory", "stays");
+          toast.success("Login successful");
+          navigate("/vendor/dashboard-stays");
         }
       } else {
         toast.error(response.data.message || "Login failed");
@@ -184,7 +176,7 @@ const Register = () => {
     }
   };
 
-  // Forgot Password - Reset Password
+  // Reset Password
   const handleResetPassword = async (e) => {
     e.preventDefault();
     if (newPassword !== confirmPassword) {
@@ -199,16 +191,21 @@ const Register = () => {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/vendor/reset-password`,
-        { email: forgotEmail, otp: forgotOtp, newPassword }
+        {
+          email: forgotEmail,
+          otp: forgotOtp,
+          newPassword,
+        }
       );
       if (response.data.success) {
-        toast.success("Password reset successfully. You can now login.");
+        toast.success("Password reset successful. Please login.");
         setShowForgotPassword(false);
         setForgotOtpSent(false);
         setForgotEmail("");
         setForgotOtp("");
         setNewPassword("");
         setConfirmPassword("");
+        setsignIn(true);
       } else {
         toast.error(response.data.message || "Failed to reset password");
       }
@@ -220,211 +217,326 @@ const Register = () => {
     }
   };
 
+  const hotelTypes = [
+    { value: "hotel", label: "Hotel", icon: "🏨" },
+    { value: "resort", label: "Resort", icon: "🏝️" },
+    { value: "villa", label: "Villa", icon: "🏡" },
+    { value: "homestay", label: "Homestay", icon: "🏠" },
+    { value: "guesthouse", label: "Guest House", icon: "🏘️" },
+    { value: "apartment", label: "Apartment", icon: "🏢" },
+  ];
+
+  const vehicleTypes = [
+    { value: "car", label: "Car", icon: "🚗" },
+    { value: "van", label: "Van", icon: "🚐" },
+    { value: "ac-bus", label: "A/C Bus", icon: "🚌" },
+    { value: "tuk-tuk", label: "Tuk Tuk", icon: "🛺" },
+    { value: "boat", label: "Boat", icon: "🚤" },
+    { value: "safari-jeep", label: "Safari Jeep", icon: "🚙" },
+  ];
+
   return (
-    <div>
-      <div className="flex h-[700px] w-full">
-        <div className="w-full hidden md:inline-block">
-          <img className="h-full" src={assets.Hero} alt="leftSideImage" />
-        </div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
+      {/* Background decorations */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+      </div>
 
-        <div className="w-full flex flex-col items-center justify-center">
-          {signIn ? (
-            <form
-              onSubmit={handleLoginSubmit}
-              className="md:w-96 w-80 flex flex-col items-center justify-center"
-            >
-              <h2 className="text-4xl text-gray-900 font-medium">Sign in</h2>
-              <p className="text-sm text-gray-500/90 mt-3 mb-4">
-                Welcome back! Please sign in to continue
-              </p>
+      {/* Back to Home */}
+      <Link
+        to="/"
+        className="absolute top-6 left-6 flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+      >
+        <FaArrowLeft />
+        <span>Back to Home</span>
+      </Link>
 
-              <div className="flex items-center w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2">
-                <svg
-                  width="16"
-                  height="11"
-                  viewBox="0 0 16 11"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    fillRule="evenodd"
-                    clipRule="evenodd"
-                    d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z"
-                    fill="#6B7280"
-                  />
-                </svg>
-                <input
-                  type="email"
-                  name="email"
-                  placeholder="Email id"
-                  className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
-                  value={loginData.email}
-                  onChange={handleLoginChange}
-                  required
-                />
-              </div>
-
-              <div className="flex items-center mt-6 w-full bg-transparent border border-gray-300/60 h-12 rounded-full overflow-hidden pl-6 gap-2">
-                <svg
-                  width="13"
-                  height="17"
-                  viewBox="0 0 13 17"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                  <path
-                    d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
-                    fill="#6B7280"
-                  />
-                </svg>
-                <input
-                  type="password"
-                  name="password"
-                  placeholder="Password"
-                  className="bg-transparent text-gray-500/80 placeholder-gray-500/80 outline-none text-sm w-full h-full"
-                  value={loginData.password}
-                  onChange={handleLoginChange}
-                  required
-                />
-              </div>
-
-              <div className="w-full flex items-center justify-between mt-8 text-gray-500/80">
-                <div className="flex items-center gap-2">
-                  <input className="h-5" type="checkbox" id="checkbox" />
-                  <label className="text-sm" htmlFor="checkbox">
-                    Remember me
-                  </label>
+      <div className="relative w-full max-w-5xl">
+        <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+          <div className="flex flex-col lg:flex-row">
+            {/* Left Side - Branding */}
+            <div className="lg:w-5/12 bg-gradient-to-br from-blue-600 to-purple-700 p-8 lg:p-12 flex flex-col justify-center items-center text-white">
+              <div className="text-center">
+                <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <img src={assets.logo} alt="SmartsBooking Logo" className="w-20 h-20 object-contain" />
                 </div>
-                <button
-                  type="button"
-                  className="text-sm underline hover:text-indigo-500"
-                  onClick={() => setShowForgotPassword(true)}
-                >
-                  Forgot password?
-                </button>
+                <h1 className="text-3xl lg:text-4xl font-bold mb-4">
+                  SmartsBooking
+                </h1>
+                <p className="text-white/80 text-lg mb-8">
+                  Partner with us and grow your hospitality business
+                </p>
+                
+                <div className="space-y-4 text-left">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="text-lg">✓</span>
+                    </div>
+                    <span>Increase your bookings</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="text-lg">✓</span>
+                    </div>
+                    <span>Easy management dashboard</span>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                      <span className="text-lg">✓</span>
+                    </div>
+                    <span>24/7 Support</span>
+                  </div>
+                </div>
               </div>
+            </div>
 
-              <button
-                type="submit"
-                className="mt-8 w-full h-11 rounded-full text-white bg-green-500 hover:opacity-90 transition-opacity"
-              >
-                Login
-              </button>
-              <p className="text-gray-500/90 text-sm mt-4">
-                Don’t have an account?{" "}
-                <a
-                  className="text-indigo-400 hover:underline"
-                  onClick={() => setsignIn(false)}
-                >
-                  Sign up
-                </a>
-              </p>
-            </form>
-          ) : (
-            <form
-              onSubmit={handleSubmit}
-              className="md:w-96 w-80 flex flex-col items-center justify-center"
-            >
-              <h2 className="text-4xl text-gray-900 font-medium">Sign up</h2>
-              <p className="text-sm text-gray-500/90 mt-3 mb-4">
-                Welcome To SmartsBooking!
-              </p>
+            {/* Right Side - Forms */}
+            <div className="lg:w-7/12 p-8 lg:p-12">
+              {signIn ? (
+                /* Login Form */
+                <form onSubmit={handleLoginSubmit} className="space-y-6">
+                  <div className="text-center mb-8">
+                    <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
+                    <p className="text-white/60">Sign in to your vendor account</p>
+                  </div>
 
-              {/* Email */}
-              <div className="flex items-center w-full border border-gray-300/60 h-12 rounded-full pl-6 gap-2">
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Email id"
-                  className="bg-transparent text-gray-500/80 outline-none text-sm w-full h-full"
-                  required
-                />
-              </div>
-
-              {/* Category Select */}
-              <div className="mt-4 flex items-center w-full border border-gray-300/60 h-12 rounded-full pl-6 gap-2">
-                <select
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="bg-transparent text-gray-700 outline-none text-sm w-full h-full "
-                  required
-                >
-                  <option value="" className="text-white">
-                    Select type
-                  </option>
-                  <option value="stays">Stays</option>
-                  <option value="ontrip">OnTrip</option>
-                  <option value="vehicle_rent" className="hidden">
-                    Vehicle Rent
-                  </option>
-                </select>
-              </div>
-
-              {/* Password */}
-              <div className="mt-4 flex items-center w-full border border-gray-300/60 h-12 rounded-full pl-6 gap-2">
-                <input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleChange}
-                  placeholder="Password"
-                  className="bg-transparent text-gray-500/80 outline-none text-sm w-full h-full"
-                  required
-                />
-              </div>
-
-              {/* Submit */}
-              <button
-                type="submit"
-                className="mt-8 w-full h-11 rounded-full text-white bg-green-500 hover:opacity-90 transition-opacity"
-              >
-                {loading ? "Sending OTP..." : "Register"}
-              </button>
-              {otpSent && (
-                <>
-                  <div className="flex items-center w-full border border-gray-300/60 h-12 rounded-full pl-6 mt-4">
+                  {/* Email */}
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
                     <input
-                      type="text"
-                      value={otp}
-                      onChange={(e) => setOtp(e.target.value)}
-                      placeholder="Enter OTP"
-                      className="bg-transparent text-gray-500/80 outline-none text-sm w-full h-full"
+                      type="email"
+                      name="email"
+                      placeholder="Email Address"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-4 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                      value={loginData.email}
+                      onChange={handleLoginChange}
+                      required
                     />
                   </div>
 
-                  <button
-                    type="button"
-                    onClick={handleverifyOtp}
-                    className="mt-6 w-full h-11 rounded-full text-white bg-indigo-500 hover:opacity-90"
-                  >
-                    Verify OTP
-                  </button>
-                </>
-              )}
+                  {/* Password */}
+                  <div className="relative">
+                    <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Password"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-4 pl-12 pr-12 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                      value={loginData.password}
+                      onChange={handleLoginChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
 
-              <p className="text-gray-500/90 text-sm mt-4">
-                Do you have an account?{" "}
-                <span
-                  className="text-indigo-400 hover:underline cursor-pointer"
-                  onClick={() => setsignIn(true)}
-                >
-                  Sign In
-                </span>
-              </p>
-            </form>
-          )}
+                  {/* Remember & Forgot */}
+                  <div className="flex items-center justify-between text-sm">
+                    <label className="flex items-center gap-2 text-white/70 cursor-pointer">
+                      <input type="checkbox" className="w-4 h-4 rounded border-white/30 bg-white/10" />
+                      Remember me
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowForgotPassword(true)}
+                      className="text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Forgot Password?
+                    </button>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-4 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                  >
+                    Sign In
+                  </button>
+
+                  {/* Switch to Register */}
+                  <p className="text-center text-white/60">
+                    Don't have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setsignIn(false)}
+                      className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+                    >
+                      Create Account
+                    </button>
+                  </p>
+                </form>
+              ) : (
+                /* Registration Form */
+                <form onSubmit={handleSubmit} className="space-y-5">
+                  <div className="text-center mb-6">
+                    <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
+                    <p className="text-white/60">Join as a vendor partner</p>
+                  </div>
+
+                  {/* Email */}
+                  <div className="relative">
+                    <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Email Address"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                      value={formData.email}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Phone */}
+                  <div className="relative">
+                    <FaPhone className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <input
+                      type="tel"
+                      name="phone"
+                      placeholder="Phone Number"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                      value={formData.phone}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Stay or Vehicle Package Name */}
+                  <div className="relative">
+                    <FaHotel className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <input
+                      type="text"
+                      name="packageName"
+                      placeholder="Stay or Vehicle Package Name"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                      value={formData.packageName}
+                      onChange={handleChange}
+                      required
+                    />
+                  </div>
+
+                  {/* Category Selection */}
+                  <div className="relative">
+                    <FaBuilding className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <select
+                      name="hotelName"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all appearance-none cursor-pointer"
+                      value={formData.hotelName}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="" className="bg-slate-800 text-white">Select Category</option>
+                      <optgroup label="Stays" className="bg-slate-800 text-white">
+                        <option value="restaurant" className="bg-slate-800 text-white">Restaurant</option>
+                        <option value="villas" className="bg-slate-800 text-white">Villas</option>
+                        <option value="houses" className="bg-slate-800 text-white">Houses</option>
+                        <option value="hotels" className="bg-slate-800 text-white">Hotels</option>
+                      </optgroup>
+                      <optgroup label="GoTrip" className="bg-slate-800 text-white">
+                        <option value="car" className="bg-slate-800 text-white">Car</option>
+                        <option value="van" className="bg-slate-800 text-white">Van</option>
+                        <option value="safari-jeep" className="bg-slate-800 text-white">Safari Jeep</option>
+                        <option value="tuktuk" className="bg-slate-800 text-white">Tuk Tuk</option>
+                      </optgroup>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
+                      ▼
+                    </div>
+                  </div>
+
+                  {/* Password */}
+                  <div className="relative">
+                    <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <input
+                      type={showPassword ? "text" : "password"}
+                      name="password"
+                      placeholder="Create Password"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-12 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
+                      value={formData.password}
+                      onChange={handleChange}
+                      required
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(!showPassword)}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 hover:text-white transition-colors"
+                    >
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </button>
+                  </div>
+
+                  {/* Submit Button */}
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold py-4 rounded-xl hover:from-green-600 hover:to-emerald-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <span className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        </svg>
+                        Creating Account...
+                      </span>
+                    ) : (
+                      "Create Account"
+                    )}
+                  </button>
+
+                  {/* OTP Section */}
+                  {otpSent && (
+                    <div className="space-y-4 pt-4 border-t border-white/20">
+                      <div className="relative">
+                        <input
+                          type="text"
+                          placeholder="Enter OTP"
+                          className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 px-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-all text-center text-lg tracking-widest"
+                          value={otp}
+                          onChange={(e) => setOtp(e.target.value)}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleverifyOtp}
+                        className="w-full bg-indigo-500 text-white font-semibold py-3 rounded-xl hover:bg-indigo-600 transition-all"
+                      >
+                        Verify OTP
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Switch to Login */}
+                  <p className="text-center text-white/60">
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => setsignIn(true)}
+                      className="text-blue-400 hover:text-blue-300 font-semibold transition-colors"
+                    >
+                      Sign In
+                    </button>
+                  </p>
+                </form>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
       {/* Forgot Password Modal */}
       {showForgotPassword && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-8 w-full max-w-md mx-4 shadow-xl">
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-gradient-to-br from-slate-800 to-slate-900 rounded-2xl p-8 w-full max-w-md shadow-2xl border border-white/10">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-white">
                 {forgotOtpSent ? "Reset Password" : "Forgot Password"}
               </h2>
               <button
@@ -436,36 +548,23 @@ const Register = () => {
                   setNewPassword("");
                   setConfirmPassword("");
                 }}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
+                className="text-white/50 hover:text-white text-2xl transition-colors"
               >
                 ×
               </button>
             </div>
 
             {!forgotOtpSent ? (
-              <form onSubmit={handleForgotSendOtp}>
-                <p className="text-sm text-gray-500 mb-4">
+              <form onSubmit={handleForgotSendOtp} className="space-y-4">
+                <p className="text-white/60 text-sm">
                   Enter your email address and we'll send you an OTP to reset your password.
                 </p>
-                <div className="flex items-center w-full border border-gray-300 h-12 rounded-full pl-6 gap-2 mb-4">
-                  <svg
-                    width="16"
-                    height="11"
-                    viewBox="0 0 16 11"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M0 .55.571 0H15.43l.57.55v9.9l-.571.55H.57L0 10.45zm1.143 1.138V9.9h13.714V1.69l-6.503 4.8h-.697zM13.749 1.1H2.25L8 5.356z"
-                      fill="#6B7280"
-                    />
-                  </svg>
+                <div className="relative">
+                  <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
                   <input
                     type="email"
                     placeholder="Enter your email"
-                    className="bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm w-full h-full pr-4"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-all"
                     value={forgotEmail}
                     onChange={(e) => setForgotEmail(e.target.value)}
                     required
@@ -474,75 +573,41 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={forgotLoading}
-                  className="w-full h-11 rounded-full text-white bg-indigo-500 hover:bg-indigo-600 transition disabled:opacity-50"
+                  className="w-full bg-blue-500 text-white font-semibold py-3.5 rounded-xl hover:bg-blue-600 transition-all disabled:opacity-50"
                 >
                   {forgotLoading ? "Sending..." : "Send OTP"}
                 </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowForgotPassword(false);
-                    setForgotEmail("");
-                  }}
-                  className="w-full mt-3 text-sm text-gray-500 hover:underline"
-                >
-                  Back to login
-                </button>
               </form>
             ) : (
-              <form onSubmit={handleResetPassword}>
-                <p className="text-sm text-gray-500 mb-4">
+              <form onSubmit={handleResetPassword} className="space-y-4">
+                <p className="text-white/60 text-sm">
                   Enter the OTP sent to your email and set your new password.
                 </p>
-                <div className="flex items-center w-full border border-gray-300 h-12 rounded-full pl-6 gap-2 mb-4">
-                  <input
-                    type="text"
-                    placeholder="Enter OTP"
-                    className="bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm w-full h-full pr-4"
-                    value={forgotOtp}
-                    onChange={(e) => setForgotOtp(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="flex items-center w-full border border-gray-300 h-12 rounded-full pl-6 gap-2 mb-4">
-                  <svg
-                    width="13"
-                    height="17"
-                    viewBox="0 0 13 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
-                      fill="#6B7280"
-                    />
-                  </svg>
+                <input
+                  type="text"
+                  placeholder="Enter OTP"
+                  className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 px-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-all text-center tracking-widest"
+                  value={forgotOtp}
+                  onChange={(e) => setForgotOtp(e.target.value)}
+                  required
+                />
+                <div className="relative">
+                  <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
                   <input
                     type="password"
                     placeholder="New Password"
-                    className="bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm w-full h-full pr-4"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-all"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
                     required
                   />
                 </div>
-                <div className="flex items-center w-full border border-gray-300 h-12 rounded-full pl-6 gap-2 mb-4">
-                  <svg
-                    width="13"
-                    height="17"
-                    viewBox="0 0 13 17"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M13 8.5c0-.938-.729-1.7-1.625-1.7h-.812V4.25C10.563 1.907 8.74 0 6.5 0S2.438 1.907 2.438 4.25V6.8h-.813C.729 6.8 0 7.562 0 8.5v6.8c0 .938.729 1.7 1.625 1.7h9.75c.896 0 1.625-.762 1.625-1.7zM4.063 4.25c0-1.406 1.093-2.55 2.437-2.55s2.438 1.144 2.438 2.55V6.8H4.061z"
-                      fill="#6B7280"
-                    />
-                  </svg>
+                <div className="relative">
+                  <FaLock className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
                   <input
                     type="password"
                     placeholder="Confirm Password"
-                    className="bg-transparent text-gray-700 placeholder-gray-500 outline-none text-sm w-full h-full pr-4"
+                    className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 transition-all"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required
@@ -551,16 +616,9 @@ const Register = () => {
                 <button
                   type="submit"
                   disabled={forgotLoading}
-                  className="w-full h-11 rounded-full text-white bg-green-500 hover:bg-green-600 transition disabled:opacity-50"
+                  className="w-full bg-green-500 text-white font-semibold py-3.5 rounded-xl hover:bg-green-600 transition-all disabled:opacity-50"
                 >
                   {forgotLoading ? "Resetting..." : "Reset Password"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setForgotOtpSent(false)}
-                  className="w-full mt-3 text-sm text-indigo-500 hover:underline"
-                >
-                  Change email
                 </button>
               </form>
             )}

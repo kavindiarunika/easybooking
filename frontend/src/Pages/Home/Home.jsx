@@ -9,6 +9,7 @@ import AboutSection from "./VideoSection";
 import Gallery from "../Gallery/Gallery";
 import VisitingPlaces from "../../Components/VisitingPlaces";
 import Safari from '../../Components/Safari'
+import Hotels from '../../Components/Hotels'
 
 const Home = () => {
   const location = useLocation();
@@ -35,10 +36,10 @@ const Home = () => {
         <Trending />
       </div>
      <div className="w-full relative "> 
-        <VisitingPlaces/>
+        <Safari/>
       </div>
      <div className="w-full relative "> 
-        <Safari/>
+        <VisitingPlaces/>
       </div>
        <AboutSection/>
       <Title text1={"Gallery"} text2={"Section"} />

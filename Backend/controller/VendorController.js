@@ -255,12 +255,12 @@ const sendOtpEmail = async (email, otp) => {
 ====================================================== */
 export const registervendor = async (req, res) => {
   try {
-    const { email, phone, password, category } = req.body;
+    const { email, phone, password, category, hotelName, hotelType, vehicleType, packageName } = req.body;
 
-    if (!email || !phone || !password || !category) {
+    if (!email || !phone || !password) {
       return res.status(400).json({
         success: false,
-        message: "All fields are required",
+        message: "Email, phone and password are required",
       });
     }
 
@@ -275,11 +275,17 @@ export const registervendor = async (req, res) => {
     // Auto-verify vendor on registration (no OTP flow)
     const hashedPassword = await bcrypt.hash(password, 10);
 
+    // Use hotelName as the category (stores the selected option like car, van, restaurant, villas, houses, hotels, etc.)
+    const vendorCategory = hotelName || category || "stays";
+
     const newVendor = new vendor({
       email,
       phone,
+      hotelName: packageName || "",
+      hotelType: hotelType || "",
+      vehicleType: vehicleType || "",
       password: hashedPassword,
-      category,
+      category: vendorCategory,
       isVerified: true,
     });
 
@@ -291,7 +297,7 @@ export const registervendor = async (req, res) => {
         id: newVendor._id,
         email: newVendor.email,
         role: "vendor",
-        category: newVendor.category,
+        category: vendorCategory,
       },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
@@ -301,7 +307,7 @@ export const registervendor = async (req, res) => {
       success: true,
       message: "Registration successful.",
       token,
-      category: newVendor.category,
+      category: vendorCategory,
     });
   } catch (error) {
     console.error("Register Vendor Error:", error);
