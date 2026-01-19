@@ -274,12 +274,20 @@ const GoTrip = () => {
             </h2>
             <p className="text-gray-500 text-sm mt-1">Email: {vendorEmail}</p>
           </div>
-          <button
-            onClick={() => setIsEditing(true)}
-            className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold transition"
-          >
-            Edit Account Details
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => navigate("/")}
+              className="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 font-semibold transition flex items-center gap-2"
+            >
+              ← Back to Home
+            </button>
+            <button
+              onClick={() => setIsEditing(true)}
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 font-semibold transition"
+            >
+              Edit Account Details
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -381,14 +389,24 @@ const GoTrip = () => {
             ? "Edit Your Safari Profile"
             : "Create Your Safari Profile"}
         </h2>
-        {hasProfile && (
+        <div className="flex items-center gap-3">
           <button
-            onClick={() => setIsEditing(false)}
-            className="text-gray-500 hover:text-red-500 text-xl font-bold"
+            type="button"
+            onClick={() => navigate("/")}
+            className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 font-semibold transition"
           >
-            ✕ Cancel
+            ← Back to Home
           </button>
-        )}
+          {hasProfile && (
+            <button
+              type="button"
+              onClick={() => setIsEditing(false)}
+              className="text-gray-500 hover:text-red-500 text-xl font-bold"
+            >
+              ✕ Cancel
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Banner shown when no profile exists */}

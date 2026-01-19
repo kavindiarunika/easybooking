@@ -19,7 +19,9 @@ const Villa = () => {
   const { navigate, addtrend, setaddtrend } = useContext(TravelContext);
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedRating, setSelectedRating] = useState("all");
+  const [selectedCountry, setSelectedCountry] = useState("all");
   const [selectedDistrict, setSelectedDistrict] = useState("all");
+  const [selectedCity, setSelectedCity] = useState("all");
   const [filteredData, setFilteredData] = useState([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [pagination, setpagination] = useState(1);
@@ -45,7 +47,7 @@ const Villa = () => {
     }
   }, [addtrend, setaddtrend]);
 
-  // Filter data based on selected category, rating, and district
+  // Filter data based on selected category, rating, country, district, and city
   useEffect(() => {
     if (addtrend && addtrend.length > 0) {
       let filtered = addtrend;
@@ -66,10 +68,24 @@ const Villa = () => {
         });
       }
 
+      // Apply country filter
+      if (selectedCountry !== "all") {
+        filtered = filtered.filter(
+          (item) => (item.country || "Sri Lanka") === selectedCountry
+        );
+      }
+
       // Apply district filter
       if (selectedDistrict !== "all") {
         filtered = filtered.filter(
           (item) => item.district === selectedDistrict
+        );
+      }
+
+      // Apply city filter
+      if (selectedCity !== "all") {
+        filtered = filtered.filter(
+          (item) => item.city === selectedCity
         );
       }
 
@@ -86,13 +102,13 @@ const Villa = () => {
       setFilteredData(filtered);
 
     }
-  }
-  }, [addtrend, selectedCategory, selectedRating, selectedDistrict, searchName]);
+  }  
+  }, [addtrend, selectedCategory, selectedRating, selectedCountry, selectedDistrict, selectedCity, searchName]);
 
   // Reset to first page whenever filters change
   useEffect(() => {
     setpagination(1);
-  }, [selectedCategory, selectedRating, selectedDistrict, searchName]);
+  }, [selectedCategory, selectedRating, selectedCountry, selectedDistrict, selectedCity, searchName]);
 
   // Ensure current page is within range when filtered data changes
   useEffect(() => {
@@ -133,33 +149,128 @@ const Villa = () => {
     { label: "1 Star", value: "1" },
   ];
 
-  const districtFilters = [
-    { label: "All Districts", value: "all" },
-    { label: "Colombo", value: "Colombo" },
-    { label: "Galle", value: "Galle" },
-    { label: "Kandy", value: "Kandy" },
-    { label: "Jaffna", value: "Jaffna" },
-    { label: "Matara", value: "Matara" },
-    { label: "Negombo", value: "Negombo" },
-    { label: "Anuradhapura", value: "Anuradhapura" },
-    { label: "Trincomalee", value: "Trincomalee" },
-    { label: "Batticaloa", value: "Batticaloa" },
-    { label: "Ampara", value: "Ampara" },
-    { label: "Nuwara Eliya", value: "Nuwara Eliya" },
-    { label: "Ratnapura", value: "Ratnapura" },
-    { label: "Badulla", value: "Badulla" },
-    { label: "Kurunegala", value: "Kurunegala" },
-    { label: "Puttalam", value: "Puttalam" },
-    { label: "Vavuniya", value: "Vavuniya" },
-    { label: "Mullativu", value: "Mullativu" },
-    { label: "Monaragala", value: "Monaragala" },
-    { label: "Matale", value: "Matale" },
-    { label: "Kegalle", value: "Kegalle" },
-    { label: "Polonnaruwa", value: "Polonnaruwa" },
-    { label: "Hambantota", value: "Hambantota" },
-    { label: "Gampaha", value: "Gampaha" },
-    { label: "Kalutara", value: "Kalutara" },
+  // Location data for cascading filters
+  const locationData = {
+    "Sri Lanka": {
+      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
+      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
+      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
+      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
+      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
+      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
+      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
+      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      "Kilinochchi": ["Kilinochchi"],
+      "Mannar": ["Mannar", "Talaimannar"],
+      "Vavuniya": ["Vavuniya"],
+      "Mullaitivu": ["Mullaitivu"],
+      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+    },
+    "India": {
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+      "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
+      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode"],
+      "Delhi": ["New Delhi", "Delhi NCR"],
+      "Goa": ["Panaji", "Margao", "Vasco da Gama"]
+    },
+    "Maldives": {
+      "Male": ["Male City", "Hulhumale", "Villimale"],
+      "Ari Atoll": ["Mahibadhoo", "Maamigili"],
+      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"]
+    },
+    "Thailand": {
+      "Bangkok": ["Bangkok", "Nonthaburi"],
+      "Phuket": ["Phuket Town", "Patong", "Kata"],
+      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"]
+    },
+    "Other": {
+      "Other": ["Other"]
+    }
+  };
+
+  const countryFilters = [
+    { label: "All Countries", value: "all" },
+    { label: "🇱🇰 Sri Lanka", value: "Sri Lanka" },
+    { label: "🇮🇳 India", value: "India" },
+    { label: "🇲🇻 Maldives", value: "Maldives" },
+    { label: "🇹🇭 Thailand", value: "Thailand" },
+    { label: "🌍 Other", value: "Other" },
   ];
+
+  // Get districts based on selected country
+  const getDistrictFilters = () => {
+    if (selectedCountry === "all") {
+      // Return all districts from all countries
+      const allDistricts = [{ label: "All Districts", value: "all" }];
+      Object.keys(locationData).forEach(country => {
+        Object.keys(locationData[country]).forEach(district => {
+          if (!allDistricts.find(d => d.value === district)) {
+            allDistricts.push({ label: district, value: district });
+          }
+        });
+      });
+      return allDistricts;
+    }
+    if (locationData[selectedCountry]) {
+      return [
+        { label: "All Districts", value: "all" },
+        ...Object.keys(locationData[selectedCountry]).map(d => ({ label: d, value: d }))
+      ];
+    }
+    return [{ label: "All Districts", value: "all" }];
+  };
+
+  // Get cities based on selected country and district
+  const getCityFilters = () => {
+    if (selectedDistrict === "all") {
+      return [{ label: "All Cities", value: "all" }];
+    }
+    if (selectedCountry !== "all" && locationData[selectedCountry]?.[selectedDistrict]) {
+      return [
+        { label: "All Cities", value: "all" },
+        ...locationData[selectedCountry][selectedDistrict].map(c => ({ label: c, value: c }))
+      ];
+    }
+    // If country is "all", try to find the district in any country
+    for (const country of Object.keys(locationData)) {
+      if (locationData[country][selectedDistrict]) {
+        return [
+          { label: "All Cities", value: "all" },
+          ...locationData[country][selectedDistrict].map(c => ({ label: c, value: c }))
+        ];
+      }
+    }
+    return [{ label: "All Cities", value: "all" }];
+  };
+
+  // Reset district and city when country changes
+  const handleCountryChange = (value) => {
+    setSelectedCountry(value);
+    setSelectedDistrict("all");
+    setSelectedCity("all");
+  };
+
+  // Reset city when district changes
+  const handleDistrictChange = (value) => {
+    setSelectedDistrict(value);
+    setSelectedCity("all");
+  };
+
+  const districtFilters = getDistrictFilters();
+  const cityFilters = getCityFilters();
 
   return (
     <section className="w-full py-16 px-4 md:px-16 bg-slate-950">
@@ -182,8 +293,30 @@ const Villa = () => {
           <div className="sticky top-4 bg-gray-800 rounded-2xl p-6 shadow-lg max-h-[calc(100vh-100px)] overflow-y-auto">
             <h2 className="text-white text-xl font-bold mb-6">Filters</h2>
 
-            {/* District Filter - First */}
+            {/* Country Filter - First */}
             <div className="mb-8">
+              <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
+                Country
+              </h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {countryFilters.map((country) => (
+                  <button
+                    key={country.value}
+                    onClick={() => handleCountryChange(country.value)}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                      selectedCountry === country.value
+                        ? "bg-green-500 text-white font-semibold"
+                        : "text-gray-300 hover:bg-gray-700"
+                    }`}
+                  >
+                    {country.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* District Filter - Second */}
+            <div className="border-t border-gray-700 pt-6 mb-8">
               <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
                 District
               </h3>
@@ -191,7 +324,7 @@ const Villa = () => {
                 {districtFilters.map((district) => (
                   <button
                     key={district.value}
-                    onClick={() => setSelectedDistrict(district.value)}
+                    onClick={() => handleDistrictChange(district.value)}
                     className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
                       selectedDistrict === district.value
                         ? "bg-green-500 text-white font-semibold"
@@ -204,7 +337,29 @@ const Villa = () => {
               </div>
             </div>
 
-            {/* Rating Filter - Second */}
+            {/* City Filter - Third */}
+            <div className="border-t border-gray-700 pt-6 mb-8">
+              <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
+                City
+              </h3>
+              <div className="space-y-2 max-h-40 overflow-y-auto">
+                {cityFilters.map((city) => (
+                  <button
+                    key={city.value}
+                    onClick={() => setSelectedCity(city.value)}
+                    className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                      selectedCity === city.value
+                        ? "bg-green-500 text-white font-semibold"
+                        : "text-gray-300 hover:bg-gray-700"
+                    }`}
+                  >
+                    {city.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Rating Filter - Fourth */}
             <div className="border-t border-gray-700 pt-6">
               <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
                 Rating
@@ -231,7 +386,9 @@ const Villa = () => {
               onClick={() => {
                 setSelectedCategory("all");
                 setSelectedRating("all");
+                setSelectedCountry("all");
                 setSelectedDistrict("all");
+                setSelectedCity("all");
               }}
               className="w-full mt-8 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-all"
             >
@@ -243,7 +400,7 @@ const Villa = () => {
         {/* Mobile filter panel (overlay) */}
         {mobileFiltersOpen && (
           <div className="absolute top-4 right-1 inset-0 z-50 flex items-start justify-end bg-black/40 lg:hidden">
-            <div className="w-6/12 max-w-xs bg-gray-800 rounded-2xl p-6 m-4 shadow-lg overflow-y-auto">
+            <div className="w-6/12 max-w-xs bg-gray-800 rounded-2xl p-6 m-4 shadow-lg overflow-y-auto max-h-[90vh]">
               <div className="flex items-center justify-between mb-4">
                 <h2 className="text-white text-xl font-bold">Filters</h2>
                 <button
@@ -254,16 +411,38 @@ const Villa = () => {
                 </button>
               </div>
 
-              {/* Reuse filter content */}
-              <div className=" mb-8">
-                <h3 className=" text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
+              {/* Country Filter */}
+              <div className="mb-6">
+                <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
+                  Country
+                </h3>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {countryFilters.map((country) => (
+                    <button
+                      key={country.value}
+                      onClick={() => handleCountryChange(country.value)}
+                      className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                        selectedCountry === country.value
+                          ? "bg-green-500 text-white font-semibold"
+                          : "text-gray-300 hover:bg-gray-700"
+                      }`}
+                    >
+                      {country.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* District Filter */}
+              <div className="border-t border-gray-700 pt-4 mb-6">
+                <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
                   District
                 </h3>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
+                <div className="space-y-2 max-h-32 overflow-y-auto">
                   {districtFilters.map((district) => (
                     <button
                       key={district.value}
-                      onClick={() => setSelectedDistrict(district.value)}
+                      onClick={() => handleDistrictChange(district.value)}
                       className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
                         selectedDistrict === district.value
                           ? "bg-green-500 text-white font-semibold"
@@ -276,7 +455,30 @@ const Villa = () => {
                 </div>
               </div>
 
-              <div className="border-t border-gray-700 pt-6">
+              {/* City Filter */}
+              <div className="border-t border-gray-700 pt-4 mb-6">
+                <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
+                  City
+                </h3>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {cityFilters.map((city) => (
+                    <button
+                      key={city.value}
+                      onClick={() => setSelectedCity(city.value)}
+                      className={`w-full text-left px-4 py-2 rounded-lg transition-all duration-200 text-sm ${
+                        selectedCity === city.value
+                          ? "bg-green-500 text-white font-semibold"
+                          : "text-gray-300 hover:bg-gray-700"
+                      }`}
+                    >
+                      {city.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rating Filter */}
+              <div className="border-t border-gray-700 pt-4">
                 <h3 className="text-green-400 font-semibold mb-4 text-sm uppercase tracking-wide">
                   Rating
                 </h3>
@@ -301,7 +503,9 @@ const Villa = () => {
                 onClick={() => {
                   setSelectedCategory("all");
                   setSelectedRating("all");
+                  setSelectedCountry("all");
                   setSelectedDistrict("all");
+                  setSelectedCity("all");
                   setMobileFiltersOpen(false);
                 }}
                 className="w-full mt-8 px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-500 transition-all"

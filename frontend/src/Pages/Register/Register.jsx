@@ -4,7 +4,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../../App.jsx";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
-import { FaHotel, FaEnvelope, FaPhone, FaLock, FaBuilding, FaEye, FaEyeSlash, FaArrowLeft } from "react-icons/fa";
+import { FaHotel, FaEnvelope, FaPhone, FaLock, FaBuilding, FaEye, FaEyeSlash, FaArrowLeft, FaGlobe, FaMapMarkerAlt, FaCity } from "react-icons/fa";
 import { assets } from "../../assets/Assest";
 
 const Register = () => {
@@ -27,6 +27,9 @@ const Register = () => {
   const [formData, setformData] = useState({
     email: "",
     phone: "",
+    country: "",
+    district: "",
+    city: "",
     packageName: "",
     hotelName: "",
     hotelType: "",
@@ -34,10 +37,191 @@ const Register = () => {
     password: "",
   });
 
+  // Location data - Countries with their districts and cities
+  const locationData = {
+    "Sri Lanka": {
+      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
+      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
+      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
+      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
+      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
+      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
+      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
+      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      "Kilinochchi": ["Kilinochchi"],
+      "Mannar": ["Mannar", "Talaimannar"],
+      "Vavuniya": ["Vavuniya"],
+      "Mullaitivu": ["Mullaitivu"],
+      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+    },
+    "India": {
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
+      "Karnataka": ["Bangalore", "Mysore", "Mangalore", "Hubli", "Belgaum"],
+      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem"],
+      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode", "Thrissur", "Kollam"],
+      "Delhi": ["New Delhi", "Delhi NCR"],
+      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+      "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Ajmer"],
+      "West Bengal": ["Kolkata", "Darjeeling", "Siliguri", "Howrah"],
+      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa"]
+    },
+    "Maldives": {
+      "Male": ["Male City", "Hulhumale", "Villimale"],
+      "Ari Atoll": ["Mahibadhoo", "Maamigili"],
+      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"],
+      "Noonu Atoll": ["Manadhoo", "Holhudhoo"],
+      "Addu Atoll": ["Hithadhoo", "Feydhoo", "Maradhoo"]
+    },
+    "Thailand": {
+      "Bangkok": ["Bangkok", "Nonthaburi", "Pak Kret"],
+      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng", "Doi Saket"],
+      "Phuket": ["Phuket Town", "Patong", "Kata", "Karon"],
+      "Krabi": ["Krabi Town", "Ao Nang", "Railay"],
+      "Pattaya": ["Pattaya City", "Jomtien", "Na Jomtien"],
+      "Koh Samui": ["Chaweng", "Lamai", "Bophut"]
+    },
+    "Indonesia": {
+      "Bali": ["Denpasar", "Ubud", "Seminyak", "Kuta", "Sanur"],
+      "Jakarta": ["Central Jakarta", "South Jakarta", "North Jakarta"],
+      "Yogyakarta": ["Yogyakarta City", "Sleman"],
+      "West Java": ["Bandung", "Bogor", "Bekasi"],
+      "East Java": ["Surabaya", "Malang"]
+    },
+    "Malaysia": {
+      "Kuala Lumpur": ["KL City Centre", "Bukit Bintang", "Bangsar"],
+      "Selangor": ["Petaling Jaya", "Shah Alam", "Subang Jaya"],
+      "Penang": ["George Town", "Batu Ferringhi", "Butterworth"],
+      "Johor": ["Johor Bahru", "Iskandar Puteri"],
+      "Sabah": ["Kota Kinabalu", "Sandakan"],
+      "Sarawak": ["Kuching", "Miri"]
+    },
+    "Singapore": {
+      "Central Region": ["Orchard", "Marina Bay", "Chinatown", "Little India"],
+      "East Region": ["Changi", "Tampines", "Bedok"],
+      "West Region": ["Jurong", "Clementi"],
+      "North Region": ["Woodlands", "Yishun"],
+      "North-East Region": ["Sengkang", "Punggol"]
+    },
+    "Philippines": {
+      "Metro Manila": ["Manila", "Makati", "Quezon City", "Taguig", "Pasig"],
+      "Cebu": ["Cebu City", "Mandaue", "Lapu-Lapu"],
+      "Palawan": ["Puerto Princesa", "El Nido", "Coron"],
+      "Boracay": ["Boracay Island"],
+      "Davao": ["Davao City"]
+    },
+    "Vietnam": {
+      "Ho Chi Minh": ["District 1", "District 3", "District 7", "Binh Thanh"],
+      "Hanoi": ["Hoan Kiem", "Ba Dinh", "Tay Ho"],
+      "Da Nang": ["Da Nang City", "Hoi An"],
+      "Nha Trang": ["Nha Trang City"],
+      "Phu Quoc": ["Duong Dong"]
+    },
+    "Nepal": {
+      "Bagmati": ["Kathmandu", "Lalitpur", "Bhaktapur"],
+      "Gandaki": ["Pokhara", "Gorkha"],
+      "Lumbini": ["Lumbini", "Butwal"]
+    },
+    "Bangladesh": {
+      "Dhaka": ["Dhaka City", "Gazipur", "Narayanganj"],
+      "Chittagong": ["Chittagong City", "Cox's Bazar"],
+      "Sylhet": ["Sylhet City"]
+    },
+    "Pakistan": {
+      "Punjab": ["Lahore", "Faisalabad", "Rawalpindi"],
+      "Sindh": ["Karachi", "Hyderabad"],
+      "Islamabad": ["Islamabad"]
+    },
+    "United Arab Emirates": {
+      "Dubai": ["Dubai City", "Deira", "Jumeirah", "Marina"],
+      "Abu Dhabi": ["Abu Dhabi City", "Al Ain"],
+      "Sharjah": ["Sharjah City"],
+      "Ajman": ["Ajman City"]
+    },
+    "Saudi Arabia": {
+      "Riyadh": ["Riyadh City"],
+      "Makkah": ["Mecca", "Jeddah"],
+      "Eastern Province": ["Dammam", "Dhahran", "Khobar"]
+    },
+    "United Kingdom": {
+      "England": ["London", "Manchester", "Birmingham", "Liverpool", "Leeds"],
+      "Scotland": ["Edinburgh", "Glasgow"],
+      "Wales": ["Cardiff", "Swansea"],
+      "Northern Ireland": ["Belfast"]
+    },
+    "United States": {
+      "California": ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
+      "New York": ["New York City", "Buffalo", "Albany"],
+      "Florida": ["Miami", "Orlando", "Tampa"],
+      "Texas": ["Houston", "Dallas", "Austin", "San Antonio"],
+      "Nevada": ["Las Vegas", "Reno"]
+    },
+    "Australia": {
+      "New South Wales": ["Sydney", "Newcastle", "Wollongong"],
+      "Victoria": ["Melbourne", "Geelong"],
+      "Queensland": ["Brisbane", "Gold Coast", "Cairns"],
+      "Western Australia": ["Perth", "Fremantle"]
+    },
+    "Canada": {
+      "Ontario": ["Toronto", "Ottawa", "Mississauga"],
+      "British Columbia": ["Vancouver", "Victoria"],
+      "Quebec": ["Montreal", "Quebec City"],
+      "Alberta": ["Calgary", "Edmonton"]
+    },
+    "Germany": {
+      "Bavaria": ["Munich", "Nuremberg"],
+      "Berlin": ["Berlin City"],
+      "Hamburg": ["Hamburg City"],
+      "Hesse": ["Frankfurt", "Wiesbaden"]
+    },
+    "France": {
+      "Île-de-France": ["Paris", "Versailles"],
+      "Provence-Alpes-Côte d'Azur": ["Nice", "Marseille", "Cannes"],
+      "Auvergne-Rhône-Alpes": ["Lyon", "Grenoble"]
+    },
+    "Other": {
+      "Other": ["Other"]
+    }
+  };
+
+  // Get districts for selected country
+  const getDistricts = () => {
+    if (formData.country && locationData[formData.country]) {
+      return Object.keys(locationData[formData.country]);
+    }
+    return [];
+  };
+
+  // Get cities for selected district
+  const getCities = () => {
+    if (formData.country && formData.district && locationData[formData.country]?.[formData.district]) {
+      return locationData[formData.country][formData.district];
+    }
+    return [];
+  };
+
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
-    setformData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    if (name === "country") {
+      setformData({ ...formData, country: value, district: "", city: "" });
+    } else if (name === "district") {
+      setformData({ ...formData, district: value, city: "" });
+    } else {
+      setformData({ ...formData, [name]: value });
+    }
   };
 
   const handleLoginChange = (e) => {
@@ -407,6 +591,92 @@ const Register = () => {
                       required
                     />
                   </div>
+
+                  {/* Country */}
+                  <div className="relative">
+                    <FaGlobe className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <select
+                      name="country"
+                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all appearance-none cursor-pointer"
+                      value={formData.country}
+                      onChange={handleChange}
+                      required
+                    >
+                      <option value="" className="bg-slate-800 text-white">Select Country</option>
+                      <option value="Sri Lanka" className="bg-slate-800 text-white">🇱🇰 Sri Lanka</option>
+                      <option value="India" className="bg-slate-800 text-white">🇮🇳 India</option>
+                      <option value="Maldives" className="bg-slate-800 text-white">🇲🇻 Maldives</option>
+                      <option value="Thailand" className="bg-slate-800 text-white">🇹🇭 Thailand</option>
+                      <option value="Indonesia" className="bg-slate-800 text-white">🇮🇩 Indonesia</option>
+                      <option value="Malaysia" className="bg-slate-800 text-white">🇲🇾 Malaysia</option>
+                      <option value="Singapore" className="bg-slate-800 text-white">🇸🇬 Singapore</option>
+                      <option value="Philippines" className="bg-slate-800 text-white">🇵🇭 Philippines</option>
+                      <option value="Vietnam" className="bg-slate-800 text-white">🇻🇳 Vietnam</option>
+                      <option value="Nepal" className="bg-slate-800 text-white">🇳🇵 Nepal</option>
+                      <option value="Bangladesh" className="bg-slate-800 text-white">🇧🇩 Bangladesh</option>
+                      <option value="Pakistan" className="bg-slate-800 text-white">🇵🇰 Pakistan</option>
+                      <option value="United Arab Emirates" className="bg-slate-800 text-white">🇦🇪 United Arab Emirates</option>
+                      <option value="Saudi Arabia" className="bg-slate-800 text-white">🇸🇦 Saudi Arabia</option>
+                      <option value="United Kingdom" className="bg-slate-800 text-white">🇬🇧 United Kingdom</option>
+                      <option value="United States" className="bg-slate-800 text-white">🇺🇸 United States</option>
+                      <option value="Australia" className="bg-slate-800 text-white">🇦🇺 Australia</option>
+                      <option value="Canada" className="bg-slate-800 text-white">🇨🇦 Canada</option>
+                      <option value="Germany" className="bg-slate-800 text-white">🇩🇪 Germany</option>
+                      <option value="France" className="bg-slate-800 text-white">🇫🇷 France</option>
+                      <option value="Other" className="bg-slate-800 text-white">🌍 Other</option>
+                    </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
+                      ▼
+                    </div>
+                  </div>
+
+                  {/* District - Only show when country is selected */}
+                  {formData.country && (
+                    <div className="relative">
+                      <FaMapMarkerAlt className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                      <select
+                        name="district"
+                        className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all appearance-none cursor-pointer"
+                        value={formData.district}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="" className="bg-slate-800 text-white">Select District/State</option>
+                        {getDistricts().map((district) => (
+                          <option key={district} value={district} className="bg-slate-800 text-white">
+                            {district}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
+                        ▼
+                      </div>
+                    </div>
+                  )}
+
+                  {/* City - Only show when district is selected */}
+                  {formData.district && (
+                    <div className="relative">
+                      <FaCity className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                      <select
+                        name="city"
+                        className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all appearance-none cursor-pointer"
+                        value={formData.city}
+                        onChange={handleChange}
+                        required
+                      >
+                        <option value="" className="bg-slate-800 text-white">Select City</option>
+                        {getCities().map((city) => (
+                          <option key={city} value={city} className="bg-slate-800 text-white">
+                            {city}
+                          </option>
+                        ))}
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
+                        ▼
+                      </div>
+                    </div>
+                  )}
 
                   {/* Stay or Vehicle Package Name */}
                   <div className="relative">
