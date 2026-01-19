@@ -40,6 +40,56 @@ export const addads = async (req, res) => {
   }
 };
 
+export const updateAds = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { villaad, homeAd, goTripAd } = req.files || {};
+
+    const uploadFiles = async (files, folder) => {
+      if (!files || files.length === 0) return null;
+
+      const media = [];
+
+      for (const file of files) {
+        const result = await cloudinary.uploader.upload(file.path, {
+          folder,
+          resource_type: "auto",
+        });
+
+        media.push({
+          url: result.secure_url,
+          type: result.resource_type,
+        });
+      }
+      return media;
+    };
+
+    // Find existing ads
+    const ads = await AdsSchema.findById(id);
+    if (!ads) {
+      return res.status(404).json({ message: "Ads not found" });
+    }
+
+    // Upload only if new files are sent
+    const villaMedia = await uploadFiles(villaad, "ads/villaads");
+    const homeMedia  = await uploadFiles(homeAd, "ads/homeads");
+    const goTripMedia = await uploadFiles(goTripAd, "ads/gotripads");
+
+    // Update fields only if new media exists
+    if (villaMedia) ads.villaad = villaMedia;
+    if (homeMedia) ads.homeAd = homeMedia;
+    if (goTripMedia) ads.goTripAd = goTripMedia;
+
+    await ads.save();
+
+    res.status(200).json({ message: "Ads updated successfully", ads });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error", error });
+  }
+};
+
 // Get Ads
 
 export const getAds = async (req, res) => {
