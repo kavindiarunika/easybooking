@@ -4,6 +4,9 @@ const venderauth = new mongoose.Schema({
 
     email:{type:String , required:true},
     phone:{type:String , required:false, default:""},
+    country:{type:String , required:false, default:""},
+    district:{type:String , required:false, default:""},
+    city:{type:String , required:false, default:""},
     hotelName:{type:String , required:false, default:""},
     hotelType:{type:String , required:false, default:""},
     vehicleType:{type:String , required:false, default:""},

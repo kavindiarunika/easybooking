@@ -28,6 +28,8 @@ const TrendingSchema = new mongoose.Schema(
     videoUrl: String,
 
     location: String,
+    country: String,
+    city: String,
     highlights: String,
     address: String,
     contact: String,

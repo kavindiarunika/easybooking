@@ -255,7 +255,7 @@ const sendOtpEmail = async (email, otp) => {
 ====================================================== */
 export const registervendor = async (req, res) => {
   try {
-    const { email, phone, password, category, hotelName, hotelType, vehicleType, packageName } = req.body;
+    const { email, phone, country, district, city, password, category, hotelName, hotelType, vehicleType, packageName } = req.body;
 
     if (!email || !phone || !password) {
       return res.status(400).json({
@@ -281,6 +281,9 @@ export const registervendor = async (req, res) => {
     const newVendor = new vendor({
       email,
       phone,
+      country: country || "",
+      district: district || "",
+      city: city || "",
       hotelName: packageName || "",
       hotelType: hotelType || "",
       vehicleType: vehicleType || "",

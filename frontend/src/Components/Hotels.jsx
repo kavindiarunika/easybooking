@@ -3,7 +3,7 @@ import axios from "axios";
 import { BACKEND_URL } from "../App.jsx";
 import { Link } from "react-router-dom";
 import { AiOutlineArrowRight } from "react-icons/ai";
-import { FaStar, FaMapMarkerAlt } from "react-icons/fa";
+import { FaStar, FaMapMarkerAlt, FaGlobe } from "react-icons/fa";
 
 const Hotels = () => {
   const [hotels, setHotels] = useState([]);
@@ -115,19 +115,27 @@ const Hotels = () => {
                     : item.description}
                 </p>
 
-                {/* Rating */}
-                <div className="flex items-center gap-1">
-                  {[...Array(5)].map((_, i) => (
-                    <FaStar
-                      key={i}
-                      className={`text-sm ${
-                        i < (item.rating || 4) ? "text-yellow-400" : "text-gray-300"
-                      }`}
-                    />
-                  ))}
-                  <span className="text-xs text-gray-500 ml-1">
-                    ({item.rating || 4} Star)
-                  </span>
+                {/* Rating and Country */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar
+                        key={i}
+                        className={`text-sm ${
+                          i < (item.rating || 4) ? "text-yellow-400" : "text-gray-300"
+                        }`}
+                      />
+                    ))}
+                    <span className="text-xs text-gray-500 ml-1">
+                      ({item.rating || 4} Star)
+                    </span>
+                  </div>
+                  
+                  {/* Country at bottom right - default to Sri Lanka */}
+                  <div className="flex items-center gap-1 text-xs text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                    <FaGlobe className="text-blue-500" />
+                    <span>{item.country || "Sri Lanka"}</span>
+                  </div>
                 </div>
               </div>
             </div>

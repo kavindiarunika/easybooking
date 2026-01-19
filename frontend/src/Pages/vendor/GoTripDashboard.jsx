@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { BACKEND_URL } from "../../App";
 import "react-toastify/dist/ReactToastify.css";
-import { FaCar, FaSignOutAlt, FaUser, FaPlus, FaEdit } from "react-icons/fa";
+import { FaCar, FaSignOutAlt, FaUser, FaPlus, FaEdit, FaHome } from "react-icons/fa";
 
 const GoTripDashboard = () => {
   const navigate = useNavigate();
@@ -193,8 +193,15 @@ const GoTripDashboard = () => {
               <span className="text-sm">{vendorEmail}</span>
             </div>
             <button
-              onClick={handleLogout}
+              onClick={() => navigate("/")}
               className="flex items-center gap-2 px-4 py-2 bg-white/20 text-white rounded-lg hover:bg-white/30 transition"
+            >
+              <FaHome />
+              Back to Home
+            </button>
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-4 py-2 bg-red-500/80 text-white rounded-lg hover:bg-red-500 transition"
             >
               <FaSignOutAlt />
               Logout
