@@ -1,7 +1,37 @@
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { backendUrl } from "../../App";
+import { 
+  FiHome, FiFileText, FiTag, FiStar, FiDollarSign, FiMapPin, 
+  FiPhone, FiMail, FiVideo, FiList, FiImage, FiGlobe, FiMap,
+  FiUpload, FiEdit2, FiX
+} from "react-icons/fi";
+
+// Location Data
+const locationData = {
+  "Sri Lanka": {
+    "Western Province": ["Colombo", "Gampaha", "Kalutara"],
+    "Central Province": ["Kandy", "Matara", "Nuwara Eliya"],
+    "Southern Province": ["Galle", "Matara", "Hambantota"],
+    "Northern Province": ["Jaffna", "Mullaitivu"],
+    "Eastern Province": ["Trincomalee", "Batticaloa", "Ampara"],
+    "North Western Province": ["Kurunegala", "Puttalam"],
+    "North Central Province": ["Polonnaruwa", "Anuradhapura"],
+    "Uva Province": ["Badulla", "Monaragala"],
+    "Sabaragamuwa Province": ["Ratnapura", "Kegalle"],
+  },
+};
+
+const getDistricts = (country) => {
+  return Object.keys(locationData[country] || {});
+};
+
+const getCities = (country, district) => {
+  return locationData[country]?.[district] || [];
+};
 
 const EditTrending = ({ token }) => {
   const [items, setItems] = useState([]);
@@ -15,79 +45,14 @@ const EditTrending = ({ token }) => {
   // image states (MATCH BACKEND)
   const [media, setMedia] = useState({
     mainImage: null,
-    image: null,
     image1: null,
     image2: null,
     image3: null,
     image4: null,
-    image5: null,
-    image6: null,
-    otherimages: [],
+    otherimages: []
   });
 
-  // Location data for cascading dropdowns
-  const locationData = {
-    "Sri Lanka": {
-      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
-      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
-      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
-      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
-      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
-      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
-      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
-      "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
-      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
-      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
-      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
-      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
-      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
-      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
-      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
-      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
-      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
-      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
-      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
-      "Kilinochchi": ["Kilinochchi"],
-      "Mannar": ["Mannar", "Talaimannar"],
-      "Vavuniya": ["Vavuniya"],
-      "Mullaitivu": ["Mullaitivu"],
-      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
-      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
-    },
-    "India": {
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
-      "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
-      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode"],
-      "Delhi": ["New Delhi", "Delhi NCR"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama"]
-    },
-    "Maldives": {
-      "Male": ["Male City", "Hulhumale", "Villimale"],
-      "Ari Atoll": ["Mahibadhoo", "Maamigili"],
-      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"]
-    },
-    "Thailand": {
-      "Bangkok": ["Bangkok", "Nonthaburi"],
-      "Phuket": ["Phuket Town", "Patong", "Kata"],
-      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"]
-    },
-    "Other": {
-      "Other": ["Other"]
-    }
-  };
-
-  const getDistricts = (country) => {
-    if (!country || !locationData[country]) return [];
-    return Object.keys(locationData[country]);
-  };
-
-  const getCities = (country, district) => {
-    if (!country || !district || !locationData[country]?.[district]) return [];
-    return locationData[country][district];
-  };
-
-  // ---------------- FETCH ----------------
+  // ---------- FETCH ----------
   useEffect(() => {
     fetchItems();
   }, []);
@@ -105,7 +70,7 @@ const EditTrending = ({ token }) => {
     }
   };
 
-  // ---------------- SELECT ----------------
+  // ---------- SELECT ----------
   const selectItem = (it) => {
     setSelected(it._id);
     setForm({
@@ -113,7 +78,7 @@ const EditTrending = ({ token }) => {
       description: it.description || "",
       category: it.category || "villa",
       rating: it.rating || 5,
-      country: it.country || "Sri Lanka",
+      country: it.country || "",
       district: it.district || "",
       city: it.city || "",
       price: it.price || 0,
@@ -129,32 +94,17 @@ const EditTrending = ({ token }) => {
 
     setMedia({
       mainImage: null,
-      image: null,
       image1: null,
       image2: null,
       image3: null,
       image4: null,
-      image5: null,
-      image6: null,
-      otherimages: [],
+      otherimages: []
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Handle country change - reset district and city
-  const handleCountryChange = (e) => {
-    const country = e.target.value;
-    setForm((p) => ({ ...p, country, district: "", city: "" }));
-  };
-
-  // Handle district change - reset city
-  const handleDistrictChange = (e) => {
-    const district = e.target.value;
-    setForm((p) => ({ ...p, district, city: "" }));
-  };
-
-  // ---------------- INPUT ----------------
+  // ---------- INPUT ----------
   const handleInput = (e) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
   };
@@ -170,7 +120,17 @@ const EditTrending = ({ token }) => {
     }));
   };
 
-  // ---------------- SEARCH ----------------
+  const handleCountryChange = (e) => {
+    const country = e.target.value;
+    setForm((p) => ({ ...p, country, district: "", city: "" }));
+  };
+
+  const handleDistrictChange = (e) => {
+    const district = e.target.value;
+    setForm((p) => ({ ...p, district, city: "" }));
+  };
+
+  // ---------- SEARCH ----------
   useEffect(() => {
     const t = setTimeout(() => {
       const q = searchQuery.trim().toLowerCase();
@@ -194,7 +154,7 @@ const EditTrending = ({ token }) => {
     setForm({});
   };
 
-  // ---------------- UPDATE ----------------
+  // ---------- UPDATE ----------
   const submitUpdate = async (e) => {
     e.preventDefault();
     if (!selected) return;
@@ -204,18 +164,10 @@ const EditTrending = ({ token }) => {
     // text fields
     Object.entries(form).forEach(([k, v]) => fd.append(k, v));
 
-    // images (ORDER MATTERS)
+    // images
     if (media.mainImage) fd.append("mainImage", media.mainImage);
 
-    const orderedImages = [
-      "image",
-      "image1",
-      "image2",
-      "image3",
-      "image4",
-      "image5",
-      "image6",
-    ];
+    const orderedImages = ["image1", "image2", "image3", "image4"];
 
     orderedImages.forEach((f) => {
       if (media[f]) fd.append(f, media[f]);
@@ -252,294 +204,395 @@ const EditTrending = ({ token }) => {
     }
   };
 
-  // ---------------- UI ----------------
+  // ---------- UI ----------
   return (
-    <div>
-      <h2 className="text-xl font-bold mb-4">Edit Trending Items</h2>
-
-      <div className="flex gap-6">
-        {/* LEFT LIST */}
-        <div className="w-1/3 space-y-3">
+    <div className="max-w-6xl mx-auto py-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
+        <FiEdit2 className="text-green-600" /> Edit Stay Listing
+      </h2>
+      <div className="flex flex-col md:flex-row gap-8">
+        {/* LEFT: Stay List */}
+        <div className="md:w-1/3 w-full space-y-4">
           <input
-            placeholder="Search..."
+            placeholder="Search stays..."
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="border w-full p-2 rounded"
+            className="border border-gray-300 w-full p-3 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
           />
-
           {loading && <p>Loading...</p>}
-
-          {filteredItems.map((it) => (
-            <div key={it._id} className="border p-3 rounded">
-              <p className="font-semibold">{it.name}</p>
-              <p className="text-sm">{it.district}</p>
-              <button
-                onClick={() => selectItem(it)}
-                className="bg-yellow-400 px-2 py-1 rounded mt-2"
-              >
-                Edit
-              </button>
-            </div>
-          ))}
-        </div>
-
-        {/* RIGHT FORM */}
-        <div className="w-2/3">
-          {!selected ? (
-            <p>Select an item to edit</p>
-          ) : (
-            <form onSubmit={submitUpdate} className="space-y-4">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Name</label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Description */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
-                <textarea
-                  name="description"
-                  value={form.description}
-                  onChange={handleInput}
-                  rows={4}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Category */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Category</label>
-                <select
-                  name="category"
-                  value={form.category}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                >
-                  <option value="villa">Villa</option>
-                  <option value="hotel">Hotel</option>
-                  <option value="restaurant">Restaurant</option>
-                  <option value="house">House</option>
-                </select>
-              </div>
-
-              {/* Rating */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Rating</label>
-                <select
-                  name="rating"
-                  value={form.rating}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                >
-                  {[5, 4, 3, 2, 1].map((r) => (
-                    <option key={r} value={r}>{r} Star</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Country */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Country</label>
-                <select
-                  name="country"
-                  value={form.country}
-                  onChange={handleCountryChange}
-                  className="border w-full p-2 rounded"
-                >
-                  <option value="">Select Country</option>
-                  {Object.keys(locationData).map((country) => (
-                    <option key={country} value={country}>{country}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* District */}
-              <div>
-                <label className="block text-sm font-medium mb-1">District</label>
-                <select
-                  name="district"
-                  value={form.district}
-                  onChange={handleDistrictChange}
-                  className="border w-full p-2 rounded"
-                >
-                  <option value="">Select District</option>
-                  {getDistricts(form.country).map((district) => (
-                    <option key={district} value={district}>{district}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-sm font-medium mb-1">City</label>
-                <select
-                  name="city"
-                  value={form.city}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                >
-                  <option value="">Select City</option>
-                  {getCities(form.country, form.district).map((city) => (
-                    <option key={city} value={city}>{city}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Price */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Price</label>
-                <input
-                  type="number"
-                  name="price"
-                  value={form.price}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Location */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Location (Google Maps Link)</label>
-                <input
-                  name="location"
-                  value={form.location}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Address */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Address</label>
-                <input
-                  name="address"
-                  value={form.address}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Contact */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Contact</label>
-                <input
-                  name="contact"
-                  value={form.contact}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Owner Email */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Owner Email</label>
-                <input
-                  type="email"
-                  name="ownerEmail"
-                  value={form.ownerEmail}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Highlights */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Highlights</label>
-                <textarea
-                  name="highlights"
-                  value={form.highlights}
-                  onChange={handleInput}
-                  rows={3}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Video URL */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Video URL</label>
-                <input
-                  name="videoUrl"
-                  value={form.videoUrl}
-                  onChange={handleInput}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Available Things */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Available Things (comma separated)</label>
-                <input
-                  name="availableThings"
-                  value={form.availableThings}
-                  onChange={handleInput}
-                  placeholder="WiFi, Pool, AC, Parking"
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* IMAGE INPUTS */}
-              {/* Main image (card image) */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Main Image (card image)</label>
-                <input
-                  type="file"
-                  name="mainImage"
-                  accept="image/*"
-                  onChange={(e) => handleSingleFile(e, "mainImage")}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              {/* Image 1 – Image 4 (additional side images) */}
-              {["image1", "image2", "image3", "image4"].map((field, index) => (
-                <div key={field}>
-                  <label className="block text-sm font-medium mb-1">Image {index + 1}</label>
-                  <input
-                    type="file"
-                    name={field}
-                    accept="image/*"
-                    onChange={(e) => handleSingleFile(e, field)}
-                    className="border w-full p-2 rounded"
-                  />
+          <div className="space-y-3">
+            {filteredItems.map((it) => (
+              <div key={it._id} className={`rounded-xl border shadow-sm p-4 flex flex-col gap-1 bg-white ${selected === it._id ? 'ring-2 ring-green-500' : ''}`}>
+                <div className="flex items-center gap-2">
+                  <FiHome className="text-green-500" />
+                  <span className="font-semibold text-lg">{it.name}</span>
                 </div>
-              ))}
-
-              {/* Other images */}
-              <div>
-                <label className="block text-sm font-medium mb-1">Other Images (Multiple)</label>
-                <input
-                  type="file"
-                  name="otherimages"
-                  accept="image/*"
-                  multiple
-                  onChange={handleOtherImages}
-                  className="border w-full p-2 rounded"
-                />
-              </div>
-
-              <div className="flex gap-3 pt-4">
-                <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
-                  Save Changes
-                </button>
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <FiMapPin /> {it.district}, {it.country}
+                </div>
+                <div className="flex items-center gap-2 text-xs text-gray-400">
+                  <FiMail /> {it.ownerEmail}
+                </div>
                 <button
-                  type="button"
-                  onClick={cancelEdit}
-                  className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500 transition"
+                  onClick={() => selectItem(it)}
+                  className="mt-2 px-3 py-1 bg-gradient-to-r from-yellow-400 to-yellow-500 text-white rounded-lg flex items-center gap-1 hover:from-yellow-500 hover:to-yellow-600 transition"
                 >
-                  Cancel
+                  <FiEdit2 /> Edit
                 </button>
               </div>
-            </form>
-          )}
+            ))}
+          </div>
         </div>
+
+        {/* RIGHT: Edit Form */}
+        <div className="md:w-2/3 w-full">
+          {!selected ? (
+            <div className="flex flex-col items-center justify-center h-full text-gray-400">
+              <FiEdit2 size={48} />
+              <p className="mt-2">Select a stay to edit</p>
+            </div>
+          ) : (
+            <form onSubmit={submitUpdate} className="space-y-8">
+                {/* Basic Information */}
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <FiHome className="text-green-500" /> Basic Information
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Name */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiHome className="text-blue-500" /> Property Name
+                      </label>
+                      <input
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleInput}
+                        required
+                        placeholder="Enter property name"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    {/* Category */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiTag className="text-purple-500" /> Category
+                      </label>
+                      <select
+                        name="category"
+                        value={form.category}
+                        onChange={handleInput}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      >
+                        <option value="villa">🏠 Villa</option>
+                        <option value="hotel">🏨 Hotel</option>
+                        <option value="restaurant">🍽️ Restaurant</option>
+                        <option value="house">🏡 House</option>
+                      </select>
+                    </div>
+                    {/* Rating */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiStar className="text-yellow-500" /> Rating
+                      </label>
+                      <select
+                        name="rating"
+                        value={form.rating}
+                        onChange={handleInput}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      >
+                        {[5, 4, 3, 2, 1].map((r) => (
+                          <option key={r} value={r}>⭐ {r} Star</option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* Price */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiDollarSign className="text-green-500" /> Price (Rs.)
+                      </label>
+                      <input
+                        type="number"
+                        name="price"
+                        value={form.price}
+                        onChange={handleInput}
+                        required
+                        placeholder="Enter price"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    {/* Owner Email */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiMail className="text-red-500" /> Owner Email
+                      </label>
+                      <input
+                        type="email"
+                        name="ownerEmail"
+                        value={form.ownerEmail}
+                        onChange={handleInput}
+                        required
+                        placeholder="owner@example.com"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    {/* Description */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiFileText className="text-indigo-500" /> Description
+                      </label>
+                      <textarea
+                        name="description"
+                        value={form.description}
+                        onChange={handleInput}
+                        required
+                        rows={4}
+                        placeholder="Describe the property..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Location Information */}
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <FiMapPin className="text-red-500" /> Location Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {/* Country */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiGlobe className="text-blue-500" /> Country
+                      </label>
+                      <select
+                        name="country"
+                        value={form.country}
+                        onChange={handleCountryChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      >
+                        <option value="">Select Country</option>
+                        {Object.keys(locationData).map((country) => (
+                          <option key={country} value={country}>{country}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* District */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiMap className="text-green-500" /> District
+                      </label>
+                      <select
+                        name="district"
+                        value={form.district}
+                        onChange={handleDistrictChange}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      >
+                        <option value="">Select District</option>
+                        {getDistricts(form.country).map((district) => (
+                          <option key={district} value={district}>{district}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* City */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiMapPin className="text-purple-500" /> City
+                      </label>
+                      <select
+                        name="city"
+                        value={form.city}
+                        onChange={handleInput}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      >
+                        <option value="">Select City</option>
+                        {getCities(form.country, form.district).map((city) => (
+                          <option key={city} value={city}>{city}</option>
+                        ))}
+                      </select>
+                    </div>
+                    {/* Address */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiMapPin className="text-orange-500" /> Full Address
+                      </label>
+                      <input
+                        type="text"
+                        name="address"
+                        value={form.address}
+                        onChange={handleInput}
+                        placeholder="Enter full address"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    {/* Google Maps Link */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiMapPin className="text-blue-500" /> Google Maps Link
+                      </label>
+                      <input
+                        type="text"
+                        name="location"
+                        value={form.location}
+                        onChange={handleInput}
+                        placeholder="https://maps.google.com/..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Contact & Additional Info */}
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <FiPhone className="text-green-500" /> Contact & Additional Info
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Contact */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiPhone className="text-green-500" /> Contact Number
+                      </label>
+                      <input
+                        type="text"
+                        name="contact"
+                        value={form.contact}
+                        onChange={handleInput}
+                        placeholder="+94 77 123 4567"
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    {/* Video URL */}
+                    <div>
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiVideo className="text-red-500" /> Video URL (YouTube)
+                      </label>
+                      <input
+                        type="text"
+                        name="videoUrl"
+                        value={form.videoUrl}
+                        onChange={handleInput}
+                        placeholder="https://youtube.com/..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                    {/* Highlights */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiStar className="text-yellow-500" /> Highlights
+                      </label>
+                      <textarea
+                        name="highlights"
+                        value={form.highlights}
+                        onChange={handleInput}
+                        rows={2}
+                        placeholder="Key features and highlights..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition resize-none"
+                      />
+                    </div>
+                    {/* Available Things */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiList className="text-indigo-500" /> Available Amenities (comma separated)
+                      </label>
+                      <input
+                        type="text"
+                        name="availableThings"
+                        value={form.availableThings}
+                        onChange={handleInput}
+                        placeholder="WiFi, Pool, AC, Parking, Restaurant..."
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Images Section */}
+                <div className="bg-white rounded-xl shadow-sm border p-6">
+                  <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+                    <FiImage className="text-pink-500" /> Property Images
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {/* Main Image */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiUpload className="text-green-500" /> Main Image (Card Display)
+                      </label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-green-500 transition">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => handleSingleFile(e, "mainImage")}
+                          className="w-full"
+                        />
+                        {media.mainImage && (
+                          <p className="text-sm text-green-600 mt-2">✓ {media.mainImage.name}</p>
+                        )}
+                      </div>
+                    </div>
+                    {/* Additional Images */}
+                    {["image1", "image2", "image3", "image4"].map((field, index) => (
+                      <div key={field}>
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                          <FiImage className="text-blue-500" /> Image {index + 1}
+                        </label>
+                        <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-blue-500 transition">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleSingleFile(e, field)}
+                            className="w-full text-sm"
+                          />
+                          {media[field] && (
+                            <p className="text-sm text-blue-600 mt-2">✓ {media[field].name}</p>
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                    {/* Other Images */}
+                    <div className="md:col-span-2">
+                      <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+                        <FiImage className="text-purple-500" /> Additional Images (Multiple)
+                      </label>
+                      <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 hover:border-purple-500 transition">
+                        <input
+                          type="file"
+                          accept="image/*"
+                          multiple
+                          onChange={handleOtherImages}
+                          className="w-full"
+                        />
+                        {media.otherimages.length > 0 && (
+                          <p className="text-sm text-purple-600 mt-2">✓ {media.otherimages.length} files selected</p>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Submit Buttons */}
+                <div className="flex justify-end gap-4">
+                  <button
+                    type="button"
+                    onClick={cancelEdit}
+                    className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition flex items-center gap-2"
+                  >
+                    <FiX /> Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-8 py-3 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-semibold rounded-lg transition-all duration-200 shadow-md hover:shadow-lg flex items-center gap-2"
+                  >
+                    <FiEdit2 /> Save Changes
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+        <ToastContainer position="top-center" />
       </div>
-    </div>
   );
 };
 

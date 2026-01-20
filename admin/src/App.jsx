@@ -8,7 +8,9 @@ import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 // Pages
 import AddTrending from "./Pages/Add/AddTrending";
+import AddStays from "./Pages/Add/AddStays";
 import DeleteTrending from "./Pages/Delete/DeleteTrending";
+import RemoveStays from "./Pages/Delete/RemoveStays";
 import EditTrending from "./Pages/edit/Edit";
 import AddTraveling from "./Pages/Add/AddTraveling";
 import DeletePlaces from "./Pages/Delete/DletePlaces";
@@ -21,6 +23,8 @@ import TrendingPaid from "./Pages/Paid/Trendingpaid";
 import Ads from "./Pages/ADS/Ads";
 import AdsManage from "./Pages/ADS/AdsManage";
 import VendorManage from "./Pages/Vendor/VendorManage";
+import AddVendor from "./Pages/Vendor/AddVendor";
+import RegisterVendor from "./Pages/Vendor/RegisterVendor";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -62,36 +66,40 @@ function App() {
       {!token ? (
         <Login settoken={setToken} />
       ) : (
-        <>
+        <div className="min-h-screen bg-gray-100">
           <Navbar settoken={setToken} />
-          <hr className="bg-gray-200" />
 
-          <div className="flex w-full">
+          <div className="flex">
             <Sidebar />
 
-            <div className="w-[70%] mx-auto ml-[max(5vw,25px)] my-8 text-gray-600 text-base">
-             <Routes>
-                       <Route path="/" element={<ProtectedRoute><Home token={token} /></ProtectedRoute>} />
-                       <Route path="/addtrending" element={<ProtectedRoute><AddTrending token={token} /></ProtectedRoute>} />
-                       <Route path="/deletetrending" element={<ProtectedRoute><DeleteTrending token={token} /></ProtectedRoute>} />
-                       <Route path="/edittrending" element={<ProtectedRoute><EditTrending token={token} /></ProtectedRoute>} />
-                       <Route path="/addtravellingplaces" element={<ProtectedRoute><AddTraveling token={token} /></ProtectedRoute>} />
-                       <Route path="/deletetravellingplaces" element={<ProtectedRoute><DeletePlaces token={token} /></ProtectedRoute>} />
-                       <Route path="/addsafari" element={<ProtectedRoute><AddSafari token={token} /></ProtectedRoute>} />
-                       <Route path="/deletesafari" element={<ProtectedRoute><DleteSafari token={token} /></ProtectedRoute>} />
-                       <Route path="/editsafari" element={<ProtectedRoute><EditSafariPage token={token} /></ProtectedRoute>} />
-                       <Route path="/admin/safari/edit/:id" element={<ProtectedRoute><EditSafariPage token={token} /></ProtectedRoute>} />
-                       <Route path="/staypaid" element={<ProtectedRoute><TrendingPaid token={token} /></ProtectedRoute>} />
-                       <Route path="/safaripaid" element={<ProtectedRoute><SafariPaid token={token} /></ProtectedRoute>} />
-                       <Route path="/ads" element={<ProtectedRoute><AdsManage token={token} /></ProtectedRoute>} />
-                       <Route path="/addads" element={<ProtectedRoute><Ads token={token} /></ProtectedRoute>} />
-                       <Route path="/vendors" element={<ProtectedRoute><VendorManage token={token} /></ProtectedRoute>} />
-                      
-             </Routes>
-
+            <div className="flex-1 p-6 overflow-auto">
+              <div className="bg-white rounded-xl shadow-sm min-h-[calc(100vh-120px)] p-6">
+                <Routes>
+                  <Route path="/" element={<ProtectedRoute><Home token={token} /></ProtectedRoute>} />
+                  <Route path="/home" element={<ProtectedRoute><Home token={token} /></ProtectedRoute>} />
+                  <Route path="/addtrending" element={<ProtectedRoute><AddTrending token={token} /></ProtectedRoute>} />
+                  <Route path="/addstays" element={<ProtectedRoute><AddStays token={token} /></ProtectedRoute>} />
+                  <Route path="/deletetrending" element={<ProtectedRoute><DeleteTrending token={token} /></ProtectedRoute>} />
+                  <Route path="/removestays" element={<ProtectedRoute><RemoveStays token={token} /></ProtectedRoute>} />
+                  <Route path="/edittrending" element={<ProtectedRoute><EditTrending token={token} /></ProtectedRoute>} />
+                  <Route path="/addtravellingplaces" element={<ProtectedRoute><AddTraveling token={token} /></ProtectedRoute>} />
+                  <Route path="/deletetravellingplaces" element={<ProtectedRoute><DeletePlaces token={token} /></ProtectedRoute>} />
+                  <Route path="/addsafari" element={<ProtectedRoute><AddSafari token={token} /></ProtectedRoute>} />
+                  <Route path="/deletesafari" element={<ProtectedRoute><DleteSafari token={token} /></ProtectedRoute>} />
+                  <Route path="/editsafari" element={<ProtectedRoute><EditSafariPage token={token} /></ProtectedRoute>} />
+                  <Route path="/admin/safari/edit/:id" element={<ProtectedRoute><EditSafariPage token={token} /></ProtectedRoute>} />
+                  <Route path="/staypaid" element={<ProtectedRoute><TrendingPaid token={token} /></ProtectedRoute>} />
+                  <Route path="/safaripaid" element={<ProtectedRoute><SafariPaid token={token} /></ProtectedRoute>} />
+                  <Route path="/ads" element={<ProtectedRoute><AdsManage token={token} /></ProtectedRoute>} />
+                  <Route path="/addads" element={<ProtectedRoute><Ads token={token} /></ProtectedRoute>} />
+                  <Route path="/addvendor" element={<ProtectedRoute><AddVendor token={token} /></ProtectedRoute>} />
+                  <Route path="/registervendor" element={<ProtectedRoute><RegisterVendor token={token} /></ProtectedRoute>} />
+                  <Route path="/vendors" element={<ProtectedRoute><VendorManage token={token} /></ProtectedRoute>} />
+                </Routes>
+              </div>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

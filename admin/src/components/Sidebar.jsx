@@ -1,155 +1,157 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { assets } from "../assets/assets";
+import { 
+  FiHome, FiPlus, FiTrash2, FiEdit, FiMapPin, FiUsers, 
+  FiChevronDown, FiChevronRight, FiImage, FiCompass
+} from "react-icons/fi";
+import { MdOutlineVilla, MdOutlineTravelExplore } from "react-icons/md";
+import { GiElephant } from "react-icons/gi";
 
 const Sidebar = () => {
+  const [openMenus, setOpenMenus] = useState({
+    ads: false,
+    stays: true,
+    places: false,
+    safari: false,
+  });
+
+  const toggleMenu = (menu) => {
+    setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
+  };
+
+  const linkClass = (isActive) => 
+    `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm ${
+      isActive 
+        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md" 
+        : "text-gray-300 hover:bg-slate-700 hover:text-white"
+    }`;
+
+  const menuHeaderClass = "flex items-center justify-between w-full px-4 py-2.5 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all cursor-pointer";
+
   return (
-    <div className="w-[18%] min-h-screen border-r-2 border-gray-200">
-      <div className="flex flex-col gap-4 pt-6 pl-[20%] text-[15px]">
-         <NavLink
-          to="/"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-gray-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.add_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Home</p>
+    <div className="w-64 min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 shadow-xl">
+      <div className="flex flex-col gap-2 p-4">
+        
+        {/* Home */}
+        <NavLink to="/" className={({ isActive }) => linkClass(isActive)}>
+          <FiHome size={18} />
+          <span>Dashboard</span>
         </NavLink>
 
-        {/*--------------------Advertisements------------------ */}
-        <NavLink
-          to="/ads"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-yellow-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.order_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">View Advertisements</p>
-        </NavLink>
-        <NavLink
-          to="/addads"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-yellow-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.add_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Add Advertisement</p>
+        {/* Advertisements Section */}
+        <div className="mt-2">
+          <div onClick={() => toggleMenu('ads')} className={menuHeaderClass}>
+            <div className="flex items-center gap-3">
+              <FiImage size={18} className="text-yellow-400" />
+              <span className="font-medium">Advertisements</span>
+            </div>
+            {openMenus.ads ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+          </div>
+          {openMenus.ads && (
+            <div className="ml-4 mt-1 space-y-1 border-l-2 border-yellow-500/30 pl-4">
+              <NavLink to="/ads" className={({ isActive }) => linkClass(isActive)}>
+                <FiImage size={16} />
+                <span>View Ads</span>
+              </NavLink>
+              <NavLink to="/addads" className={({ isActive }) => linkClass(isActive)}>
+                <FiPlus size={16} />
+                <span>Add Ad</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+
+        {/* Stays Section */}
+        <div className="mt-2">
+          <div onClick={() => toggleMenu('stays')} className={menuHeaderClass}>
+            <div className="flex items-center gap-3">
+              <MdOutlineVilla size={18} className="text-green-400" />
+              <span className="font-medium">Stays</span>
+            </div>
+            {openMenus.stays ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+          </div>
+          {openMenus.stays && (
+            <div className="ml-4 mt-1 space-y-1 border-l-2 border-green-500/30 pl-4">
+              <NavLink to="/addstays" className={({ isActive }) => linkClass(isActive)}>
+                <FiPlus size={16} />
+                <span>Add New Stay</span>
+              </NavLink>
+              <NavLink to="/deletetrending" className={({ isActive }) => linkClass(isActive)}>
+                <FiTrash2 size={16} />
+                <span>Delete Stay</span>
+              </NavLink>
+              <NavLink to="/edittrending" className={({ isActive }) => linkClass(isActive)}>
+                <FiEdit size={16} />
+                <span>Edit Stay</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+
+        {/* Travelling Places Section */}
+        <div className="mt-2">
+          <div onClick={() => toggleMenu('places')} className={menuHeaderClass}>
+            <div className="flex items-center gap-3">
+              <MdOutlineTravelExplore size={18} className="text-blue-400" />
+              <span className="font-medium">Travel Places</span>
+            </div>
+            {openMenus.places ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+          </div>
+          {openMenus.places && (
+            <div className="ml-4 mt-1 space-y-1 border-l-2 border-blue-500/30 pl-4">
+              <NavLink to="/addtravellingplaces" className={({ isActive }) => linkClass(isActive)}>
+                <FiPlus size={16} />
+                <span>Add Place</span>
+              </NavLink>
+              <NavLink to="/deletetravellingplaces" className={({ isActive }) => linkClass(isActive)}>
+                <FiTrash2 size={16} />
+                <span>Delete Place</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+
+        {/* Safari Section */}
+        <div className="mt-2">
+          <div onClick={() => toggleMenu('safari')} className={menuHeaderClass}>
+            <div className="flex items-center gap-3">
+              <GiElephant size={18} className="text-purple-400" />
+              <span className="font-medium">Safari</span>
+            </div>
+            {openMenus.safari ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+          </div>
+          {openMenus.safari && (
+            <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-500/30 pl-4">
+              <NavLink to="/addsafari" className={({ isActive }) => linkClass(isActive)}>
+                <FiPlus size={16} />
+                <span>Add Safari</span>
+              </NavLink>
+              <NavLink to="/deletesafari" className={({ isActive }) => linkClass(isActive)}>
+                <FiTrash2 size={16} />
+                <span>Delete Safari</span>
+              </NavLink>
+              <NavLink to="/editsafari" className={({ isActive }) => linkClass(isActive)}>
+                <FiEdit size={16} />
+                <span>Edit Safari</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+
+        {/* Divider */}
+        <hr className="my-4 border-slate-700" />
+
+        {/* Vendor Management */}
+        <NavLink to="/addvendor" className={({ isActive }) => linkClass(isActive)}>
+          <FiPlus size={18} className="text-orange-400" />
+          <span>Add Vendor</span>
         </NavLink>
 
-        {/* Add Trending */}
-        <NavLink
-          to="/addtrending"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-green-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.add_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Add Stays</p>
+        <NavLink to="/vendors" className={({ isActive }) => linkClass(isActive)}>
+          <FiUsers size={18} className="text-orange-400" />
+          <span>Vendor Management</span>
         </NavLink>
 
-        {/* Delete Trending */}
-        <NavLink
-          to="/deletetrending"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-green-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.order_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Delete Stays</p>
-        </NavLink>
-
-        {/* Edit Trending */}
-        <NavLink
-          to="/edittrending"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-green-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.parcel_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Edit Stays</p>
-        </NavLink>
-        {/*--------------------add traveling places------------------ */}
-        <NavLink
-          to="/addtravellingplaces"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-blue-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.add_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Add Travelling Places</p>
-        </NavLink>
-        {/*--------------------delete traveling places------------------ */}
-        <NavLink
-          to="/deletetravellingplaces"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-blue-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.delete_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Delete Travelling Places</p>
-        </NavLink>
-        {/*--------------------add safari------------------ */}
-        <NavLink
-          to="/addsafari"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-purple-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.add_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Add Safari</p>
-        </NavLink>
-        <NavLink
-          to="/deletesafari"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-purple-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.order_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Delete Safari</p>
-        </NavLink>
-        <NavLink
-          to="/editsafari"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-purple-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.parcel_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">edit Safari</p>
-        </NavLink>
-        {/*--------------------Vendor Management------------------ */}
-        <NavLink
-          to="/vendors"
-          className={({ isActive }) =>
-            `flex items-center gap-3 border bg-orange-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
-              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
-            }`
-          }
-        >
-          <img src={assets.order_icon} alt="" className="w-5 h-5" />
-          <p className="hidden md:block">Vendor Management</p>
-        </NavLink>
       </div>
     </div>
   );

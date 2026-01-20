@@ -19,6 +19,11 @@ const VendorManage = ({ token }) => {
   const [password, setPassword] = useState("");
   const [category, setCategory] = useState("stays");
   const [isVerified, setIsVerified] = useState(true);
+  const [bankAccountName, setBankAccountName] = useState("");
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
+  const [bankCode, setBankCode] = useState("");
+  const [businessAddress, setBusinessAddress] = useState("");
+  const [packageName, setPackageName] = useState("");
 
   const categories = [
     { value: "stays", label: "Stays" },
@@ -57,7 +62,17 @@ const VendorManage = ({ token }) => {
     try {
       const res = await axios.post(
         `${backendUrl}/api/vendor/registerByAdmin`,
-        { email, phone, password, category },
+        { 
+          email, 
+          phone, 
+          password, 
+          category,
+          bankAccountName,
+          bankAccountNumber,
+          bankCode,
+          businessAddress,
+          packageName
+        },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       if (res.data.success) {
@@ -76,7 +91,17 @@ const VendorManage = ({ token }) => {
   const handleEditVendor = async (e) => {
     e.preventDefault();
     try {
-      const updateData = { email, phone, category, isVerified };
+      const updateData = { 
+        email, 
+        phone, 
+        category, 
+        isVerified,
+        bankAccountName,
+        bankAccountNumber,
+        bankCode,
+        businessAddress,
+        packageName
+      };
       if (password) updateData.password = password;
 
       const res = await axios.put(
@@ -121,6 +146,11 @@ const VendorManage = ({ token }) => {
     setPhone(vendor.phone || "");
     setCategory(vendor.category);
     setIsVerified(vendor.isVerified);
+    setBankAccountName(vendor.bankAccountName || "");
+    setBankAccountNumber(vendor.bankAccountNumber || "");
+    setBankCode(vendor.bankCode || "");
+    setBusinessAddress(vendor.businessAddress || "");
+    setPackageName(vendor.packageName || "");
     setPassword("");
     setShowEditModal(true);
   };
@@ -153,6 +183,11 @@ const VendorManage = ({ token }) => {
     setPassword("");
     setCategory("stays");
     setIsVerified(true);
+    setBankAccountName("");
+    setBankAccountNumber("");
+    setBankCode("");
+    setBusinessAddress("");
+    setPackageName("");
     setSelectedVendor(null);
   };
 
@@ -333,6 +368,66 @@ const VendorManage = ({ token }) => {
                   ))}
                 </select>
               </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Address
+                </label>
+                <input
+                  type="text"
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Enter business address"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Stay/Vehicle Package Name
+                </label>
+                <input
+                  type="text"
+                  value={packageName}
+                  onChange={(e) => setPackageName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="e.g., Gold Package, Premium Villa Package"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bank Account Name
+                </label>
+                <input
+                  type="text"
+                  value={bankAccountName}
+                  onChange={(e) => setBankAccountName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Account holder name"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bank Account Number
+                </label>
+                <input
+                  type="text"
+                  value={bankAccountNumber}
+                  onChange={(e) => setBankAccountNumber(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Account number"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bank Code / Swift Code
+                </label>
+                <input
+                  type="text"
+                  value={bankCode}
+                  onChange={(e) => setBankCode(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
+                  placeholder="Bank code or swift code"
+                />
+              </div>
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
@@ -424,6 +519,66 @@ const VendorManage = ({ token }) => {
                     Verified
                   </span>
                 </label>
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Business Address
+                </label>
+                <input
+                  type="text"
+                  value={businessAddress}
+                  onChange={(e) => setBusinessAddress(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Enter business address"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Stay/Vehicle Package Name
+                </label>
+                <input
+                  type="text"
+                  value={packageName}
+                  onChange={(e) => setPackageName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="e.g., Gold Package, Premium Villa Package"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bank Account Name
+                </label>
+                <input
+                  type="text"
+                  value={bankAccountName}
+                  onChange={(e) => setBankAccountName(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Account holder name"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bank Account Number
+                </label>
+                <input
+                  type="text"
+                  value={bankAccountNumber}
+                  onChange={(e) => setBankAccountNumber(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Account number"
+                />
+              </div>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  Bank Code / Swift Code
+                </label>
+                <input
+                  type="text"
+                  value={bankCode}
+                  onChange={(e) => setBankCode(e.target.value)}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="Bank code or swift code"
+                />
               </div>
               <div className="flex justify-end gap-3">
                 <button
