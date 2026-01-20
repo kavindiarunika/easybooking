@@ -1,6 +1,7 @@
 import React, { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Hero from "../../Components/Hero";
+import HomeAdvertisement from "../../Components/HomeAdvertisement";
 import Title from "../../Components/Title";
 
 import Trending from "../../Components/Trending";
@@ -30,6 +31,9 @@ const Home = () => {
     <div className="bg-slate-950">
     
       <Hero />
+
+      {/* Home Advertisement Section */}
+      <HomeAdvertisement />
 
     
      <div className="w-full relative"> 

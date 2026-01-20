@@ -4,7 +4,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { BACKEND_URL } from "../../App";
 import "react-toastify/dist/ReactToastify.css";
-import { FaHotel, FaSignOutAlt, FaUser, FaPlus, FaEdit, FaHome } from "react-icons/fa";
+import { FaHotel, FaSignOutAlt, FaUser, FaPlus, FaEdit, FaHome, FaTh, FaClipboardList, FaChartBar, FaBell, FaCog } from "react-icons/fa";
 
 const VendorDashboard = () => {
   const navigate = useNavigate();
@@ -413,30 +413,94 @@ const VendorDashboard = () => {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-8">
-        {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-gray-500 text-sm">Property Status</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-2">
-              {hasProfile ? "Active" : "No Property"}
+        {/* Terms & Conditions Card */}
+        <div className="bg-white rounded-xl shadow p-6 mt-6 mb-8">
+          <h2 className="text-lg font-semibold text-gray-800 mb-3">
+            Smartsbooking Terms & Conditions
+          </h2>
+
+          <div className="space-y-3 text-gray-700 text-sm leading-relaxed">
+            <p>
+              <span className="font-medium">Smartsbooking.com</span> does not charge
+              any commission from any party.
+            </p>
+
+            <p>
+              Your organization must agree to provide a
+              <span className="font-semibold text-green-600"> 10% discount </span>
+              to customers who come through us.
+            </p>
+
+            <p>
+              The annual fee for all our services is
+              <span className="font-semibold"> Rs. 5,000/=</span> and it must be paid
+              on the due date.
             </p>
           </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-gray-500 text-sm">Property Name</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-2">
-              {profileData?.name || "N/A"}
-            </p>
-          </div>
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-gray-500 text-sm">Category</h3>
-            <p className="text-2xl font-bold text-gray-800 mt-2 capitalize">
-              {profileData?.category || "N/A"}
-            </p>
+
+          <div className="mt-5 flex justify-end">
+            <button className="px-4 py-2 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition">
+              I Understand
+            </button>
           </div>
         </div>
+      </main>
 
-        {/* Property Card or Add Button */}
-        {!showForm && (
+      <div className="min-h-screen bg-gray-100">
+        {/* Main Content */}
+        <main className="flex-1 transition-all duration-300 p-8">
+          {/* Quick Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-blue-500 hover:shadow-lg transition">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Status</p>
+                  <p className="text-3xl font-bold text-blue-600 mt-2">
+                    {hasProfile ? "Active" : "Inactive"}
+                  </p>
+                </div>
+                <FaTh className="text-4xl text-blue-200" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-green-500 hover:shadow-lg transition">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Property Name</p>
+                  <p className="text-xl font-bold text-green-600 mt-2">
+                    {profileData?.name || "N/A"}
+                  </p>
+                </div>
+                <FaClipboardList className="text-4xl text-green-200" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-purple-500 hover:shadow-lg transition">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Category</p>
+                  <p className="text-xl font-bold text-purple-600 mt-2 capitalize">
+                    {profileData?.category || "N/A"}
+                  </p>
+                </div>
+                <FaChartBar className="text-4xl text-purple-200" />
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg shadow-md p-6 border-l-4 border-orange-500 hover:shadow-lg transition">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-gray-500 text-sm font-medium">Price</p>
+                  <p className="text-xl font-bold text-orange-600 mt-2">
+                    Rs. {profileData?.price || "N/A"}
+                  </p>
+                </div>
+                <FaBell className="text-4xl text-orange-200" />
+              </div>
+            </div>
+          </div>
+
+          {!showForm && (
           <div className="bg-white rounded-lg shadow p-6 mb-6">
             {hasProfile && profileData ? (
               <div>
@@ -495,6 +559,8 @@ const VendorDashboard = () => {
             )}
           </div>
         )}
+
+          
 
         {/* Add/Edit Form */}
         {showForm && (
@@ -828,6 +894,7 @@ const VendorDashboard = () => {
           </div>
         )}
       </main>
+      </div>
 
       <ToastContainer position="top-center" />
     </div>

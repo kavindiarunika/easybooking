@@ -50,6 +50,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "http://localhost:5237",
   "http://localhost:5238",
+  "http://localhost:5239", // Added for current Vite dev server
 
   // Production domains
   "https://smartsbooking.com",
