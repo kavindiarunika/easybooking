@@ -24,7 +24,7 @@ const ShowAds = () => {
   const handleDelete = async (adId, type, index) => {
     try {
       await axios.delete(
-        `${backendUrl}/api/ads/deleteads/${adId}?type=${type}`
+        `${backendUrl}/api/ads/deleteads/${adId}?type=${type}`,
       );
       toast.success("Ad deleted successfully");
 
@@ -60,12 +60,14 @@ const ShowAds = () => {
                 <video
                   src={item.url}
                   controls
+                  crossOrigin="anonymous"
                   className="w-full h-[220px] object-cover"
                 />
               ) : (
                 <img
                   src={item.url}
                   alt={`${title} Ad`}
+                  crossOrigin="anonymous"
                   className="w-full h-[220px] object-cover"
                 />
               )}

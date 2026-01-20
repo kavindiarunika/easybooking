@@ -50,9 +50,11 @@ const Trending = () => {
     const fetchAds = async () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/api/ads/getads`);
-        setAds(Array.isArray(res.data) ? res.data : []);
+        // The response is an object with homeAd, villaad, goTripAd properties
+        setAds(res.data || {});
       } catch (err) {
         console.error("Ads error:", err);
+        setAds({});
       }
     };
     fetchAds();
@@ -64,7 +66,7 @@ const Trending = () => {
       .get(
         `${
           import.meta.env.VITE_BACKEND_URL || "http://localhost:4000"
-        }/api/trending/trenddata`
+        }/api/trending/trenddata`,
       )
       .then((res) => {
         setaddtrend(Array.isArray(res.data) ? res.data : []);
@@ -148,9 +150,26 @@ const Trending = () => {
           </div>
 
           {/* ================= ADS AFTER EVERY 2 CATEGORIES ================= */}
-          {(index + 1) % 2 === 0 && ads && ads.villaad && (
-            <HomeAds ads={ads.villaad} />
-          )}
+        {/* ================= ADS AFTER EVERY 2 CATEGORIES (SHOW 2 ADS) ================= */}
+{/* ================= ADS AFTER EVERY 2 CATEGORIES (SHOW 2 DIFFERENT ADS) ================= */}
+{(index + 1) % 2 === 0 &&
+  ads?.homeAd &&
+  Array.isArray(ads.homeAd) &&
+  ads.homeAd.length > 0 && (() => {
+    // which ad block this is (0, 1, 2, ...)
+    const adBlockIndex = Math.floor((index + 1) / 2) - 1;
+
+    const startIndex = adBlockIndex * 2;
+
+    // pick 2 different ads, move forward each time
+    const firstAd = ads.homeAd[startIndex % ads.homeAd.length];
+    const secondAd =
+      ads.homeAd[(startIndex + 1) % ads.homeAd.length];
+
+    return <HomeAds ads={[firstAd, secondAd]} />;
+  })()}
+
+
         </React.Fragment>
       ))}
     </section>

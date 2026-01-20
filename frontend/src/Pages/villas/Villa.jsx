@@ -12,6 +12,7 @@ import { FaGlobe } from "react-icons/fa";
 import axios from "axios";
 import SearchBar from "../../Components/SearchBar";
 import { useParams } from "react-router-dom";
+import VillaAd from "./VillaAd";
 
 const Villa = () => {
 
@@ -275,7 +276,7 @@ const Villa = () => {
   return (
     <section className="w-full py-16 px-4 md:px-16 bg-slate-950">
       <p className="w-full h-24"></p>
-             
+             <VillaAd/>
       {/* Mobile filter toggle button - visible only on small screens */}
       <div className="lg:hidden flex justify-end mb-4">
         <button
