@@ -6,7 +6,7 @@ import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
 import { safa } from "../../assets/safari";
 
-const EditSafari = ({ safariId: propSafariId }) => {
+const EditSafari = ({ safariId: propSafariId, onSuccess }) => {
   const { id: paramId } = useParams();
   const safariId = propSafariId || paramId;
 
@@ -136,6 +136,7 @@ const EditSafari = ({ safariId: propSafariId }) => {
       );
       toast.dismiss();
       toast.success("update successfully");
+      if (onSuccess) onSuccess();
     } catch (error) {
       toast.error("error occur");
     }

@@ -17,6 +17,31 @@ const Sidebar = () => {
           <img src={assets.add_icon} alt="" className="w-5 h-5" />
           <p className="hidden md:block">Home</p>
         </NavLink>
+
+        {/*--------------------Advertisements------------------ */}
+        <NavLink
+          to="/ads"
+          className={({ isActive }) =>
+            `flex items-center gap-3 border bg-yellow-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
+              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
+            }`
+          }
+        >
+          <img src={assets.order_icon} alt="" className="w-5 h-5" />
+          <p className="hidden md:block">View Advertisements</p>
+        </NavLink>
+        <NavLink
+          to="/addads"
+          className={({ isActive }) =>
+            `flex items-center gap-3 border bg-yellow-300 border-gray-300 border-r-0 px-3 py-2 rounded-l transition ${
+              isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
+            }`
+          }
+        >
+          <img src={assets.add_icon} alt="" className="w-5 h-5" />
+          <p className="hidden md:block">Add Advertisement</p>
+        </NavLink>
+
         {/* Add Trending */}
         <NavLink
           to="/addtrending"

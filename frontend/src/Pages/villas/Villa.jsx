@@ -7,6 +7,7 @@ import {
   AiOutlineFilter,
   AiOutlineClose,
 } from "react-icons/ai";
+import { FaGlobe } from "react-icons/fa";
 
 import axios from "axios";
 import SearchBar from "../../Components/SearchBar";
@@ -545,6 +546,59 @@ const Villa = () => {
                 <SearchBar value={searchName} onChange={(e) => setsearchName(e.target.value)} />
             </div>
 
+          {/* Country Select - Above Cards */}
+          <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-800 rounded-xl">
+            <label className="text-white font-medium">🌍 Select Country:</label>
+            <select
+              value={selectedCountry}
+              onChange={(e) => handleCountryChange(e.target.value)}
+              className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+            >
+              {countryFilters.map((country) => (
+                <option key={country.value} value={country.value}>
+                  {country.label}
+                </option>
+              ))}
+            </select>
+            
+            <select
+              value={selectedDistrict}
+              onChange={(e) => handleDistrictChange(e.target.value)}
+              className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+            >
+              {districtFilters.map((district) => (
+                <option key={district.value} value={district.value}>
+                  {district.label}
+                </option>
+              ))}
+            </select>
+
+            <select
+              value={selectedCity}
+              onChange={(e) => setSelectedCity(e.target.value)}
+              className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
+            >
+              {cityFilters.map((city) => (
+                <option key={city.value} value={city.value}>
+                  {city.label}
+                </option>
+              ))}
+            </select>
+
+            {(selectedCountry !== "all" || selectedDistrict !== "all" || selectedCity !== "all") && (
+              <button
+                onClick={() => {
+                  setSelectedCountry("all");
+                  setSelectedDistrict("all");
+                  setSelectedCity("all");
+                }}
+                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
+              >
+                Clear Location
+              </button>
+            )}
+          </div>
+
           {/* Cards Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {currentData.length > 0 ? (
@@ -615,6 +669,15 @@ const Villa = () => {
                         ? item.description.substring(0, 100) + "..."
                         : item.description}
                     </p>
+
+                    {/* Country Display */}
+                    <div className="flex items-center gap-2 text-gray-500 text-sm">
+                      <FaGlobe className="text-green-500" />
+                      <span>{item.country || "Sri Lanka"}</span>
+                      {item.district && (
+                        <span className="text-gray-400">• {item.district}</span>
+                      )}
+                    </div>
 
                     {/* Button */}
                     <button

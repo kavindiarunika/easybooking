@@ -25,6 +25,68 @@ const EditTrending = ({ token }) => {
     otherimages: [],
   });
 
+  // Location data for cascading dropdowns
+  const locationData = {
+    "Sri Lanka": {
+      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
+      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
+      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
+      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
+      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
+      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
+      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
+      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      "Kilinochchi": ["Kilinochchi"],
+      "Mannar": ["Mannar", "Talaimannar"],
+      "Vavuniya": ["Vavuniya"],
+      "Mullaitivu": ["Mullaitivu"],
+      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+    },
+    "India": {
+      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
+      "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
+      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
+      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode"],
+      "Delhi": ["New Delhi", "Delhi NCR"],
+      "Goa": ["Panaji", "Margao", "Vasco da Gama"]
+    },
+    "Maldives": {
+      "Male": ["Male City", "Hulhumale", "Villimale"],
+      "Ari Atoll": ["Mahibadhoo", "Maamigili"],
+      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"]
+    },
+    "Thailand": {
+      "Bangkok": ["Bangkok", "Nonthaburi"],
+      "Phuket": ["Phuket Town", "Patong", "Kata"],
+      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"]
+    },
+    "Other": {
+      "Other": ["Other"]
+    }
+  };
+
+  const getDistricts = (country) => {
+    if (!country || !locationData[country]) return [];
+    return Object.keys(locationData[country]);
+  };
+
+  const getCities = (country, district) => {
+    if (!country || !district || !locationData[country]?.[district]) return [];
+    return locationData[country][district];
+  };
+
   // ---------------- FETCH ----------------
   useEffect(() => {
     fetchItems();
@@ -51,7 +113,9 @@ const EditTrending = ({ token }) => {
       description: it.description || "",
       category: it.category || "villa",
       rating: it.rating || 5,
+      country: it.country || "Sri Lanka",
       district: it.district || "",
+      city: it.city || "",
       price: it.price || 0,
       location: it.location || "",
       highlights: it.highlights || "",
@@ -76,6 +140,18 @@ const EditTrending = ({ token }) => {
     });
 
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Handle country change - reset district and city
+  const handleCountryChange = (e) => {
+    const country = e.target.value;
+    setForm((p) => ({ ...p, country, district: "", city: "" }));
+  };
+
+  // Handle district change - reset city
+  const handleDistrictChange = (e) => {
+    const district = e.target.value;
+    setForm((p) => ({ ...p, district, city: "" }));
   };
 
   // ---------------- INPUT ----------------
@@ -213,65 +289,248 @@ const EditTrending = ({ token }) => {
             <p>Select an item to edit</p>
           ) : (
             <form onSubmit={submitUpdate} className="space-y-4">
-              {Object.keys(form).map((k) => (
-                <div key={k}>
-                  <label className="block text-sm capitalize">{k}</label>
-                  {k === "description" || k === "highlights" ? (
-                    <textarea
-                      name={k}
-                      value={form[k]}
-                      onChange={handleInput}
-                      className="border w-full p-2 rounded"
-                    />
-                  ) : (
-                    <input
-                      name={k}
-                      value={form[k]}
-                      onChange={handleInput}
-                      className="border w-full p-2 rounded"
-                    />
-                  )}
-                </div>
-              ))}
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Name</label>
+                <input
+                  name="name"
+                  value={form.name}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Description */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Description</label>
+                <textarea
+                  name="description"
+                  value={form.description}
+                  onChange={handleInput}
+                  rows={4}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Category */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Category</label>
+                <select
+                  name="category"
+                  value={form.category}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                >
+                  <option value="villa">Villa</option>
+                  <option value="hotel">Hotel</option>
+                  <option value="restaurant">Restaurant</option>
+                  <option value="house">House</option>
+                </select>
+              </div>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Rating</label>
+                <select
+                  name="rating"
+                  value={form.rating}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                >
+                  {[5, 4, 3, 2, 1].map((r) => (
+                    <option key={r} value={r}>{r} Star</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Country */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Country</label>
+                <select
+                  name="country"
+                  value={form.country}
+                  onChange={handleCountryChange}
+                  className="border w-full p-2 rounded"
+                >
+                  <option value="">Select Country</option>
+                  {Object.keys(locationData).map((country) => (
+                    <option key={country} value={country}>{country}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* District */}
+              <div>
+                <label className="block text-sm font-medium mb-1">District</label>
+                <select
+                  name="district"
+                  value={form.district}
+                  onChange={handleDistrictChange}
+                  className="border w-full p-2 rounded"
+                >
+                  <option value="">Select District</option>
+                  {getDistricts(form.country).map((district) => (
+                    <option key={district} value={district}>{district}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* City */}
+              <div>
+                <label className="block text-sm font-medium mb-1">City</label>
+                <select
+                  name="city"
+                  value={form.city}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                >
+                  <option value="">Select City</option>
+                  {getCities(form.country, form.district).map((city) => (
+                    <option key={city} value={city}>{city}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Price */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Price</label>
+                <input
+                  type="number"
+                  name="price"
+                  value={form.price}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Location */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Location (Google Maps Link)</label>
+                <input
+                  name="location"
+                  value={form.location}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Address */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Address</label>
+                <input
+                  name="address"
+                  value={form.address}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Contact */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Contact</label>
+                <input
+                  name="contact"
+                  value={form.contact}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Owner Email */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Owner Email</label>
+                <input
+                  type="email"
+                  name="ownerEmail"
+                  value={form.ownerEmail}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Highlights */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Highlights</label>
+                <textarea
+                  name="highlights"
+                  value={form.highlights}
+                  onChange={handleInput}
+                  rows={3}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Video URL */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Video URL</label>
+                <input
+                  name="videoUrl"
+                  value={form.videoUrl}
+                  onChange={handleInput}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
+
+              {/* Available Things */}
+              <div>
+                <label className="block text-sm font-medium mb-1">Available Things (comma separated)</label>
+                <input
+                  name="availableThings"
+                  value={form.availableThings}
+                  onChange={handleInput}
+                  placeholder="WiFi, Pool, AC, Parking"
+                  className="border w-full p-2 rounded"
+                />
+              </div>
 
               {/* IMAGE INPUTS */}
               {/* Main image (card image) */}
-              <label className="mr-4 text-black">Main Image (card image)</label>
-              <input
-                type="file"
-                name="mainImage"
-                onChange={(e) => handleSingleFile(e, "mainImage")}
-              />
+              <div>
+                <label className="block text-sm font-medium mb-1">Main Image (card image)</label>
+                <input
+                  type="file"
+                  name="mainImage"
+                  accept="image/*"
+                  onChange={(e) => handleSingleFile(e, "mainImage")}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
 
               {/* Image 1 – Image 4 (additional side images) */}
-              {["image1", "image2", "image3", "image4"].map((field) => (
+              {["image1", "image2", "image3", "image4"].map((field, index) => (
                 <div key={field}>
-                  <label className="mr-4 text-black">{field}</label>
+                  <label className="block text-sm font-medium mb-1">Image {index + 1}</label>
                   <input
                     type="file"
                     name={field}
+                    accept="image/*"
                     onChange={(e) => handleSingleFile(e, field)}
+                    className="border w-full p-2 rounded"
                   />
                 </div>
               ))}
 
               {/* Other images */}
-              <label className="mr-4 text-black">Other Images</label>
-              <input
-                type="file"
-                name="otherimages"
-                multiple
-                onChange={handleOtherImages}
-              />
+              <div>
+                <label className="block text-sm font-medium mb-1">Other Images (Multiple)</label>
+                <input
+                  type="file"
+                  name="otherimages"
+                  accept="image/*"
+                  multiple
+                  onChange={handleOtherImages}
+                  className="border w-full p-2 rounded"
+                />
+              </div>
 
-              <div className="flex gap-3">
-                <button className="bg-green-600 text-white px-4 py-2 rounded">
-                  Save
+              <div className="flex gap-3 pt-4">
+                <button className="bg-green-600 text-white px-6 py-2 rounded hover:bg-green-700 transition">
+                  Save Changes
                 </button>
                 <button
                   type="button"
                   onClick={cancelEdit}
-                  className="bg-gray-300 px-4 py-2 rounded"
+                  className="bg-gray-400 text-white px-6 py-2 rounded hover:bg-gray-500 transition"
                 >
                   Cancel
                 </button>
