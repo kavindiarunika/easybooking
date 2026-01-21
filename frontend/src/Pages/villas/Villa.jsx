@@ -7,7 +7,6 @@ import {
   AiOutlineFilter,
   AiOutlineClose,
 } from "react-icons/ai";
-import { FaGlobe } from "react-icons/fa";
 
 import axios from "axios";
 import SearchBar from "../../Components/SearchBar";
@@ -15,7 +14,6 @@ import { useParams } from "react-router-dom";
 import VillaAd from "./VillaAd";
 
 const Villa = () => {
-
   const { category } = useParams();
   const { navigate, addtrend, setaddtrend } = useContext(TravelContext);
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -26,7 +24,7 @@ const Villa = () => {
   const [filteredData, setFilteredData] = useState([]);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
   const [pagination, setpagination] = useState(1);
-  const [searchName ,setsearchName] =useState("");
+  const [searchName, setsearchName] = useState("");
   const pagenumber = 30;
 
   const totalPages = Math.ceil(filteredData.length / pagenumber);
@@ -41,7 +39,7 @@ const Villa = () => {
         .get(
           `${
             import.meta.env.VITE_BACKEND_URL || "http://localhost:4000"
-          }/api/trending/trenddata`
+          }/api/trending/trenddata`,
         )
         .then((res) => setaddtrend(res.data))
         .catch((err) => console.error("Failed to fetch trends:", err));
@@ -56,7 +54,7 @@ const Villa = () => {
       // Apply category filter
       if (selectedCategory !== "all") {
         filtered = filtered.filter(
-          (item) => item.category === selectedCategory
+          (item) => item.category === selectedCategory,
         );
       }
 
@@ -72,44 +70,55 @@ const Villa = () => {
       // Apply country filter
       if (selectedCountry !== "all") {
         filtered = filtered.filter(
-          (item) => (item.country || "Sri Lanka") === selectedCountry
+          (item) => (item.country || "Sri Lanka") === selectedCountry,
         );
       }
 
       // Apply district filter
       if (selectedDistrict !== "all") {
         filtered = filtered.filter(
-          (item) => item.district === selectedDistrict
+          (item) => item.district === selectedDistrict,
         );
       }
 
       // Apply city filter
       if (selectedCity !== "all") {
-        filtered = filtered.filter(
-          (item) => item.city === selectedCity
-        );
+        filtered = filtered.filter((item) => item.city === selectedCity);
       }
 
       setFilteredData(filtered);
-    
 
-
-    //search
-    if(searchName.trim() !== ""){
-
-      filtered =filtered.filter((item) =>item.name ?.toLowerCase().includes(searchName.toLowerCase()) 
-        || item.address?.toLowerCase().includes(searchName.toLowerCase())
-    );
-      setFilteredData(filtered);
-
+      //search
+      if (searchName.trim() !== "") {
+        filtered = filtered.filter(
+          (item) =>
+            item.name?.toLowerCase().includes(searchName.toLowerCase()) ||
+            item.address?.toLowerCase().includes(searchName.toLowerCase()),
+        );
+        setFilteredData(filtered);
+      }
     }
-  }  
-  }, [addtrend, selectedCategory, selectedRating, selectedCountry, selectedDistrict, selectedCity, searchName]);
+  }, [
+    addtrend,
+    selectedCategory,
+    selectedRating,
+    selectedCountry,
+    selectedDistrict,
+    selectedCity,
+    searchName,
+  ]);
 
   // Reset to first page whenever filters change
   useEffect(() => {
     setpagination(1);
-  }, [selectedCategory, selectedRating, selectedCountry, selectedDistrict, selectedCity, searchName]);
+  }, [
+    selectedCategory,
+    selectedRating,
+    selectedCountry,
+    selectedDistrict,
+    selectedCity,
+    searchName,
+  ]);
 
   // Ensure current page is within range when filtered data changes
   useEffect(() => {
@@ -125,13 +134,12 @@ const Villa = () => {
   }
 
   useEffect(() => {
-  if (category && filters.some(f => f.value === category)) {
-    setSelectedCategory(category);
-  } else {
-    setSelectedCategory("all");
-  }
-}, [category]);
-
+    if (category && filters.some((f) => f.value === category)) {
+      setSelectedCategory(category);
+    } else {
+      setSelectedCategory("all");
+    }
+  }, [category]);
 
   const filters = [
     { label: "All", value: "all" },
@@ -153,53 +161,67 @@ const Villa = () => {
   // Location data for cascading filters
   const locationData = {
     "Sri Lanka": {
-      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
-      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
-      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
-      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
-      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
-      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
-      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      Colombo: [
+        "Colombo",
+        "Dehiwala",
+        "Moratuwa",
+        "Kotte",
+        "Maharagama",
+        "Kesbewa",
+      ],
+      Gampaha: [
+        "Negombo",
+        "Gampaha",
+        "Kelaniya",
+        "Wattala",
+        "Ja-Ela",
+        "Minuwangoda",
+      ],
+      Kandy: ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      Galle: ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      Matara: ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      Hambantota: ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      Kalutara: ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
       "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
-      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
-      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
-      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
-      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
-      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
-      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
-      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
-      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
-      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
-      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
-      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
-      "Kilinochchi": ["Kilinochchi"],
-      "Mannar": ["Mannar", "Talaimannar"],
-      "Vavuniya": ["Vavuniya"],
-      "Mullaitivu": ["Mullaitivu"],
-      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
-      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+      Ratnapura: ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      Anuradhapura: ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      Polonnaruwa: ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      Kurunegala: ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      Puttalam: ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      Trincomalee: ["Trincomalee", "Kinniya", "Kantale"],
+      Batticaloa: ["Batticaloa", "Kattankudy", "Eravur"],
+      Ampara: ["Ampara", "Kalmunai", "Akkaraipattu"],
+      Badulla: ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      Monaragala: ["Monaragala", "Wellawaya", "Bibile"],
+      Jaffna: ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      Kilinochchi: ["Kilinochchi"],
+      Mannar: ["Mannar", "Talaimannar"],
+      Vavuniya: ["Vavuniya"],
+      Mullaitivu: ["Mullaitivu"],
+      Matale: ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      Kegalle: ["Kegalle", "Mawanella", "Rambukkana"],
     },
-    "India": {
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
-      "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
+    India: {
+      Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik"],
+      Karnataka: ["Bangalore", "Mysore", "Mangalore"],
       "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
-      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode"],
-      "Delhi": ["New Delhi", "Delhi NCR"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama"]
+      Kerala: ["Kochi", "Thiruvananthapuram", "Kozhikode"],
+      Delhi: ["New Delhi", "Delhi NCR"],
+      Goa: ["Panaji", "Margao", "Vasco da Gama"],
     },
-    "Maldives": {
-      "Male": ["Male City", "Hulhumale", "Villimale"],
+    Maldives: {
+      Male: ["Male City", "Hulhumale", "Villimale"],
       "Ari Atoll": ["Mahibadhoo", "Maamigili"],
-      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"]
+      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"],
     },
-    "Thailand": {
-      "Bangkok": ["Bangkok", "Nonthaburi"],
-      "Phuket": ["Phuket Town", "Patong", "Kata"],
-      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"]
+    Thailand: {
+      Bangkok: ["Bangkok", "Nonthaburi"],
+      Phuket: ["Phuket Town", "Patong", "Kata"],
+      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"],
     },
-    "Other": {
-      "Other": ["Other"]
-    }
+    Other: {
+      Other: ["Other"],
+    },
   };
 
   const countryFilters = [
@@ -216,9 +238,9 @@ const Villa = () => {
     if (selectedCountry === "all") {
       // Return all districts from all countries
       const allDistricts = [{ label: "All Districts", value: "all" }];
-      Object.keys(locationData).forEach(country => {
-        Object.keys(locationData[country]).forEach(district => {
-          if (!allDistricts.find(d => d.value === district)) {
+      Object.keys(locationData).forEach((country) => {
+        Object.keys(locationData[country]).forEach((district) => {
+          if (!allDistricts.find((d) => d.value === district)) {
             allDistricts.push({ label: district, value: district });
           }
         });
@@ -228,7 +250,10 @@ const Villa = () => {
     if (locationData[selectedCountry]) {
       return [
         { label: "All Districts", value: "all" },
-        ...Object.keys(locationData[selectedCountry]).map(d => ({ label: d, value: d }))
+        ...Object.keys(locationData[selectedCountry]).map((d) => ({
+          label: d,
+          value: d,
+        })),
       ];
     }
     return [{ label: "All Districts", value: "all" }];
@@ -239,10 +264,16 @@ const Villa = () => {
     if (selectedDistrict === "all") {
       return [{ label: "All Cities", value: "all" }];
     }
-    if (selectedCountry !== "all" && locationData[selectedCountry]?.[selectedDistrict]) {
+    if (
+      selectedCountry !== "all" &&
+      locationData[selectedCountry]?.[selectedDistrict]
+    ) {
       return [
         { label: "All Cities", value: "all" },
-        ...locationData[selectedCountry][selectedDistrict].map(c => ({ label: c, value: c }))
+        ...locationData[selectedCountry][selectedDistrict].map((c) => ({
+          label: c,
+          value: c,
+        })),
       ];
     }
     // If country is "all", try to find the district in any country
@@ -250,7 +281,10 @@ const Villa = () => {
       if (locationData[country][selectedDistrict]) {
         return [
           { label: "All Cities", value: "all" },
-          ...locationData[country][selectedDistrict].map(c => ({ label: c, value: c }))
+          ...locationData[country][selectedDistrict].map((c) => ({
+            label: c,
+            value: c,
+          })),
         ];
       }
     }
@@ -276,7 +310,7 @@ const Villa = () => {
   return (
     <section className="w-full py-16 px-4 md:px-16 bg-slate-950">
       <p className="w-full h-24"></p>
-             <VillaAd/>
+      <VillaAd />
       {/* Mobile filter toggle button - visible only on small screens */}
       <div className="lg:hidden flex justify-end mb-4">
         <button
@@ -519,7 +553,6 @@ const Villa = () => {
 
         {/* Right Side - Cards Section */}
         <div className="flex-1">
-         
           {/* Type Filter - Horizontal at Top */}
           <div className="flex flex-wrap gap-3 mb-8 pb-6 border-b border-gray-700">
             {filters.map((filter) => (
@@ -536,68 +569,18 @@ const Villa = () => {
               </button>
             ))}
             <div className="sm:ml-48 hidden sm:block ">
- <SearchBar value={searchName} onChange={(e) => setsearchName(e.target.value)} />
+              <SearchBar
+                value={searchName}
+                onChange={(e) => setsearchName(e.target.value)}
+              />
             </div>
-          
-           
-            
           </div>
 
-            <div className="mb-4 mt-2 sm:hidden md:hidden">
-                <SearchBar value={searchName} onChange={(e) => setsearchName(e.target.value)} />
-            </div>
-
-          {/* Country Select - Above Cards */}
-          <div className="flex flex-wrap items-center gap-4 mb-6 p-4 bg-gray-800 rounded-xl">
-            <label className="text-white font-medium">🌍 Select Country:</label>
-            <select
-              value={selectedCountry}
-              onChange={(e) => handleCountryChange(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-            >
-              {countryFilters.map((country) => (
-                <option key={country.value} value={country.value}>
-                  {country.label}
-                </option>
-              ))}
-            </select>
-            
-            <select
-              value={selectedDistrict}
-              onChange={(e) => handleDistrictChange(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-            >
-              {districtFilters.map((district) => (
-                <option key={district.value} value={district.value}>
-                  {district.label}
-                </option>
-              ))}
-            </select>
-
-            <select
-              value={selectedCity}
-              onChange={(e) => setSelectedCity(e.target.value)}
-              className="px-4 py-2 rounded-lg bg-gray-700 text-white border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500 cursor-pointer"
-            >
-              {cityFilters.map((city) => (
-                <option key={city.value} value={city.value}>
-                  {city.label}
-                </option>
-              ))}
-            </select>
-
-            {(selectedCountry !== "all" || selectedDistrict !== "all" || selectedCity !== "all") && (
-              <button
-                onClick={() => {
-                  setSelectedCountry("all");
-                  setSelectedDistrict("all");
-                  setSelectedCity("all");
-                }}
-                className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition text-sm"
-              >
-                Clear Location
-              </button>
-            )}
+          <div className="mb-4 mt-2 sm:hidden md:hidden">
+            <SearchBar
+              value={searchName}
+              onChange={(e) => setsearchName(e.target.value)}
+            />
           </div>
 
           {/* Cards Grid */}
@@ -670,15 +653,6 @@ const Villa = () => {
                         ? item.description.substring(0, 100) + "..."
                         : item.description}
                     </p>
-
-                    {/* Country Display */}
-                    <div className="flex items-center gap-2 text-gray-500 text-sm">
-                      <FaGlobe className="text-green-500" />
-                      <span>{item.country || "Sri Lanka"}</span>
-                      {item.district && (
-                        <span className="text-gray-400">• {item.district}</span>
-                      )}
-                    </div>
 
                     {/* Button */}
                     <button

@@ -4,7 +4,7 @@ import axios from "axios";
 import { AiOutlineArrowRight } from "react-icons/ai";
 import Slider from "react-slick";
 import { BACKEND_URL } from "../App";
-import HomeAds from "../Components/HomeAds"; // our new ads component
+import HomeAds from "../Components/HomeAds";
 
 const Trending = () => {
   const { navigate, addtrend, setaddtrend } = useContext(TravelContext);
@@ -149,31 +149,22 @@ const Trending = () => {
             </Slider>
           </div>
 
-          {/* ================= ADS AFTER EVERY 2 CATEGORIES ================= */}
-        {/* ================= ADS AFTER EVERY 2 CATEGORIES (SHOW 2 ADS) ================= */}
-{/* ================= ADS AFTER EVERY 2 CATEGORIES (SHOW 2 DIFFERENT ADS) ================= */}
-{(index + 1) % 2 === 0 &&
-  ads?.homeAd &&
-  Array.isArray(ads.homeAd) &&
-  ads.homeAd.length > 0 && (() => {
-    // which ad block this is (0, 1, 2, ...)
-    const adBlockIndex = Math.floor((index + 1) / 2) - 1;
-
-    const startIndex = adBlockIndex * 2;
-
-    // pick 2 different ads, move forward each time
-    const firstAd = ads.homeAd[startIndex % ads.homeAd.length];
-    const secondAd =
-      ads.homeAd[(startIndex + 1) % ads.homeAd.length];
-
-    return <HomeAds ads={[firstAd, secondAd]} />;
-  })()}
-
-
+          {(index + 1) % 2 === 0 &&
+            ads?.homeAd &&
+            Array.isArray(ads.homeAd) &&
+            ads.homeAd.length > 0 && (() => {
+              const adBlockIndex = Math.floor((index + 1) / 2) - 1;
+              const startIndex = adBlockIndex * 2;
+              const firstAd = ads.homeAd[startIndex % ads.homeAd.length];
+              const secondAd = ads.homeAd[(startIndex + 1) % ads.homeAd.length];
+              return <HomeAds ads={[firstAd, secondAd]} />;
+            })()}
         </React.Fragment>
+      
       ))}
     </section>
   );
+  
 };
 
 export default Trending;
