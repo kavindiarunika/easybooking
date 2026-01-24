@@ -7,7 +7,6 @@ import Title from "../../Components/Title";
 import Trending from "../../Components/Trending";
 import Packages from "../../Components/Packages";
 import AboutSection from "./VideoSection";
-import Gallery from "../Gallery/Gallery";
 import VisitingPlaces from "../../Components/VisitingPlaces";
 import Safari from '../../Components/Safari'
 import Hotels from '../../Components/Hotels'
@@ -46,11 +45,7 @@ const Home = () => {
         <VisitingPlaces/>
       </div>
        <AboutSection/>
-      <Title text1={"Gallery"} text2={"Section"} />
-      <div id="gallery-section">
-        <Gallery />
-      </div>
-       <div id="packages-section" className="w-full relative"> 
+      <div id="packages-section" className="w-full relative"> 
         <Packages />
       </div>
 

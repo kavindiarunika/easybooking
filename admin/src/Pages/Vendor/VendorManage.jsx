@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 
 const VendorManage = ({ token }) => {
   const [vendors, setVendors] = useState([]);
+  const [filteredVendors, setFilteredVendors] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
@@ -12,6 +13,9 @@ const VendorManage = ({ token }) => {
   const [selectedVendor, setSelectedVendor] = useState(null);
   const [vendorDetails, setVendorDetails] = useState(null);
   const [detailLoading, setDetailLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [categoryFilter, setCategoryFilter] = useState("all");
+  const [verificationFilter, setVerificationFilter] = useState("all");
 
   // Form states
   const [email, setEmail] = useState("");
@@ -35,9 +39,15 @@ const VendorManage = ({ token }) => {
   const fetchVendors = async () => {
     try {
       setLoading(true);
+      console.log("Fetching vendors with token:", token);
+      console.log("Backend URL:", backendUrl);
+      
       const res = await axios.get(`${backendUrl}/api/vendor/all`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      
+      console.log("Vendor API Response:", res.data);
+      
       if (res.data.success) {
         setVendors(res.data.vendors);
       } else {
@@ -46,6 +56,7 @@ const VendorManage = ({ token }) => {
       }
     } catch (error) {
       console.error("Error fetching vendors:", error);
+      console.error("Error details:", error.response?.data);
       toast.error(error.response?.data?.message || "Failed to fetch vendors");
     } finally {
       setLoading(false);
@@ -53,8 +64,36 @@ const VendorManage = ({ token }) => {
   };
 
   useEffect(() => {
-    fetchVendors();
+    if (token) {
+      console.log("Token found, fetching vendors");
+      fetchVendors();
+    } else {
+      console.warn("No token provided to VendorManage");
+      setLoading(false);
+    }
   }, [token]);
+
+  // Filter vendors based on search and filters
+  useEffect(() => {
+    let filtered = vendors.filter((vendor) => {
+      const matchesSearch =
+        vendor.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vendor.phone?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        vendor.businessAddress?.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesCategory =
+        categoryFilter === "all" || vendor.category === categoryFilter;
+
+      const matchesVerification =
+        verificationFilter === "all" ||
+        (verificationFilter === "verified" && vendor.isVerified) ||
+        (verificationFilter === "unverified" && !vendor.isVerified);
+
+      return matchesSearch && matchesCategory && matchesVerification;
+    });
+
+    setFilteredVendors(filtered);
+  }, [vendors, searchTerm, categoryFilter, verificationFilter]);
 
   // Add new vendor
   const handleAddVendor = async (e) => {
@@ -141,6 +180,7 @@ const VendorManage = ({ token }) => {
 
   // Open edit modal
   const openEditModal = (vendor) => {
+    console.log("Opening edit modal for vendor:", vendor);
     setSelectedVendor(vendor);
     setEmail(vendor.email);
     setPhone(vendor.phone || "");
@@ -153,10 +193,12 @@ const VendorManage = ({ token }) => {
     setPackageName(vendor.packageName || "");
     setPassword("");
     setShowEditModal(true);
+    console.log("Edit modal state set to true");
   };
 
   // Open detail modal
   const openDetailModal = async (vendor) => {
+    console.log("Opening detail modal for vendor:", vendor);
     setSelectedVendor(vendor);
     setShowDetailModal(true);
     setDetailLoading(true);
@@ -165,12 +207,17 @@ const VendorManage = ({ token }) => {
       const res = await axios.get(`${backendUrl}/api/vendor/details/${vendor._id}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
+      console.log("Vendor details response:", res.data);
       if (res.data.success) {
         setVendorDetails(res.data);
+      } else {
+        console.error("API returned success: false");
+        toast.error("Failed to fetch vendor details");
       }
     } catch (error) {
       console.error("Error fetching vendor details:", error);
-      toast.error("Failed to fetch vendor details");
+      console.error("Error response:", error.response?.data);
+      toast.error("Failed to fetch vendor details: " + (error.response?.data?.message || error.message));
     } finally {
       setDetailLoading(false);
     }
@@ -201,28 +248,122 @@ const VendorManage = ({ token }) => {
 
   return (
     <div className="p-6">
+      {!token && (
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg mb-6">
+          <p className="font-bold">Error: No authentication token found</p>
+          <p className="text-sm">Please log in again to access vendor management</p>
+        </div>
+      )}
+      
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Vendor Management</h1>
+        <div>
+          <h1 className="text-3xl font-bold text-gray-800">Vendor Management</h1>
+          <p className="text-sm text-gray-500 mt-1">
+            Total Registered Vendors: <span className="font-semibold text-gray-700">{vendors.length}</span>
+          </p>
+        </div>
         <button
           onClick={() => {
             resetForm();
             setShowAddModal(true);
           }}
-          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition"
+          className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition font-medium"
         >
-          + Add Vendor
+          + Add New Vendor
         </button>
+      </div>
+
+      {/* Search and Filter Section */}
+      <div className="bg-white rounded-lg p-4 mb-6 shadow-sm border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          {/* Search Input */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Search
+            </label>
+            <input
+              type="text"
+              placeholder="Search by email, phone, or address..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+
+          {/* Category Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Category
+            </label>
+            <select
+              value={categoryFilter}
+              onChange={(e) => setCategoryFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Categories</option>
+              <option value="stays">Stays</option>
+              <option value="ontrip">On Trip</option>
+              <option value="vehicle_rent">Vehicle Rent</option>
+            </select>
+          </div>
+
+          {/* Verification Filter */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Verification Status
+            </label>
+            <select
+              value={verificationFilter}
+              onChange={(e) => setVerificationFilter(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="all">All Status</option>
+              <option value="verified">Verified</option>
+              <option value="unverified">Unverified</option>
+            </select>
+          </div>
+
+          {/* Reset Filters */}
+          <div className="flex items-end">
+            <button
+              onClick={() => {
+                setSearchTerm("");
+                setCategoryFilter("all");
+                setVerificationFilter("all");
+              }}
+              className="w-full px-3 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition font-medium text-sm"
+            >
+              Reset Filters
+            </button>
+          </div>
+        </div>
       </div>
 
       {/* Vendors Table */}
       {loading ? (
-        <div className="text-center py-10">Loading...</div>
-      ) : vendors.length === 0 ? (
-        <div className="text-center py-10 text-gray-500">No vendors found</div>
+        <div className="text-center py-10 text-gray-500">
+          <div className="animate-spin mb-2">⏳</div>
+          Loading vendors...
+        </div>
+      ) : filteredVendors.length === 0 ? (
+        <div className="text-center py-10 text-gray-500 bg-gray-50 rounded-lg">
+          <p className="text-lg font-medium">No vendors found</p>
+          <p className="text-sm">
+            {searchTerm || categoryFilter !== "all" || verificationFilter !== "all"
+              ? "Try adjusting your filters"
+              : "No vendors registered yet"}
+          </p>
+        </div>
       ) : (
         <div className="overflow-x-auto">
+          <div className="mb-4">
+            <p className="text-sm text-gray-600">
+              Showing <span className="font-semibold">{filteredVendors.length}</span> of{" "}
+              <span className="font-semibold">{vendors.length}</span> vendors
+            </p>
+          </div>
           <table className="min-w-full bg-white border border-gray-200 rounded-lg">
-            <thead className="bg-gray-100">
+            <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
               <tr>
                 <th className="px-4 py-3 text-left text-sm font-semibold text-gray-600">
                   #
@@ -248,14 +389,14 @@ const VendorManage = ({ token }) => {
               </tr>
             </thead>
             <tbody>
-              {vendors.map((vendor, index) => (
-                <tr key={vendor._id} className="border-t hover:bg-gray-50">
-                  <td className="px-4 py-3 text-sm">{index + 1}</td>
-                  <td className="px-4 py-3 text-sm">{vendor.email}</td>
-                  <td className="px-4 py-3 text-sm">{vendor.phone || "-"}</td>
+              {filteredVendors.map((vendor, index) => (
+                <tr key={vendor._id} className="border-t hover:bg-blue-50 transition">
+                  <td className="px-4 py-3 text-sm text-gray-700">{index + 1}</td>
+                  <td className="px-4 py-3 text-sm text-gray-800 font-medium">{vendor.email}</td>
+                  <td className="px-4 py-3 text-sm text-gray-600">{vendor.phone || "-"}</td>
                   <td className="px-4 py-3 text-sm capitalize">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         vendor.category === "stays"
                           ? "bg-green-100 text-green-700"
                           : vendor.category === "ontrip"
@@ -268,36 +409,39 @@ const VendorManage = ({ token }) => {
                   </td>
                   <td className="px-4 py-3 text-sm">
                     <span
-                      className={`px-2 py-1 rounded text-xs font-medium ${
+                      className={`px-3 py-1 rounded-full text-xs font-semibold ${
                         vendor.isVerified
                           ? "bg-green-100 text-green-700"
                           : "bg-red-100 text-red-700"
                       }`}
                     >
-                      {vendor.isVerified ? "Yes" : "No"}
+                      {vendor.isVerified ? "✅ Verified" : "⏳ Pending"}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm text-gray-600">
                     {formatDate(vendor.createdAt)}
                   </td>
-                  <td className="px-4 py-3 text-center">
+                  <td className="px-4 py-3 text-center space-x-1">
                     <button
                       onClick={() => openDetailModal(vendor)}
-                      className="bg-indigo-500 text-white px-3 py-1 rounded mr-2 hover:bg-indigo-600 transition text-sm"
+                      className="bg-indigo-500 text-white px-3 py-1 rounded text-xs hover:bg-indigo-600 transition inline-block"
+                      title="View vendor details"
                     >
-                      View
+                      👁️ View
                     </button>
                     <button
                       onClick={() => openEditModal(vendor)}
-                      className="bg-blue-500 text-white px-3 py-1 rounded mr-2 hover:bg-blue-600 transition text-sm"
+                      className="bg-blue-500 text-white px-3 py-1 rounded text-xs hover:bg-blue-600 transition inline-block"
+                      title="Edit vendor"
                     >
-                      Edit
+                      ✏️ Edit
                     </button>
                     <button
                       onClick={() => handleDeleteVendor(vendor._id)}
-                      className="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 transition text-sm"
+                      className="bg-red-500 text-white px-3 py-1 rounded text-xs hover:bg-red-600 transition inline-block"
+                      title="Delete vendor"
                     >
-                      Delete
+                      🗑️ Delete
                     </button>
                   </td>
                 </tr>
@@ -309,10 +453,21 @@ const VendorManage = ({ token }) => {
 
       {/* Add Vendor Modal */}
       {showAddModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Add New Vendor</h2>
-            <form onSubmit={handleAddVendor}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold">Add New Vendor</h2>
+              <button
+                onClick={() => {
+                  setShowAddModal(false);
+                  resetForm();
+                }}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleAddVendor} className="flex-1 overflow-y-auto p-6">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
@@ -428,10 +583,13 @@ const VendorManage = ({ token }) => {
                   placeholder="Bank code or swift code"
                 />
               </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowAddModal(false)}
+                  onClick={() => {
+                    setShowAddModal(false);
+                    resetForm();
+                  }}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
                 >
                   Cancel
@@ -450,10 +608,21 @@ const VendorManage = ({ token }) => {
 
       {/* Edit Vendor Modal */}
       {showEditModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">Edit Vendor</h2>
-            <form onSubmit={handleEditVendor}>
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg w-full max-w-md max-h-[90vh] flex flex-col">
+            <div className="p-6 border-b border-gray-200 flex justify-between items-center">
+              <h2 className="text-xl font-bold">Edit Vendor</h2>
+              <button
+                onClick={() => {
+                  setShowEditModal(false);
+                  resetForm();
+                }}
+                className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+              >
+                ×
+              </button>
+            </div>
+            <form onSubmit={handleEditVendor} className="flex-1 overflow-y-auto p-6">
               <div className="mb-4">
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Email
@@ -580,10 +749,13 @@ const VendorManage = ({ token }) => {
                   placeholder="Bank code or swift code"
                 />
               </div>
-              <div className="flex justify-end gap-3">
+              <div className="flex justify-end gap-3 mt-6">
                 <button
                   type="button"
-                  onClick={() => setShowEditModal(false)}
+                  onClick={() => {
+                    setShowEditModal(false);
+                    resetForm();
+                  }}
                   className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition"
                 >
                   Cancel

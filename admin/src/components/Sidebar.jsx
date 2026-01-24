@@ -142,14 +142,14 @@ const Sidebar = () => {
         <hr className="my-4 border-slate-700" />
 
         {/* Vendor Management */}
+        <NavLink to="/vendors/manage" className={({ isActive }) => linkClass(isActive)}>
+          <FiUsers size={18} className="text-orange-400" />
+          <span>View All Vendors</span>
+        </NavLink>
+
         <NavLink to="/addvendor" className={({ isActive }) => linkClass(isActive)}>
           <FiPlus size={18} className="text-orange-400" />
           <span>Add Vendor</span>
-        </NavLink>
-
-        <NavLink to="/vendors" className={({ isActive }) => linkClass(isActive)}>
-          <FiUsers size={18} className="text-orange-400" />
-          <span>Vendor Management</span>
         </NavLink>
 
       </div>
