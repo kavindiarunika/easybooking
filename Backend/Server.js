@@ -63,7 +63,9 @@ const allowedOrigins = [
   "http://admin.smartsbooking.com",
 ];
 
-app.use(
+app.use(helmet());
+
+{/*app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
@@ -81,7 +83,7 @@ app.use(
       },
     },
   })
-);
+); */}
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -104,7 +106,7 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-app.use((req, res, next) => {
+{/*app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
     "connect-src 'self' http://localhost:4000 ws://localhost:4000 https://sandbox.payhere.lk https://www.payhere.lk https://www.google-analytics.com https://www.paypal.com https://www.sandbox.paypal.com"
@@ -112,7 +114,7 @@ app.use((req, res, next) => {
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
   next();
-});
+});*/}
 
 // Debug logger
 app.use((req, res, next) => {

@@ -77,36 +77,201 @@ function App() {
             <div className="flex-1 p-6 overflow-auto">
               <div className="bg-white rounded-xl shadow-sm min-h-[calc(100vh-120px)] p-6">
                 <Routes>
-                  <Route path="/" element={<ProtectedRoute><Home token={token} /></ProtectedRoute>} />
-                  <Route path="/home" element={<ProtectedRoute><Home token={token} /></ProtectedRoute>} />
-                  <Route path="/addtrending" element={<ProtectedRoute><AddTrending token={token} /></ProtectedRoute>} />
-                  <Route path="/addstays" element={<ProtectedRoute><AddStays token={token} /></ProtectedRoute>} />
-                  <Route path="/deletetrending" element={<ProtectedRoute><DeleteTrending token={token} /></ProtectedRoute>} />
-                  <Route path="/removestays" element={<ProtectedRoute><RemoveStays token={token} /></ProtectedRoute>} />
-                  <Route path="/edittrending" element={<ProtectedRoute><EditTrending token={token} /></ProtectedRoute>} />
-                  <Route path="/addtravellingplaces" element={<ProtectedRoute><AddTraveling token={token} /></ProtectedRoute>} />
-                  <Route path="/deletetravellingplaces" element={<ProtectedRoute><DeletePlaces token={token} /></ProtectedRoute>} />
-                  <Route path="/addsafari" element={<ProtectedRoute><AddSafari token={token} /></ProtectedRoute>} />
-                  <Route path="/deletesafari" element={<ProtectedRoute><DleteSafari token={token} /></ProtectedRoute>} />
-                  <Route path="/editsafari" element={<ProtectedRoute><EditSafariPage token={token} /></ProtectedRoute>} />
-                  <Route path="/admin/safari/edit/:id" element={<ProtectedRoute><EditSafariPage token={token} /></ProtectedRoute>} />
-                  <Route path="/staypaid" element={<ProtectedRoute><TrendingPaid token={token} /></ProtectedRoute>} />
-                  <Route path="/safaripaid" element={<ProtectedRoute><SafariPaid token={token} /></ProtectedRoute>} />
-                  <Route path="/ads" element={<ProtectedRoute><AdsManage token={token} /></ProtectedRoute>} />
-                  <Route path="/addads" element={<ProtectedRoute><Ads token={token} /></ProtectedRoute>} />
-                  <Route path="/addvendor" element={<ProtectedRoute><AddVendor token={token} /></ProtectedRoute>} />
-                  <Route path="/registervendor" element={<ProtectedRoute><RegisterVendor token={token} /></ProtectedRoute>} />
-                  <Route path="/vendors" element={<ProtectedRoute><VendorDashboard /></ProtectedRoute>} />
-                  <Route path="/vendors/manage" element={<ProtectedRoute><VendorManage token={token} /></ProtectedRoute>} />
-                  <Route path="/stays" element={<ProtectedRoute><StaysDashboard /></ProtectedRoute>} />
-                  <Route path="/tripdashboard" element={<Navigate to="/stays" replace />} />
+                  <Route
+                    path="/"
+                    element={
+                      <ProtectedRoute>
+                        <Home token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/home"
+                    element={
+                      <ProtectedRoute>
+                        <Home token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addtrending"
+                    element={
+                      <ProtectedRoute>
+                        <AddTrending token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addstays"
+                    element={
+                      <ProtectedRoute>
+                        <AddStays token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/deletetrending"
+                    element={
+                      <ProtectedRoute>
+                        <DeleteTrending token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/removestays"
+                    element={
+                      <ProtectedRoute>
+                        <RemoveStays token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/edittrending"
+                    element={
+                      <ProtectedRoute>
+                        <EditTrending token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addtravellingplaces"
+                    element={
+                      <ProtectedRoute>
+                        <AddTraveling token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/deletetravellingplaces"
+                    element={
+                      <ProtectedRoute>
+                        <DeletePlaces token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addsafari"
+                    element={
+                      <ProtectedRoute>
+                        <AddSafari token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/deletesafari"
+                    element={
+                      <ProtectedRoute>
+                        <DleteSafari token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/editsafari"
+                    element={
+                      <ProtectedRoute>
+                        <EditSafariPage token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/safari/edit/:id"
+                    element={
+                      <ProtectedRoute>
+                        <EditSafariPage token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/staypaid"
+                    element={
+                      <ProtectedRoute>
+                        <TrendingPaid token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/safaripaid"
+                    element={
+                      <ProtectedRoute>
+                        <SafariPaid token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/ads"
+                    element={
+                      <ProtectedRoute>
+                        <AdsManage token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addads"
+                    element={
+                      <ProtectedRoute>
+                        <Ads token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/updateads"
+                    element={
+                      <ProtectedRoute>
+                        <AdsUpdate token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addvendor"
+                    element={
+                      <ProtectedRoute>
+                        <AddVendor token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/registervendor"
+                    element={
+                      <ProtectedRoute>
+                        <RegisterVendor token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendors"
+                    element={
+                      <ProtectedRoute>
+                        <VendorDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/vendors/manage"
+                    element={
+                      <ProtectedRoute>
+                        <VendorManage token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/stays"
+                    element={
+                      <ProtectedRoute>
+                        <StaysDashboard />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/tripdashboard"
+                    element={<Navigate to="/stays" replace />}
+                  />
                 </Routes>
               </div>
             </div>
           </div>
-		</div>
+        </div>
       )}
-	</div>
+    </div>
   );
 }
 

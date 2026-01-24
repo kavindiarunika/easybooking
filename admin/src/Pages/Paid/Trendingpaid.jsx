@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { backendUrl } from "../../App.jsx";
-import StayFilter from "../../components/stayFilter.jsx";
+import StayFilter from "../../components/StayFilter.jsx";
 import StaySearch from "../../components/StaySearch.jsx";
 
 const TrendingPaid = () => {
