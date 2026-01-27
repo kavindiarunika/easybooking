@@ -93,7 +93,8 @@ const Villa = () => {
         filtered = filtered.filter(
           (item) =>
             item.name?.toLowerCase().includes(searchName.toLowerCase()) ||
-            item.address?.toLowerCase().includes(searchName.toLowerCase()),
+            item.address?.toLowerCase().includes(searchName.toLowerCase()) ||
+            item.email?.toLowerCase().includes(searchName.toLowerCase()),
         );
         setFilteredData(filtered);
       }

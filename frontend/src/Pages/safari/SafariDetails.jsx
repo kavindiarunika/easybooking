@@ -11,6 +11,7 @@ const SafariDetails = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    
     const getSafariById = async () => {
       try {
         const res = await axios.get(`${BACKEND_URL}/api/safari/safari/${id}`);
@@ -180,35 +181,40 @@ const SafariDetails = () => {
       </main>
 
       {/* ================= FLOATING WHATSAPP BUTTON ================= */}
-      <a
-        href={`https://wa.me/${
-          safari.whatsapp
-        }?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(
-          safari.name
-        )}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Chat on WhatsApp"
-        style={{ bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}
-        className="
-          fixed left-4 sm:left-6
-          z-[99999]
-          flex items-center justify-center
-          bg-green-500 hover:bg-green-600
-          text-white
-          rounded-full
-          shadow-2xl
-          p-3
-          w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3
-          transition-all
-          pointer-events-auto
-        "
-      >
-        <IoLogoWhatsapp className="w-12 h-12 sm:w-10 sm:h-10" />
-        <span className="hidden sm:inline ml-2 font-semibold">
-          Chat on WhatsApp
-        </span>
-      </a>
+   <div
+  className="fixed left-4 sm:left-6 z-[99999] flex flex-col gap-4 pointer-events-auto"
+  style={{ bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}
+>
+   <span className="block text-center text-black bg-amber-300/80 p-4 rounded-2xl font-bold text-sm">
+     Get 10% off on your first booking
+  </span>
+  <a
+    href={`https://wa.me/${safari.whatsapp}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(
+      safari.name
+    )}`}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label="Chat on WhatsApp"
+    className="
+      flex items-center justify-center
+      bg-green-500 hover:bg-green-600
+      text-white
+      rounded-full
+      shadow-2xl
+      p-3
+      w-12 h-12 sm:w-auto sm:h-auto sm:px-5 sm:py-3
+      transition-all
+    "
+  >
+    <IoLogoWhatsapp className="w-6 h-6 sm:w-8 sm:h-8" />
+    <span className="hidden sm:inline ml-2 font-semibold">
+      Chat on WhatsApp
+    </span>
+  </a>
+
+ 
+</div>
+
     </>
   );
 };

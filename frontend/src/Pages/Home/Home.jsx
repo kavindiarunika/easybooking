@@ -10,6 +10,7 @@ import AboutSection from "./VideoSection";
 import VisitingPlaces from "../../Components/VisitingPlaces";
 import Safari from '../../Components/Safari'
 import Hotels from '../../Components/Hotels'
+import CommingSoon from "../../Components/CommingSoon";
 
 const Home = () => {
   const location = useLocation();
@@ -47,6 +48,10 @@ const Home = () => {
        <AboutSection/>
       <div id="packages-section" className="w-full relative"> 
         <Packages />
+      </div>
+
+      <div className="w-full relative "> 
+        <CommingSoon/>
       </div>
 
      

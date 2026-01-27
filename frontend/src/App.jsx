@@ -3,7 +3,7 @@ import { Route, Routes } from "react-router-dom";
 import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Navbar";
 import Footer from "./Components/Footer";
-import Gallery from "./Pages/Gallery/Gallery";
+
 import Trending from "./Pages/Trending/Trending";
 import TrendingGallery from "./Pages/TrendingGallery/Gallery";
 import Visitingplaces from "./Pages/VisitingPlaces/Visitingplaces";
@@ -38,7 +38,7 @@ const App = () => {
       <Scroll />
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/gallery" element={<Gallery />} />
+      
         <Route path="/villa/:category?" element={<Villa />} />
 
         <Route path="/trending/:name" element={<Trending />} />

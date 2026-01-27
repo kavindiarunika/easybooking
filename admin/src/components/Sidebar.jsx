@@ -7,6 +7,8 @@ import {
 import { MdOutlineVilla, MdOutlineTravelExplore } from "react-icons/md";
 import { GiElephant } from "react-icons/gi";
 
+import { FiEye } from "react-icons/fi";
+
 const Sidebar = () => {
   const [openMenus, setOpenMenus] = useState({
     ads: false,
@@ -76,6 +78,10 @@ const Sidebar = () => {
                 <FiPlus size={16} />
                 <span>Add New Stay</span>
               </NavLink>
+              <NavLink to="/showstays" className={({ isActive }) => linkClass(isActive)}>
+                <FiEye size={16} />
+                <span>Show All Stays</span>
+              </NavLink>
               <NavLink to="/deletetrending" className={({ isActive }) => linkClass(isActive)}>
                 <FiTrash2 size={16} />
                 <span>Delete Stay</span>
@@ -125,6 +131,10 @@ const Sidebar = () => {
               <NavLink to="/addsafari" className={({ isActive }) => linkClass(isActive)}>
                 <FiPlus size={16} />
                 <span>Add Safari</span>
+              </NavLink>
+              <NavLink to="/showsafari" className={({ isActive }) => linkClass(isActive)}>
+                <FiEye size={16} />
+                <span>Show Safari</span>
               </NavLink>
               <NavLink to="/deletesafari" className={({ isActive }) => linkClass(isActive)}>
                 <FiTrash2 size={16} />
