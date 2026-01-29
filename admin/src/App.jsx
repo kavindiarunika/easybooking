@@ -30,6 +30,7 @@ import RegisterVendor from "./Pages/Vendor/RegisterVendor";
 import StaysDashboard from "./Pages/Home/StaysDashboard";
 import ShowStays from "./Pages/Show/ShowStays";
 import ShowSafari from "./Pages/Show/ShowSafari";
+import NewStays from "./Pages/NewVendors/NewStays";
 
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
@@ -267,13 +268,11 @@ function App() {
                     path="/tripdashboard"
                     element={<Navigate to="/stays" replace />}
                   />
+                  <Route path="/showstays" element={<ShowStays />} />
+                  <Route path="/showsafari" element={<ShowSafari />} />
                   <Route
-                    path="/showstays"
-                    element={<ShowStays/>}
-                  />
-                  <Route
-                    path="/showsafari"
-                    element={<ShowSafari/>}
+                    path="/newstays"
+                    element={<NewStays token={token} />}
                   />
                 </Routes>
               </div>

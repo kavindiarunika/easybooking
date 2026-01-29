@@ -4,8 +4,21 @@ import axios from "axios";
 import { BACKEND_URL } from "../../App.jsx";
 import { toast } from "react-toastify";
 import { useNavigate, Link } from "react-router-dom";
-import { FaHotel, FaEnvelope, FaPhone, FaLock, FaBuilding, FaEye, FaEyeSlash, FaArrowLeft, FaGlobe, FaMapMarkerAlt, FaCity } from "react-icons/fa";
+import {
+  FaHotel,
+  FaEnvelope,
+  FaPhone,
+  FaLock,
+  FaBuilding,
+  FaEye,
+  FaEyeSlash,
+  FaArrowLeft,
+  FaGlobe,
+  FaMapMarkerAlt,
+  FaCity,
+} from "react-icons/fa";
 import { assets } from "../../assets/Assest";
+import { MdLocalOffer } from "react-icons/md";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -40,159 +53,185 @@ const Register = () => {
   // Location data - Countries with their districts and cities
   const locationData = {
     "Sri Lanka": {
-      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
-      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
-      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
-      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
-      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
-      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
-      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      Colombo: [
+        "Colombo",
+        "Dehiwala",
+        "Moratuwa",
+        "Kotte",
+        "Maharagama",
+        "Kesbewa",
+      ],
+      Gampaha: [
+        "Negombo",
+        "Gampaha",
+        "Kelaniya",
+        "Wattala",
+        "Ja-Ela",
+        "Minuwangoda",
+      ],
+      Kandy: ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      Galle: ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      Matara: ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      Hambantota: ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      Kalutara: ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
       "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
-      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
-      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
-      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
-      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
-      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
-      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
-      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
-      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
-      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
-      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
-      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
-      "Kilinochchi": ["Kilinochchi"],
-      "Mannar": ["Mannar", "Talaimannar"],
-      "Vavuniya": ["Vavuniya"],
-      "Mullaitivu": ["Mullaitivu"],
-      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
-      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+      Ratnapura: ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      Anuradhapura: ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      Polonnaruwa: ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      Kurunegala: ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      Puttalam: ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      Trincomalee: ["Trincomalee", "Kinniya", "Kantale"],
+      Batticaloa: ["Batticaloa", "Kattankudy", "Eravur"],
+      Ampara: ["Ampara", "Kalmunai", "Akkaraipattu"],
+      Badulla: ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      Monaragala: ["Monaragala", "Wellawaya", "Bibile"],
+      Jaffna: ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      Kilinochchi: ["Kilinochchi"],
+      Mannar: ["Mannar", "Talaimannar"],
+      Vavuniya: ["Vavuniya"],
+      Mullaitivu: ["Mullaitivu"],
+      Matale: ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      Kegalle: ["Kegalle", "Mawanella", "Rambukkana"],
     },
-    "India": {
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
-      "Karnataka": ["Bangalore", "Mysore", "Mangalore", "Hubli", "Belgaum"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem"],
-      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode", "Thrissur", "Kollam"],
-      "Delhi": ["New Delhi", "Delhi NCR"],
-      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
-      "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Ajmer"],
+    India: {
+      Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
+      Karnataka: ["Bangalore", "Mysore", "Mangalore", "Hubli", "Belgaum"],
+      "Tamil Nadu": [
+        "Chennai",
+        "Coimbatore",
+        "Madurai",
+        "Tiruchirappalli",
+        "Salem",
+      ],
+      Kerala: [
+        "Kochi",
+        "Thiruvananthapuram",
+        "Kozhikode",
+        "Thrissur",
+        "Kollam",
+      ],
+      Delhi: ["New Delhi", "Delhi NCR"],
+      Gujarat: ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+      Rajasthan: ["Jaipur", "Jodhpur", "Udaipur", "Ajmer"],
       "West Bengal": ["Kolkata", "Darjeeling", "Siliguri", "Howrah"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa"]
+      Goa: ["Panaji", "Margao", "Vasco da Gama", "Mapusa"],
     },
-    "Maldives": {
-      "Male": ["Male City", "Hulhumale", "Villimale"],
+    Maldives: {
+      Male: ["Male City", "Hulhumale", "Villimale"],
       "Ari Atoll": ["Mahibadhoo", "Maamigili"],
       "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"],
       "Noonu Atoll": ["Manadhoo", "Holhudhoo"],
-      "Addu Atoll": ["Hithadhoo", "Feydhoo", "Maradhoo"]
+      "Addu Atoll": ["Hithadhoo", "Feydhoo", "Maradhoo"],
     },
-    "Thailand": {
-      "Bangkok": ["Bangkok", "Nonthaburi", "Pak Kret"],
+    Thailand: {
+      Bangkok: ["Bangkok", "Nonthaburi", "Pak Kret"],
       "Chiang Mai": ["Chiang Mai City", "San Kamphaeng", "Doi Saket"],
-      "Phuket": ["Phuket Town", "Patong", "Kata", "Karon"],
-      "Krabi": ["Krabi Town", "Ao Nang", "Railay"],
-      "Pattaya": ["Pattaya City", "Jomtien", "Na Jomtien"],
-      "Koh Samui": ["Chaweng", "Lamai", "Bophut"]
+      Phuket: ["Phuket Town", "Patong", "Kata", "Karon"],
+      Krabi: ["Krabi Town", "Ao Nang", "Railay"],
+      Pattaya: ["Pattaya City", "Jomtien", "Na Jomtien"],
+      "Koh Samui": ["Chaweng", "Lamai", "Bophut"],
     },
-    "Indonesia": {
-      "Bali": ["Denpasar", "Ubud", "Seminyak", "Kuta", "Sanur"],
-      "Jakarta": ["Central Jakarta", "South Jakarta", "North Jakarta"],
-      "Yogyakarta": ["Yogyakarta City", "Sleman"],
+    Indonesia: {
+      Bali: ["Denpasar", "Ubud", "Seminyak", "Kuta", "Sanur"],
+      Jakarta: ["Central Jakarta", "South Jakarta", "North Jakarta"],
+      Yogyakarta: ["Yogyakarta City", "Sleman"],
       "West Java": ["Bandung", "Bogor", "Bekasi"],
-      "East Java": ["Surabaya", "Malang"]
+      "East Java": ["Surabaya", "Malang"],
     },
-    "Malaysia": {
+    Malaysia: {
       "Kuala Lumpur": ["KL City Centre", "Bukit Bintang", "Bangsar"],
-      "Selangor": ["Petaling Jaya", "Shah Alam", "Subang Jaya"],
-      "Penang": ["George Town", "Batu Ferringhi", "Butterworth"],
-      "Johor": ["Johor Bahru", "Iskandar Puteri"],
-      "Sabah": ["Kota Kinabalu", "Sandakan"],
-      "Sarawak": ["Kuching", "Miri"]
+      Selangor: ["Petaling Jaya", "Shah Alam", "Subang Jaya"],
+      Penang: ["George Town", "Batu Ferringhi", "Butterworth"],
+      Johor: ["Johor Bahru", "Iskandar Puteri"],
+      Sabah: ["Kota Kinabalu", "Sandakan"],
+      Sarawak: ["Kuching", "Miri"],
     },
-    "Singapore": {
+    Singapore: {
       "Central Region": ["Orchard", "Marina Bay", "Chinatown", "Little India"],
       "East Region": ["Changi", "Tampines", "Bedok"],
       "West Region": ["Jurong", "Clementi"],
       "North Region": ["Woodlands", "Yishun"],
-      "North-East Region": ["Sengkang", "Punggol"]
+      "North-East Region": ["Sengkang", "Punggol"],
     },
-    "Philippines": {
+    Philippines: {
       "Metro Manila": ["Manila", "Makati", "Quezon City", "Taguig", "Pasig"],
-      "Cebu": ["Cebu City", "Mandaue", "Lapu-Lapu"],
-      "Palawan": ["Puerto Princesa", "El Nido", "Coron"],
-      "Boracay": ["Boracay Island"],
-      "Davao": ["Davao City"]
+      Cebu: ["Cebu City", "Mandaue", "Lapu-Lapu"],
+      Palawan: ["Puerto Princesa", "El Nido", "Coron"],
+      Boracay: ["Boracay Island"],
+      Davao: ["Davao City"],
     },
-    "Vietnam": {
+    Vietnam: {
       "Ho Chi Minh": ["District 1", "District 3", "District 7", "Binh Thanh"],
-      "Hanoi": ["Hoan Kiem", "Ba Dinh", "Tay Ho"],
+      Hanoi: ["Hoan Kiem", "Ba Dinh", "Tay Ho"],
       "Da Nang": ["Da Nang City", "Hoi An"],
       "Nha Trang": ["Nha Trang City"],
-      "Phu Quoc": ["Duong Dong"]
+      "Phu Quoc": ["Duong Dong"],
     },
-    "Nepal": {
-      "Bagmati": ["Kathmandu", "Lalitpur", "Bhaktapur"],
-      "Gandaki": ["Pokhara", "Gorkha"],
-      "Lumbini": ["Lumbini", "Butwal"]
+    Nepal: {
+      Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur"],
+      Gandaki: ["Pokhara", "Gorkha"],
+      Lumbini: ["Lumbini", "Butwal"],
     },
-    "Bangladesh": {
-      "Dhaka": ["Dhaka City", "Gazipur", "Narayanganj"],
-      "Chittagong": ["Chittagong City", "Cox's Bazar"],
-      "Sylhet": ["Sylhet City"]
+    Bangladesh: {
+      Dhaka: ["Dhaka City", "Gazipur", "Narayanganj"],
+      Chittagong: ["Chittagong City", "Cox's Bazar"],
+      Sylhet: ["Sylhet City"],
     },
-    "Pakistan": {
-      "Punjab": ["Lahore", "Faisalabad", "Rawalpindi"],
-      "Sindh": ["Karachi", "Hyderabad"],
-      "Islamabad": ["Islamabad"]
+    Pakistan: {
+      Punjab: ["Lahore", "Faisalabad", "Rawalpindi"],
+      Sindh: ["Karachi", "Hyderabad"],
+      Islamabad: ["Islamabad"],
     },
     "United Arab Emirates": {
-      "Dubai": ["Dubai City", "Deira", "Jumeirah", "Marina"],
+      Dubai: ["Dubai City", "Deira", "Jumeirah", "Marina"],
       "Abu Dhabi": ["Abu Dhabi City", "Al Ain"],
-      "Sharjah": ["Sharjah City"],
-      "Ajman": ["Ajman City"]
+      Sharjah: ["Sharjah City"],
+      Ajman: ["Ajman City"],
     },
     "Saudi Arabia": {
-      "Riyadh": ["Riyadh City"],
-      "Makkah": ["Mecca", "Jeddah"],
-      "Eastern Province": ["Dammam", "Dhahran", "Khobar"]
+      Riyadh: ["Riyadh City"],
+      Makkah: ["Mecca", "Jeddah"],
+      "Eastern Province": ["Dammam", "Dhahran", "Khobar"],
     },
     "United Kingdom": {
-      "England": ["London", "Manchester", "Birmingham", "Liverpool", "Leeds"],
-      "Scotland": ["Edinburgh", "Glasgow"],
-      "Wales": ["Cardiff", "Swansea"],
-      "Northern Ireland": ["Belfast"]
+      England: ["London", "Manchester", "Birmingham", "Liverpool", "Leeds"],
+      Scotland: ["Edinburgh", "Glasgow"],
+      Wales: ["Cardiff", "Swansea"],
+      "Northern Ireland": ["Belfast"],
     },
     "United States": {
-      "California": ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
+      California: ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
       "New York": ["New York City", "Buffalo", "Albany"],
-      "Florida": ["Miami", "Orlando", "Tampa"],
-      "Texas": ["Houston", "Dallas", "Austin", "San Antonio"],
-      "Nevada": ["Las Vegas", "Reno"]
+      Florida: ["Miami", "Orlando", "Tampa"],
+      Texas: ["Houston", "Dallas", "Austin", "San Antonio"],
+      Nevada: ["Las Vegas", "Reno"],
     },
-    "Australia": {
+    Australia: {
       "New South Wales": ["Sydney", "Newcastle", "Wollongong"],
-      "Victoria": ["Melbourne", "Geelong"],
-      "Queensland": ["Brisbane", "Gold Coast", "Cairns"],
-      "Western Australia": ["Perth", "Fremantle"]
+      Victoria: ["Melbourne", "Geelong"],
+      Queensland: ["Brisbane", "Gold Coast", "Cairns"],
+      "Western Australia": ["Perth", "Fremantle"],
     },
-    "Canada": {
-      "Ontario": ["Toronto", "Ottawa", "Mississauga"],
+    Canada: {
+      Ontario: ["Toronto", "Ottawa", "Mississauga"],
       "British Columbia": ["Vancouver", "Victoria"],
-      "Quebec": ["Montreal", "Quebec City"],
-      "Alberta": ["Calgary", "Edmonton"]
+      Quebec: ["Montreal", "Quebec City"],
+      Alberta: ["Calgary", "Edmonton"],
     },
-    "Germany": {
-      "Bavaria": ["Munich", "Nuremberg"],
-      "Berlin": ["Berlin City"],
-      "Hamburg": ["Hamburg City"],
-      "Hesse": ["Frankfurt", "Wiesbaden"]
+    Germany: {
+      Bavaria: ["Munich", "Nuremberg"],
+      Berlin: ["Berlin City"],
+      Hamburg: ["Hamburg City"],
+      Hesse: ["Frankfurt", "Wiesbaden"],
     },
-    "France": {
+    France: {
       "Île-de-France": ["Paris", "Versailles"],
       "Provence-Alpes-Côte d'Azur": ["Nice", "Marseille", "Cannes"],
-      "Auvergne-Rhône-Alpes": ["Lyon", "Grenoble"]
+      "Auvergne-Rhône-Alpes": ["Lyon", "Grenoble"],
     },
-    "Other": {
-      "Other": ["Other"]
-    }
+    Other: {
+      Other: ["Other"],
+    },
   };
 
   // Get districts for selected country
@@ -205,7 +244,11 @@ const Register = () => {
 
   // Get cities for selected district
   const getCities = () => {
-    if (formData.country && formData.district && locationData[formData.country]?.[formData.district]) {
+    if (
+      formData.country &&
+      formData.district &&
+      locationData[formData.country]?.[formData.district]
+    ) {
       return locationData[formData.country][formData.district];
     }
     return [];
@@ -232,45 +275,62 @@ const Register = () => {
     e.preventDefault();
     setLoading(true);
 
+    // Validate required fields
+    if (!formData.email || !formData.phone || !formData.password) {
+      toast.error("Email, phone, and password are required");
+      setLoading(false);
+      return;
+    }
+
     try {
+      console.log("Sending registration data:", formData);
       const response = await axios.post(
         `${BACKEND_URL}/api/vendor/registervendor`,
-        formData
+        formData,
       );
+
+      console.log("Registration response:", response.data);
 
       if (response.data.success && response.data.token) {
         const { token } = response.data;
         localStorage.setItem("vendorToken", token);
-        
+
         // Determine category and redirect accordingly
         const selectedCategory = formData.hotelName;
-        const isGoTrip = ["car", "van", "safari-jeep", "tuktuk"].includes(selectedCategory);
-        
+        const isGoTrip = ["car", "van", "safari-jeep", "tuktuk"].includes(
+          selectedCategory,
+        );
+
         if (isGoTrip) {
           localStorage.setItem("vendorCategory", "gotrip");
-          toast.success("Registration successful. Redirecting to GoTrip Dashboard...");
+          toast.success(
+            "Registration successful. Redirecting to GoTrip Dashboard...",
+          );
           navigate("/vendor/dashboard-gotrip", {
             state: { openCreate: true },
           });
         } else {
           localStorage.setItem("vendorCategory", "stays");
-          toast.success("Registration successful. Redirecting to Stays Dashboard...");
+          toast.success(
+            "Registration successful. Redirecting to Stays Dashboard...",
+          );
           navigate("/vendor/dashboard-stays", {
             state: { openCreate: true },
           });
         }
       } else if (response.data.success) {
         toast.success(
-          "Vendor registered successfully. OTP sent to your email."
+          "Vendor registered successfully. OTP sent to your email.",
         );
         setOtpSent(true);
       } else {
         toast.error(response.data.message || "Registration failed");
       }
     } catch (error) {
-      console.error(error);
+      console.error("Registration error:", error);
+      console.error("Error response:", error.response?.data);
       toast.error(
-        error.response?.data?.message || "Error in vendor registration"
+        error.response?.data?.message || "Error in vendor registration",
       );
     } finally {
       setLoading(false);
@@ -304,17 +364,19 @@ const Register = () => {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/vendor/login`,
-        loginData
+        loginData,
       );
 
       if (response.data.success && response.data.token) {
         const { token, category } = response.data;
 
         localStorage.setItem("vendorToken", token);
-        
+
         // Determine dashboard based on category
-        const isGoTrip = ["car", "van", "safari-jeep", "tuktuk"].includes(category);
-        
+        const isGoTrip = ["car", "van", "safari-jeep", "tuktuk"].includes(
+          category,
+        );
+
         if (isGoTrip) {
           localStorage.setItem("vendorCategory", "gotrip");
           toast.success("Login successful");
@@ -344,7 +406,7 @@ const Register = () => {
     try {
       const response = await axios.post(
         `${BACKEND_URL}/api/vendor/forgot-password`,
-        { email: forgotEmail }
+        { email: forgotEmail },
       );
       if (response.data.success) {
         toast.success("OTP sent to your email");
@@ -379,7 +441,7 @@ const Register = () => {
           email: forgotEmail,
           otp: forgotOtp,
           newPassword,
-        }
+        },
       );
       if (response.data.success) {
         toast.success("Password reset successful. Please login.");
@@ -420,10 +482,10 @@ const Register = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-900 via-purple-900 to-indigo-900 flex items-center justify-center p-4">
+    <div className="min-h-screen  flex items-center justify-center p-4">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-8 filter blur-3xl opacity-30 animate-pulse"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
       </div>
@@ -441,34 +503,41 @@ const Register = () => {
         <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
           <div className="flex flex-col lg:flex-row">
             {/* Left Side - Branding */}
-            <div className="lg:w-5/12 bg-gradient-to-br from-blue-600 to-purple-700 p-8 lg:p-12 flex flex-col justify-center items-center text-white">
+            <div className="lg:w-5/12 bg-green-200/20 p-8 lg:p-12 flex flex-col justify-center items-center text-white">
               <div className="text-center">
                 <div className="w-24 h-24 bg-white rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-lg">
-                  <img src={assets.logo} alt="SmartsBooking Logo" className="w-20 h-20 object-contain" />
+                  <img
+                    src={assets.logo}
+                    alt="SmartsBooking Logo"
+                    className="w-20 h-20 object-contain"
+                  />
                 </div>
                 <h1 className="text-3xl lg:text-4xl font-bold mb-4">
                   SmartsBooking
                 </h1>
-                <p className="text-white/80 text-lg mb-8">
-                  Partner with us and grow your hospitality business
-                </p>
-                
+
                 <div className="space-y-4 text-left">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <span className="text-lg">✓</span>
+                      <span className="text-lg .prata-regular">
+                        <MdLocalOffer />
+                      </span>
                     </div>
                     <span>Increase your bookings</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <span className="text-lg">✓</span>
+                      <span className="text-lg .prata-regula">
+                        <MdLocalOffer />
+                      </span>
                     </div>
                     <span>Easy management dashboard</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
-                      <span className="text-lg">✓</span>
+                      <span className="text-lg .prata-regula">
+                        <MdLocalOffer />
+                      </span>
                     </div>
                     <span>24/7 Support</span>
                   </div>
@@ -482,8 +551,12 @@ const Register = () => {
                 /* Login Form */
                 <form onSubmit={handleLoginSubmit} className="space-y-6">
                   <div className="text-center mb-8">
-                    <h2 className="text-3xl font-bold text-white mb-2">Welcome Back</h2>
-                    <p className="text-white/60">Sign in to your vendor account</p>
+                    <h2 className="text-3xl font-bold text-white mb-2">
+                      Welcome Back
+                    </h2>
+                    <p className="text-white/60">
+                      Sign in to your vendor account
+                    </p>
                   </div>
 
                   {/* Email */}
@@ -524,7 +597,10 @@ const Register = () => {
                   {/* Remember & Forgot */}
                   <div className="flex items-center justify-between text-sm">
                     <label className="flex items-center gap-2 text-white/70 cursor-pointer">
-                      <input type="checkbox" className="w-4 h-4 rounded border-white/30 bg-white/10" />
+                      <input
+                        type="checkbox"
+                        className="w-4 h-4 rounded border-white/30 bg-white/10"
+                      />
                       Remember me
                     </label>
                     <button
@@ -539,7 +615,7 @@ const Register = () => {
                   {/* Submit Button */}
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-4 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
+                    className="w-full bg-green-400 text-white font-semibold py-4 rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300 transform hover:scale-[1.02] shadow-lg hover:shadow-xl"
                   >
                     Sign In
                   </button>
@@ -560,7 +636,9 @@ const Register = () => {
                 /* Registration Form */
                 <form onSubmit={handleSubmit} className="space-y-5">
                   <div className="text-center mb-6">
-                    <h2 className="text-3xl font-bold text-white mb-2">Create Account</h2>
+                    <h2 className="text-3xl font-bold text-white mb-2">
+                      Create Account
+                    </h2>
                     <p className="text-white/60">Join as a vendor partner</p>
                   </div>
 
@@ -602,28 +680,126 @@ const Register = () => {
                       onChange={handleChange}
                       required
                     >
-                      <option value="" className="bg-slate-800 text-white">Select Country</option>
-                      <option value="Sri Lanka" className="bg-slate-800 text-white">🇱🇰 Sri Lanka</option>
-                      <option value="India" className="bg-slate-800 text-white">🇮🇳 India</option>
-                      <option value="Maldives" className="bg-slate-800 text-white">🇲🇻 Maldives</option>
-                      <option value="Thailand" className="bg-slate-800 text-white">🇹🇭 Thailand</option>
-                      <option value="Indonesia" className="bg-slate-800 text-white">🇮🇩 Indonesia</option>
-                      <option value="Malaysia" className="bg-slate-800 text-white">🇲🇾 Malaysia</option>
-                      <option value="Singapore" className="bg-slate-800 text-white">🇸🇬 Singapore</option>
-                      <option value="Philippines" className="bg-slate-800 text-white">🇵🇭 Philippines</option>
-                      <option value="Vietnam" className="bg-slate-800 text-white">🇻🇳 Vietnam</option>
-                      <option value="Nepal" className="bg-slate-800 text-white">🇳🇵 Nepal</option>
-                      <option value="Bangladesh" className="bg-slate-800 text-white">🇧🇩 Bangladesh</option>
-                      <option value="Pakistan" className="bg-slate-800 text-white">🇵🇰 Pakistan</option>
-                      <option value="United Arab Emirates" className="bg-slate-800 text-white">🇦🇪 United Arab Emirates</option>
-                      <option value="Saudi Arabia" className="bg-slate-800 text-white">🇸🇦 Saudi Arabia</option>
-                      <option value="United Kingdom" className="bg-slate-800 text-white">🇬🇧 United Kingdom</option>
-                      <option value="United States" className="bg-slate-800 text-white">🇺🇸 United States</option>
-                      <option value="Australia" className="bg-slate-800 text-white">🇦🇺 Australia</option>
-                      <option value="Canada" className="bg-slate-800 text-white">🇨🇦 Canada</option>
-                      <option value="Germany" className="bg-slate-800 text-white">🇩🇪 Germany</option>
-                      <option value="France" className="bg-slate-800 text-white">🇫🇷 France</option>
-                      <option value="Other" className="bg-slate-800 text-white">🌍 Other</option>
+                      <option value="" className="bg-slate-800 text-white">
+                        Select Country
+                      </option>
+                      <option
+                        value="Sri Lanka"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇱🇰 Sri Lanka
+                      </option>
+                      <option value="India" className="bg-slate-800 text-white">
+                        🇮🇳 India
+                      </option>
+                      <option
+                        value="Maldives"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇲🇻 Maldives
+                      </option>
+                      <option
+                        value="Thailand"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇹🇭 Thailand
+                      </option>
+                      <option
+                        value="Indonesia"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇮🇩 Indonesia
+                      </option>
+                      <option
+                        value="Malaysia"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇲🇾 Malaysia
+                      </option>
+                      <option
+                        value="Singapore"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇸🇬 Singapore
+                      </option>
+                      <option
+                        value="Philippines"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇵🇭 Philippines
+                      </option>
+                      <option
+                        value="Vietnam"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇻🇳 Vietnam
+                      </option>
+                      <option value="Nepal" className="bg-slate-800 text-white">
+                        🇳🇵 Nepal
+                      </option>
+                      <option
+                        value="Bangladesh"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇧🇩 Bangladesh
+                      </option>
+                      <option
+                        value="Pakistan"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇵🇰 Pakistan
+                      </option>
+                      <option
+                        value="United Arab Emirates"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇦🇪 United Arab Emirates
+                      </option>
+                      <option
+                        value="Saudi Arabia"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇸🇦 Saudi Arabia
+                      </option>
+                      <option
+                        value="United Kingdom"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇬🇧 United Kingdom
+                      </option>
+                      <option
+                        value="United States"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇺🇸 United States
+                      </option>
+                      <option
+                        value="Australia"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇦🇺 Australia
+                      </option>
+                      <option
+                        value="Canada"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇨🇦 Canada
+                      </option>
+                      <option
+                        value="Germany"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇩🇪 Germany
+                      </option>
+                      <option
+                        value="France"
+                        className="bg-slate-800 text-white"
+                      >
+                        🇫🇷 France
+                      </option>
+                      <option value="Other" className="bg-slate-800 text-white">
+                        🌍 Other
+                      </option>
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
                       ▼
@@ -641,9 +817,15 @@ const Register = () => {
                         onChange={handleChange}
                         required
                       >
-                        <option value="" className="bg-slate-800 text-white">Select District/State</option>
+                        <option value="" className="bg-slate-800 text-white">
+                          Select District/State
+                        </option>
                         {getDistricts().map((district) => (
-                          <option key={district} value={district} className="bg-slate-800 text-white">
+                          <option
+                            key={district}
+                            value={district}
+                            className="bg-slate-800 text-white"
+                          >
                             {district}
                           </option>
                         ))}
@@ -665,9 +847,15 @@ const Register = () => {
                         onChange={handleChange}
                         required
                       >
-                        <option value="" className="bg-slate-800 text-white">Select City</option>
+                        <option value="" className="bg-slate-800 text-white">
+                          Select City
+                        </option>
                         {getCities().map((city) => (
-                          <option key={city} value={city} className="bg-slate-800 text-white">
+                          <option
+                            key={city}
+                            value={city}
+                            className="bg-slate-800 text-white"
+                          >
                             {city}
                           </option>
                         ))}
@@ -702,18 +890,60 @@ const Register = () => {
                       onChange={handleChange}
                       required
                     >
-                      <option value="" className="bg-slate-800 text-white">Select Category</option>
-                      <optgroup label="Stays" className="bg-slate-800 text-white">
-                        <option value="restaurant" className="bg-slate-800 text-white">Restaurant</option>
-                        <option value="villas" className="bg-slate-800 text-white">Villas</option>
-                        <option value="houses" className="bg-slate-800 text-white">Houses</option>
-                        <option value="hotels" className="bg-slate-800 text-white">Hotels</option>
+                      <option value="" className="bg-slate-800 text-white">
+                        Select Category
+                      </option>
+                      <optgroup
+                        label="Stays"
+                        className="bg-slate-800 text-white"
+                      >
+                        <option
+                          value="restaurant"
+                          className="bg-slate-800 text-white"
+                        >
+                          Restaurant
+                        </option>
+                        <option
+                          value="villas"
+                          className="bg-slate-800 text-white"
+                        >
+                          Villas
+                        </option>
+                        <option
+                          value="houses"
+                          className="bg-slate-800 text-white"
+                        >
+                          Houses
+                        </option>
+                        <option
+                          value="hotels"
+                          className="bg-slate-800 text-white"
+                        >
+                          Hotels
+                        </option>
                       </optgroup>
-                      <optgroup label="GoTrip" className="bg-slate-800 text-white">
-                        <option value="car" className="bg-slate-800 text-white">Car</option>
-                        <option value="van" className="bg-slate-800 text-white">Van</option>
-                        <option value="safari-jeep" className="bg-slate-800 text-white">Safari Jeep</option>
-                        <option value="tuktuk" className="bg-slate-800 text-white">Tuk Tuk</option>
+                      <optgroup
+                        label="GoTrip"
+                        className="bg-slate-800 text-white"
+                      >
+                        <option value="car" className="bg-slate-800 text-white">
+                          Car
+                        </option>
+                        <option value="van" className="bg-slate-800 text-white">
+                          Van
+                        </option>
+                        <option
+                          value="safari-jeep"
+                          className="bg-slate-800 text-white"
+                        >
+                          Safari Jeep
+                        </option>
+                        <option
+                          value="tuktuk"
+                          className="bg-slate-800 text-white"
+                        >
+                          Tuk Tuk
+                        </option>
                       </optgroup>
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
@@ -750,9 +980,24 @@ const Register = () => {
                   >
                     {loading ? (
                       <span className="flex items-center justify-center gap-2">
-                        <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                        <svg
+                          className="animate-spin h-5 w-5"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                          />
                         </svg>
                         Creating Account...
                       </span>
@@ -827,7 +1072,8 @@ const Register = () => {
             {!forgotOtpSent ? (
               <form onSubmit={handleForgotSendOtp} className="space-y-4">
                 <p className="text-white/60 text-sm">
-                  Enter your email address and we'll send you an OTP to reset your password.
+                  Enter your email address and we'll send you an OTP to reset
+                  your password.
                 </p>
                 <div className="relative">
                   <FaEnvelope className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />

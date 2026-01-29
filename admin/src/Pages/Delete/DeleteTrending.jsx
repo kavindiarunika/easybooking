@@ -1,11 +1,16 @@
-
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { backendUrl } from "../../App";
-import { FiTrash2, FiMapPin, FiGlobe, FiMap, FiLoader, FiAlertCircle } from "react-icons/fi";
-
+import {
+  FiTrash2,
+  FiMapPin,
+  FiGlobe,
+  FiMap,
+  FiLoader,
+  FiAlertCircle,
+} from "react-icons/fi";
 
 const DeleteTrending = ({ token }) => {
   const [deleteId, setDeleteId] = useState("");
@@ -17,53 +22,67 @@ const DeleteTrending = ({ token }) => {
   // Location data for cascading dropdowns
   const locationData = {
     "Sri Lanka": {
-      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
-      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
-      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
-      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
-      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
-      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
-      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      Colombo: [
+        "Colombo",
+        "Dehiwala",
+        "Moratuwa",
+        "Kotte",
+        "Maharagama",
+        "Kesbewa",
+      ],
+      Gampaha: [
+        "Negombo",
+        "Gampaha",
+        "Kelaniya",
+        "Wattala",
+        "Ja-Ela",
+        "Minuwangoda",
+      ],
+      Kandy: ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      Galle: ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      Matara: ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      Hambantota: ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      Kalutara: ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
       "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
-      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
-      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
-      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
-      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
-      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
-      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
-      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
-      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
-      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
-      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
-      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
-      "Kilinochchi": ["Kilinochchi"],
-      "Mannar": ["Mannar", "Talaimannar"],
-      "Vavuniya": ["Vavuniya"],
-      "Mullaitivu": ["Mullaitivu"],
-      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
-      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+      Ratnapura: ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      Anuradhapura: ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      Polonnaruwa: ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      Kurunegala: ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      Puttalam: ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      Trincomalee: ["Trincomalee", "Kinniya", "Kantale"],
+      Batticaloa: ["Batticaloa", "Kattankudy", "Eravur"],
+      Ampara: ["Ampara", "Kalmunai", "Akkaraipattu"],
+      Badulla: ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      Monaragala: ["Monaragala", "Wellawaya", "Bibile"],
+      Jaffna: ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      Kilinochchi: ["Kilinochchi"],
+      Mannar: ["Mannar", "Talaimannar"],
+      Vavuniya: ["Vavuniya"],
+      Mullaitivu: ["Mullaitivu"],
+      Matale: ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      Kegalle: ["Kegalle", "Mawanella", "Rambukkana"],
     },
-    "India": {
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik"],
-      "Karnataka": ["Bangalore", "Mysore", "Mangalore"],
+    India: {
+      Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik"],
+      Karnataka: ["Bangalore", "Mysore", "Mangalore"],
       "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai"],
-      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode"],
-      "Delhi": ["New Delhi", "Delhi NCR"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama"]
+      Kerala: ["Kochi", "Thiruvananthapuram", "Kozhikode"],
+      Delhi: ["New Delhi", "Delhi NCR"],
+      Goa: ["Panaji", "Margao", "Vasco da Gama"],
     },
-    "Maldives": {
-      "Male": ["Male City", "Hulhumale", "Villimale"],
+    Maldives: {
+      Male: ["Male City", "Hulhumale", "Villimale"],
       "Ari Atoll": ["Mahibadhoo", "Maamigili"],
-      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"]
+      "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"],
     },
-    "Thailand": {
-      "Bangkok": ["Bangkok", "Nonthaburi"],
-      "Phuket": ["Phuket Town", "Patong", "Kata"],
-      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"]
+    Thailand: {
+      Bangkok: ["Bangkok", "Nonthaburi"],
+      Phuket: ["Phuket Town", "Patong", "Kata"],
+      "Chiang Mai": ["Chiang Mai City", "San Kamphaeng"],
     },
-    "Other": {
-      "Other": ["Other"]
-    }
+    Other: {
+      Other: ["Other"],
+    },
   };
 
   const getDistricts = (country) => {
@@ -105,11 +124,14 @@ const DeleteTrending = ({ token }) => {
     }
     setDeleting(true);
     try {
-      const res = await axios.delete(`${backendUrl}/api/trending/delete/${deleteId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
+      const res = await axios.delete(
+        `${backendUrl}/api/trending/delete/${selected.name}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      });
+      );
       if (res.data.success) {
         toast.success("Stay deleted!");
         setDeleteId("");
@@ -128,7 +150,6 @@ const DeleteTrending = ({ token }) => {
     }
   };
 
-
   return (
     <div className="max-w-2xl mx-auto mt-8">
       <div className="bg-white rounded-xl shadow-sm border p-6">
@@ -140,7 +161,9 @@ const DeleteTrending = ({ token }) => {
             <FiTrash2 className="text-red-400" /> Select Stay to Delete
           </label>
           {loading ? (
-            <div className="flex items-center gap-2 text-gray-500"><FiLoader className="animate-spin" /> Loading stays...</div>
+            <div className="flex items-center gap-2 text-gray-500">
+              <FiLoader className="animate-spin" /> Loading stays...
+            </div>
           ) : (
             <select
               value={deleteId}
@@ -163,9 +186,15 @@ const DeleteTrending = ({ token }) => {
               <FiMapPin className="text-blue-500" /> {selected.name}
             </div>
             <div className="flex flex-wrap gap-3 text-sm text-gray-600">
-              <span className="flex items-center gap-1"><FiGlobe className="text-green-500" /> {selected.country}</span>
-              <span className="flex items-center gap-1"><FiMap className="text-purple-500" /> {selected.district}</span>
-              <span className="flex items-center gap-1"><FiMapPin className="text-orange-500" /> {selected.city}</span>
+              <span className="flex items-center gap-1">
+                <FiGlobe className="text-green-500" /> {selected.country}
+              </span>
+              <span className="flex items-center gap-1">
+                <FiMap className="text-purple-500" /> {selected.district}
+              </span>
+              <span className="flex items-center gap-1">
+                <FiMapPin className="text-orange-500" /> {selected.city}
+              </span>
             </div>
             <div className="text-gray-500 text-xs mt-1">{selected.address}</div>
           </div>
@@ -177,13 +206,18 @@ const DeleteTrending = ({ token }) => {
           className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold px-6 py-3 rounded-lg transition-all duration-200 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {deleting ? (
-            <><FiLoader className="animate-spin" /> Deleting...</>
+            <>
+              <FiLoader className="animate-spin" /> Deleting...
+            </>
           ) : (
-            <><FiTrash2 /> Delete Stay</>
+            <>
+              <FiTrash2 /> Delete Stay
+            </>
           )}
         </button>
         <div className="mt-4 text-xs text-gray-400 flex items-center gap-2">
-          <FiAlertCircle className="text-yellow-400" /> This action cannot be undone.
+          <FiAlertCircle className="text-yellow-400" /> This action cannot be
+          undone.
         </div>
         <ToastContainer position="top-center" autoClose={4000} />
       </div>

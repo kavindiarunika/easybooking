@@ -40,6 +40,11 @@ const Sidebar = () => {
           <span>Dashboard</span>
         </NavLink>
 
+          <NavLink to="/newstays" className={({ isActive }) => linkClass(isActive)}>
+               
+                <span>New Vendors</span>
+              </NavLink>
+
         {/* Advertisements Section */}
         <div className="mt-2">
           <div onClick={() => toggleMenu('ads')} className={menuHeaderClass}>
@@ -74,6 +79,7 @@ const Sidebar = () => {
           </div>
           {openMenus.stays && (
             <div className="ml-4 mt-1 space-y-1 border-l-2 border-green-500/30 pl-4">
+            
               <NavLink to="/addstays" className={({ isActive }) => linkClass(isActive)}>
                 <FiPlus size={16} />
                 <span>Add New Stay</span>

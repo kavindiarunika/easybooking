@@ -10,6 +10,7 @@ import {
   deleteVendor,
   forgotPassword,
   resetPassword,
+  acceptVendor,
 } from "../controller/VendorController.js";
 import express from "express";
 import adminAuth from "../middleware/adminAuth.js";
@@ -24,6 +25,7 @@ vendorrouter.post("/forgot-password", forgotPassword);
 vendorrouter.post("/reset-password", resetPassword);
 
 // Admin vendor management routes
+vendorrouter.put("/accept/:vendorId", adminAuth, acceptVendor);
 vendorrouter.get("/all", adminAuth, getAllVendors);
 vendorrouter.get("/details/:id", adminAuth, getVendorDetails);
 vendorrouter.get("/:id", adminAuth, getVendorById);

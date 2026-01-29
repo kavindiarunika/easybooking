@@ -55,9 +55,16 @@ const SafariDetails = () => {
         <div className="h-32"></div>
 
         {/* TITLE */}
-        <h1 className="text-4xl md:text-5xl font-bold text-amber-300 mb-8 px-4">
+        <div className="flex flex-row justify-between items-center gap-2 mt-4">
+           <h1 className="text-4xl md:text-3xl font-bold text-amber-300 mb-8 px-4">
           {safari.name}
         </h1>
+        <h1 className=" md:text-xl text-sm font-bold rounded-full bg-green-300/80 shadow-2xl shadow-emerald-300 text-black mb-8 p-4 mr-4">
+          -10%
+        </h1>
+
+        </div>
+       
 
         {/* MAIN LAYOUT */}
         <div className="flex flex-col lg:flex-row items-start gap-10 px-4">
@@ -185,9 +192,7 @@ const SafariDetails = () => {
   className="fixed left-4 sm:left-6 z-[99999] flex flex-col gap-4 pointer-events-auto"
   style={{ bottom: "calc(1.5rem + env(safe-area-inset-bottom, 0px))" }}
 >
-   <span className="block text-center text-black bg-amber-300/80 p-4 rounded-2xl font-bold text-sm">
-     Get 10% off on your first booking
-  </span>
+  
   <a
     href={`https://wa.me/${safari.whatsapp}?text=Hello%20I%20am%20interested%20in%20${encodeURIComponent(
       safari.name

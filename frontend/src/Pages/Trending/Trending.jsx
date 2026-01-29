@@ -11,6 +11,7 @@ import {
   FaPhoneAlt,
   FaDollarSign,
   FaWhatsapp,
+  FaEnvelope,
 } from "react-icons/fa";
 import api from "../../api";
 
@@ -68,7 +69,7 @@ const Trending = () => {
   const { name } = useParams();
 
   const item = addtrend.find(
-    (t) => t.name.trim() === decodeURIComponent(name).trim()
+    (t) => t.name.trim() === decodeURIComponent(name).trim(),
   );
 
   useEffect(() => {
@@ -216,7 +217,7 @@ const Trending = () => {
                         className="w-full max-w-[92%] max-h-[60vh] h-auto object-contain"
                       />
                     </div>
-                  )
+                  ),
                 )}
               </div>
             </div>
@@ -269,8 +270,9 @@ const Trending = () => {
 
         {/* RIGHT - BOOKING */}
         <div className="bg-gray-800/50 p-6 rounded-xl">
-          <h3 className="text-xl font-bold mb-4 text-amber-300">
-            Book Your Stay
+          <h3 className="text-xl font-bold mb-4 text-white">Book Your Stay</h3>
+          <h3 className="text-m font-semibold mb-4 px-4 py-2 rounded-lg bg-amber-100 text-amber-700 inline-block shadow-sm">
+            10% Discount Available for Early Bookings!
           </h3>
 
           <form className="space-y-4" onSubmit={handleSubmit}>
@@ -329,17 +331,29 @@ const Trending = () => {
         </div>
       </div>
 
-      {/* WHATSAPP */}
-      {item?.contact && (
-        <a
-          href={`https://wa.me/${item.contact.replace(/\D/g, "")}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="fixed bottom-6 right-6 bg-green-500 p-4 rounded-full"
-        >
-          <FaWhatsapp size={28} />
-        </a>
-      )}
+      {/* WHATSAPP & EMAIL */}
+      <div className="fixed bottom-6 right-6 flex gap-4">
+        {item?.contact && (
+          <a
+            href={`https://wa.me/${item.contact.replace(/\D/g, "")}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="bg-green-500 p-4 rounded-full hover:bg-green-600 transition shadow-lg"
+            title="Contact via WhatsApp"
+          >
+            <FaWhatsapp size={28} />
+          </a>
+        )}
+        {item?.contact && (
+          <a
+            href={`mailto:${item.contact}?subject=Inquiry about ${item.name}&body=Hello, I am interested in your property.`}
+            className="bg-white text-black p-4 rounded-full hover:bg-blue-600 transition shadow-lg"
+            title="Send Email"
+          >
+            <FaEnvelope size={28} />
+          </a>
+        )}
+      </div>
     </div>
   );
 };

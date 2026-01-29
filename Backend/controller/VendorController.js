@@ -31,15 +31,17 @@ export const getAllVendors = async (req, res) => {
 export const getVendorById = async (req, res) => {
   try {
     const { id } = req.params;
-    const vendorData = await vendor.findById(id).select("-password -otp -otpExpireAt");
-    
+    const vendorData = await vendor
+      .findById(id)
+      .select("-password -otp -otpExpireAt");
+
     if (!vendorData) {
       return res.status(404).json({
         success: false,
         message: "Vendor not found",
       });
     }
-    
+
     res.status(200).json({
       success: true,
       vendor: vendorData,
@@ -59,8 +61,10 @@ export const getVendorById = async (req, res) => {
 export const getVendorDetails = async (req, res) => {
   try {
     const { id } = req.params;
-    const vendorData = await vendor.findById(id).select("-password -otp -otpExpireAt");
-    
+    const vendorData = await vendor
+      .findById(id)
+      .select("-password -otp -otpExpireAt");
+
     if (!vendorData) {
       return res.status(404).json({
         success: false,
@@ -104,7 +108,10 @@ export const getVendorDetails = async (req, res) => {
       totalStays: listings.stays.length,
       totalTravelPlaces: listings.travelPlaces.length,
       totalVehicles: listings.vehicles.length,
-      totalListings: listings.stays.length + listings.travelPlaces.length + listings.vehicles.length,
+      totalListings:
+        listings.stays.length +
+        listings.travelPlaces.length +
+        listings.vehicles.length,
     };
 
     res.status(200).json({
@@ -142,7 +149,7 @@ export const updateVendor = async (req, res) => {
     if (phone) vendorData.phone = phone;
     if (category) vendorData.category = category;
     if (typeof isVerified === "boolean") vendorData.isVerified = isVerified;
-    
+
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);
       vendorData.password = hashedPassword;
@@ -169,7 +176,7 @@ export const updateVendor = async (req, res) => {
 export const deleteVendor = async (req, res) => {
   try {
     const { id } = req.params;
-    
+
     const vendorData = await vendor.findByIdAndDelete(id);
     if (!vendorData) {
       return res.status(404).json({
@@ -255,7 +262,19 @@ const sendOtpEmail = async (email, otp) => {
 ====================================================== */
 export const registervendor = async (req, res) => {
   try {
-    const { email, phone, country, district, city, password, category, hotelName, hotelType, vehicleType, packageName } = req.body;
+    const {
+      email,
+      phone,
+      country,
+      district,
+      city,
+      password,
+      category,
+      hotelName,
+      hotelType,
+      vehicleType,
+      packageName,
+    } = req.body;
 
     if (!email || !phone || !password) {
       return res.status(400).json({
@@ -303,7 +322,7 @@ export const registervendor = async (req, res) => {
         category: vendorCategory,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.status(201).json({
@@ -428,7 +447,7 @@ export const logincontroller = async (req, res) => {
         category: existingVendor.category,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      { expiresIn: "7d" },
     );
 
     return res.status(200).json({
@@ -581,5 +600,45 @@ const sendPasswordResetEmail = async (email, otp) => {
   } catch (error) {
     console.error("Failed to send password reset email:", error);
     throw error;
+  }
+};
+/* ======================================================
+   ACCEPT VENDOR (ADMIN)
+====================================================== */
+export const acceptVendor = async (req, res) => {
+  try {
+    const { vendorId } = req.params;
+
+    if (!vendorId) {
+      return res.status(400).json({
+        success: false,
+        message: "Vendor ID is required",
+      });
+    }
+
+    const updatedVendor = await vendor.findByIdAndUpdate(
+      vendorId,
+      { accept: true },
+      { new: true },
+    );
+
+    if (!updatedVendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Vendor accepted successfully",
+      vendor: updatedVendor,
+    });
+  } catch (error) {
+    console.error("Accept Vendor Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+    });
   }
 };
