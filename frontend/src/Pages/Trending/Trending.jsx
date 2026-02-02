@@ -136,15 +136,23 @@ const Trending = () => {
     <div className="bg-gray-900 text-white min-h-screen px-6 py-10">
       <p className="h-30 w-full"></p>
       {/* Back */}
-      <div className=" flex flex-row  gap-4">
-        <button
+      <div className=" flex flex-row items-center justify-between  gap-4 mb-4">
+        <div className="flex gap-4">
+           <button
           onClick={() => navigate("/villa")}
           className="flex items-center gap-2 mb-6"
         >
           <IoArrowBackOutline size={26} />
         </button>
 
-        <h1 className="text-3xl font-bold text-cyan-400 mb-6">{item.name}</h1>
+    <h1 className="text-2xl font-bold text-cyan-400 mb-6">{item.name}</h1>
+
+        </div>
+       
+       
+
+
+      
       </div>
 
       {/* ================= GALLERY ================= */}

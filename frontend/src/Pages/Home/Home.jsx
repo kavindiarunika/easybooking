@@ -46,9 +46,7 @@ const Home = () => {
         <VisitingPlaces/>
       </div>
        <AboutSection/>
-      <div id="packages-section" className="w-full relative"> 
-        <Packages />
-      </div>
+     
 
       <div className="w-full relative "> 
         <CommingSoon/>

@@ -104,7 +104,7 @@ const Trending = () => {
           {/* ================= CATEGORY SECTION ================= */}
           <div>
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl sm:text-3xl font-bold capitalize text-green-200">
+              <h2 className="text-2xl sm:text-2xl font-bold capitalize text-green-200">
                 {category}s
               </h2>
 
@@ -123,12 +123,15 @@ const Trending = () => {
                     onClick={() => navigate(`/trending/${item.name}`)}
                     className="h-[220px] sm:h-[380px] w-[150px] sm:w-full cursor-pointer rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 flex flex-col"
                   >
-                    <img
+                    <div className="relative">
+                           <img
                       src={item.mainImage || item.image || item.image1}
                       alt={item.name}
-                      className="h-[90px] sm:h-[200px] w-full object-cover"
+                      className=" h-[90px] sm:h-[200px] w-full object-cover"
                     />
-
+                     <h1 className="absolute top-2 right-2 bg-green-300 text-black rounded-full p-4">-10%</h1>
+                    </div>
+                  
                     <div className="flex flex-col justify-between flex-1 p-3 sm:p-4">
                       <div>
                         <h3 className="font-semibold text-sm sm:text-lg truncate">
@@ -136,6 +139,9 @@ const Trending = () => {
                         </h3>
                         <p className="text-green-700 font-bold mt-1 sm:mt-2 text-sm">
                           Rs. {item.price?.toLocaleString() || "N/A"}
+                        </p>
+                        <p className="text-sm text-gray-800 line-clamp-2">
+                        {item.description}
                         </p>
                       </div>
 
