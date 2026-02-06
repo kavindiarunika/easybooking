@@ -8,26 +8,72 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
   if (!file) return null;
 
   const maxAttempts = 3;
+  const filePath = file.path;
 
-  if (!fs.existsSync(file.path)) {
+  // First try: use file buffer if available (safest approach)
+  if (file.buffer) {
+    console.log(
+      "uploadToCloudinary: Using buffer upload for",
+      file.originalname,
+    );
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const result = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              resource_type: resourceType,
+              folder: `trending/${resourceType}s`,
+            },
+            (error, result) => {
+              if (error) reject(error);
+              else resolve(result);
+            },
+          );
+          stream.end(file.buffer);
+        });
+
+        // Don't need to delete - no local file was saved
+        return result.secure_url;
+      } catch (error) {
+        console.error(
+          `Cloudinary buffer upload failed (${resourceType}) attempt ${attempt}:`,
+          error.message,
+        );
+
+        if (attempt < maxAttempts) {
+          await new Promise((r) => setTimeout(r, 500 * attempt));
+          continue;
+        }
+
+        return null;
+      }
+    }
+  }
+
+  // Fallback: use file path upload (original logic)
+  console.log(
+    "uploadToCloudinary: Using file path upload for",
+    file.originalname,
+  );
+  if (!fs.existsSync(filePath)) {
     console.warn(
       "uploadToCloudinary: file not found, skipping:",
-      file.path,
-      file?.originalname
+      filePath,
+      file?.originalname,
     );
     return null;
   }
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      const result = await cloudinary.uploader.upload(file.path, {
+      const result = await cloudinary.uploader.upload(filePath, {
         resource_type: resourceType,
         folder: `trending/${resourceType}s`,
       });
 
       try {
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
         }
       } catch (e) {
         console.warn("Failed to remove local uploaded file:", e);
@@ -37,13 +83,15 @@ const uploadToCloudinary = async (file, resourceType = "image") => {
     } catch (error) {
       console.error(
         `Cloudinary upload failed (${resourceType}) attempt ${attempt}:`,
-        error
+        error,
       );
+      console.error("File path was:", filePath);
+      console.error("File exists:", fs.existsSync(filePath));
 
       // Try to remove local file if it still exists to avoid disk growth
       try {
-        if (fs.existsSync(file.path)) {
-          fs.unlinkSync(file.path);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
         }
       } catch (e) {
         console.warn("Failed to remove local uploaded file after failure:", e);
@@ -89,12 +137,10 @@ const addtrending = async (req, res) => {
     // If admin creates a profile, they must provide ownerEmail
     if (req.user.role === "admin") {
       if (!ownerEmail || String(ownerEmail).trim() === "") {
-        return res
-          .status(400)
-          .json({
-            success: false,
-            message: "ownerEmail is required when creating a profile as admin",
-          });
+        return res.status(400).json({
+          success: false,
+          message: "ownerEmail is required when creating a profile as admin",
+        });
       }
     } else if (req.user.role === "vendor") {
       // Vendors create only for themselves — use email from token
@@ -120,6 +166,23 @@ const addtrending = async (req, res) => {
     if (videoUrl && typeof videoUrl === "string") {
       videoUrl = videoUrl.trim();
       if (videoUrl === "") videoUrl = null;
+    }
+
+    // Debug: log files received
+    if (req.files) {
+      console.log("addtrending: Files received from multer:");
+      Object.keys(req.files).forEach((fieldName) => {
+        const files = req.files[fieldName];
+        if (Array.isArray(files)) {
+          files.forEach((f) => {
+            console.log(
+              `  ${fieldName}: ${f.filename} at ${f.path}, exists: ${fs.existsSync(f.path)}`,
+            );
+          });
+        }
+      });
+    } else {
+      console.log("addtrending: No files received from multer");
     }
 
     const mainImageUrl = req.files?.mainImage?.[0]
@@ -150,8 +213,8 @@ const addtrending = async (req, res) => {
       ? (
           await Promise.all(
             req.files.otherimages.map((file) =>
-              uploadToCloudinary(file, "image")
-            )
+              uploadToCloudinary(file, "image"),
+            ),
           )
         ).filter(Boolean)
       : [];
@@ -160,12 +223,12 @@ const addtrending = async (req, res) => {
     try {
       console.log(
         "addtrending: incoming files keys:",
-        Object.keys(req.files || {})
+        Object.keys(req.files || {}),
       );
       if (Array.isArray(req.files?.otherimages)) {
         console.log(
           "addtrending: otherimages filenames:",
-          req.files.otherimages.map((f) => f.originalname)
+          req.files.otherimages.map((f) => f.originalname),
         );
       }
       console.log("addtrending: uploaded image urls counts", {
@@ -209,7 +272,7 @@ const addtrending = async (req, res) => {
           // ignore token parse errors — ownerEmail stays undefined
           console.warn(
             "Could not decode token for ownerEmail inference:",
-            e.message
+            e.message,
           );
         }
       }
@@ -407,8 +470,8 @@ const updateTrendingById = async (req, res) => {
       updateData.availableThings = Array.isArray(availableThings)
         ? availableThings
         : availableThings
-        ? availableThings.split(",").map((i) => i.trim())
-        : [];
+          ? availableThings.split(",").map((i) => i.trim())
+          : [];
     }
 
     if (count !== undefined) {
@@ -422,6 +485,23 @@ const updateTrendingById = async (req, res) => {
     }
 
     // ---------------- IMAGE HANDLING (robust per-field uploads) ----------------
+
+    // Debug: log files received
+    if (req.files) {
+      console.log("updateTrendingById: Files received from multer:");
+      Object.keys(req.files).forEach((fieldName) => {
+        const files = req.files[fieldName];
+        if (Array.isArray(files)) {
+          files.forEach((f) => {
+            console.log(
+              `  ${fieldName}: ${f.filename} at ${f.path}, exists: ${fs.existsSync(f.path)}`,
+            );
+          });
+        }
+      });
+    } else {
+      console.log("updateTrendingById: No files received from multer");
+    }
 
     const mainImageUrl = req.files?.mainImage?.[0]
       ? await uploadToCloudinary(req.files.mainImage[0], "image")
@@ -451,8 +531,8 @@ const updateTrendingById = async (req, res) => {
       ? (
           await Promise.all(
             req.files.otherimages.map((file) =>
-              uploadToCloudinary(file, "image")
-            )
+              uploadToCloudinary(file, "image"),
+            ),
           )
         ).filter(Boolean)
       : [];
@@ -585,7 +665,7 @@ const patchTrending = async (req, res) => {
     const updated = await TrendingModel.findByIdAndUpdate(
       req.params.id,
       updateData,
-      { new: true }
+      { new: true },
     );
 
     if (!updated) {

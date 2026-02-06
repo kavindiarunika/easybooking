@@ -26,6 +26,7 @@ const Header = () => {
               { name: "Home", path: "./" },
               { name: "stays", path: "/villa" },
                {name:"GoTrip" , path:"/safarihome"},
+                {name:"product" , path:"/product"},
               {name:"traveling places", path:"/places" },
              
               

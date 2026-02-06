@@ -12,7 +12,7 @@ function parseJwt(token) {
         .map(function (c) {
           return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
         })
-        .join("")
+        .join(""),
     );
     return JSON.parse(jsonPayload);
   } catch (e) {
@@ -29,8 +29,15 @@ const ProtectedRoute = ({ children, allowedRole, allowedCategory }) => {
   const payload = parseJwt(token);
   if (!payload) return <Navigate to="/vendor/register" replace />;
 
-  if (allowedRole && payload.role !== allowedRole)
-    return <Navigate to="/vendor/register" replace />;
+  if (allowedRole) {
+    // Accept explicit role claims OR product-vendor style tokens that include vendorId
+    const roleMatches = payload.role === allowedRole;
+    const vendorIdClaim =
+      allowedRole === "vendor" && (payload.vendorId || payload._id);
+    if (!roleMatches && !vendorIdClaim) {
+      return <Navigate to="/vendor/register" replace />;
+    }
+  }
 
   if (allowedCategory && payload.category !== allowedCategory) {
     // If vendor is logged in but tries to access a different vendor dashboard, redirect them to their own dashboard

@@ -696,109 +696,109 @@ const Register = () => {
                         value="Maldives"
                         className="bg-slate-800 text-white"
                       >
-                        🇲🇻 Maldives
+                        Maldives
                       </option>
                       <option
                         value="Thailand"
                         className="bg-slate-800 text-white"
                       >
-                        🇹🇭 Thailand
+                        Thailand
                       </option>
                       <option
                         value="Indonesia"
                         className="bg-slate-800 text-white"
                       >
-                        🇮🇩 Indonesia
+                        Indonesia
                       </option>
                       <option
                         value="Malaysia"
                         className="bg-slate-800 text-white"
                       >
-                        🇲🇾 Malaysia
+                        Malaysia
                       </option>
                       <option
                         value="Singapore"
                         className="bg-slate-800 text-white"
                       >
-                        🇸🇬 Singapore
+                        Singapore
                       </option>
                       <option
                         value="Philippines"
                         className="bg-slate-800 text-white"
                       >
-                        🇵🇭 Philippines
+                        Philippines
                       </option>
                       <option
                         value="Vietnam"
                         className="bg-slate-800 text-white"
                       >
-                        🇻🇳 Vietnam
+                        Vietnam
                       </option>
                       <option value="Nepal" className="bg-slate-800 text-white">
-                        🇳🇵 Nepal
+                        Nepal
                       </option>
                       <option
                         value="Bangladesh"
                         className="bg-slate-800 text-white"
                       >
-                        🇧🇩 Bangladesh
+                        Bangladesh
                       </option>
                       <option
                         value="Pakistan"
                         className="bg-slate-800 text-white"
                       >
-                        🇵🇰 Pakistan
+                        Pakistan
                       </option>
                       <option
                         value="United Arab Emirates"
                         className="bg-slate-800 text-white"
                       >
-                        🇦🇪 United Arab Emirates
+                        United Arab Emirates
                       </option>
                       <option
                         value="Saudi Arabia"
                         className="bg-slate-800 text-white"
                       >
-                        🇸🇦 Saudi Arabia
+                        Saudi Arabia
                       </option>
                       <option
                         value="United Kingdom"
                         className="bg-slate-800 text-white"
                       >
-                        🇬🇧 United Kingdom
+                        United Kingdom
                       </option>
                       <option
                         value="United States"
                         className="bg-slate-800 text-white"
                       >
-                        🇺🇸 United States
+                        United States
                       </option>
                       <option
                         value="Australia"
                         className="bg-slate-800 text-white"
                       >
-                        🇦🇺 Australia
+                        Australia
                       </option>
                       <option
                         value="Canada"
                         className="bg-slate-800 text-white"
                       >
-                        🇨🇦 Canada
+                        Canada
                       </option>
                       <option
                         value="Germany"
                         className="bg-slate-800 text-white"
                       >
-                        🇩🇪 Germany
+                        Germany
                       </option>
                       <option
                         value="France"
                         className="bg-slate-800 text-white"
                       >
-                        🇫🇷 France
+                        France
                       </option>
                       <option value="Other" className="bg-slate-800 text-white">
-                        🌍 Other
+                        Other
                       </option>
                     </select>
                     <div className="absolute right-4 top-1/2 -translate-y-1/2 text-white/50 pointer-events-none">
@@ -865,21 +865,7 @@ const Register = () => {
                       </div>
                     </div>
                   )}
-
-                  {/* Stay or Vehicle Package Name */}
-                  <div className="relative">
-                    <FaHotel className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
-                    <input
-                      type="text"
-                      name="packageName"
-                      placeholder="Stay or Vehicle Package Name"
-                      className="w-full bg-white/10 border border-white/20 rounded-xl py-3.5 pl-12 pr-4 text-white placeholder-white/50 focus:outline-none focus:border-blue-400 focus:ring-2 focus:ring-blue-400/30 transition-all"
-                      value={formData.packageName}
-                      onChange={handleChange}
-                      required
-                    />
-                  </div>
-
+                  {/* packageName field removed */}
                   {/* Category Selection */}
                   <div className="relative">
                     <FaBuilding className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />

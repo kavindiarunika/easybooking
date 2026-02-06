@@ -22,7 +22,12 @@ if (fs.existsSync(canonicalUploads)) {
 
 console.log("Upload directory set to:", uploadDir);
 
-const storage = multer.diskStorage({
+// Use memory storage for buffer-based uploads to Cloudinary
+// This avoids file system issues and is more reliable
+const storage = multer.memoryStorage();
+
+// Original disk storage (kept as fallback reference)
+const diskStorage = multer.diskStorage({
   destination: function (req, file, callback) {
     callback(null, uploadDir);
   },
@@ -51,8 +56,8 @@ const fileFilter = (req, file, cb) => {
   } else {
     cb(
       new Error(
-        "Only image files (jpg, jpeg, png, webp) and video files (mp4, mov, avi, mkv, webm) are allowed"
-      )
+        "Only image files (jpg, jpeg, png, webp) and video files (mp4, mov, avi, mkv, webm) are allowed",
+      ),
     );
   }
 };

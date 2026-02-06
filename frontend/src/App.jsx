@@ -25,12 +25,19 @@ import GoTripDashboard from "./Pages/vendor/GoTripDashboard";
 import ProtectedRoute from "./Components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ProductHome from "./Pages/Product/ProductHome";
+import ProductBrowse from "./Pages/Product/ProductBrowse";
+import ProductRegister from "./Pages/Product/ProductRegister";
+import ProductReview from "./Pages/Product/ProductReview";
+import ProductDashboard from "./Pages/vendor/ProductDashboard";
 
 export const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const App = () => {
-  const location = useLocation().pathname.includes("/vendor");
+  const location =
+    useLocation().pathname.includes("/vendor") ||
+    useLocation().pathname.includes("/product");
   return (
     <div className="bg-black">
       {!location && <Navbar />}
@@ -38,7 +45,7 @@ const App = () => {
       <Scroll />
       <Routes>
         <Route path="/" element={<Home />} />
-      
+
         <Route path="/villa/:category?" element={<Villa />} />
 
         <Route path="/trending/:name" element={<Trending />} />
@@ -48,7 +55,18 @@ const App = () => {
         <Route path="/safaridetails/:id" element={<SafariDetails />} />
         <Route path="/vehicle" element={<VehicleCard />} />
         <Route path="/vendor/register" element={<Register />} />
-
+        <Route path="/product" element={<ProductHome />} />
+        <Route path="/product/browse" element={<ProductBrowse />} />
+        <Route path="/product/register" element={<ProductRegister />} />
+        <Route path="/product/review/:id" element={<ProductReview />} />
+        <Route
+          path="/vendor/dashboard-products"
+          element={
+            <ProtectedRoute allowedRole="vendor">
+              <ProductDashboard />
+            </ProtectedRoute>
+          }
+        />
         <Route path="/vendor/dashboard-stays" element={<VendorDashboard />} />
         <Route path="/vendor/dashboard-gotrip" element={<GoTripDashboard />} />
         <Route

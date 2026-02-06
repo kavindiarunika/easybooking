@@ -11,24 +11,23 @@ import trendrouter from "./router/trendingRouter.js";
 import loginrouter from "./controller/logincontroller.js";
 import travelingplacesroute from "./router/travelingplacesroute.js";
 import safariRouter from "./router/safariRoute.js";
-import vendorrouter from './router/vendorRouter.js'
-import adsRouter from './router/adsRouter.js';
+import vendorrouter from "./router/vendorRouter.js";
+import adsRouter from "./router/adsRouter.js";
+import productRouter from "./router/productRoute.js";
+import productVendorRoute from "./router/productVendorRoute.js";
 import helmet from "helmet";
-
 
 const app = express();
 const port = process.env.PORT || 4000;
 
-
 connectDB();
-
 
 const backendUploads = path.join(process.cwd(), "Backend", "uploads");
 const backendNestedUploads = path.join(
   process.cwd(),
   "Backend",
   "Backend",
-  "uploads"
+  "uploads",
 );
 const cwdUploads = path.join(process.cwd(), "uploads");
 let uploadsStaticDir = null;
@@ -65,7 +64,8 @@ const allowedOrigins = [
 
 app.use(helmet());
 
-{/*app.use(
+{
+  /*app.use(
   helmet({
     contentSecurityPolicy: {
       directives: {
@@ -83,7 +83,8 @@ app.use(helmet());
       },
     },
   })
-); */}
+); */
+}
 app.use(
   cors({
     origin: (origin, callback) => {
@@ -99,14 +100,15 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization", "token"],
-  })
+  }),
 );
 
 // Body Parsers for handling JSON and form data
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-{/*app.use((req, res, next) => {
+{
+  /*app.use((req, res, next) => {
   res.setHeader(
     "Content-Security-Policy",
     "connect-src 'self' http://localhost:4000 ws://localhost:4000 https://sandbox.payhere.lk https://www.payhere.lk https://www.google-analytics.com https://www.paypal.com https://www.sandbox.paypal.com"
@@ -114,14 +116,14 @@ app.use(express.urlencoded({ extended: true }));
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
   next();
-});*/}
+});*/
+}
 
 // Debug logger
 app.use((req, res, next) => {
   console.log("Incoming request:", req.method, req.path);
   next();
 });
-
 
 // Login/Admin route
 app.use("/api/admin", loginrouter);
@@ -138,6 +140,10 @@ app.use("/api/vehicle", vehicleRouter);
 app.use("/api/vendor", vendorrouter);
 
 app.use("/api/ads", adsRouter);
+
+app.use("/api/product", productRouter);
+
+app.use("/api/product-vendor", productVendorRoute);
 
 app.get("/", (req, res) => res.send("API working."));
 
@@ -159,7 +165,7 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => console.log("Socket disconnected:", socket.id));
 });
 
-server.listen(port, '0.0.0.0', () => {
+server.listen(port, "0.0.0.0", () => {
   console.log(`✅ Server running on port ${port}`);
   console.log(`🌐 Accessible at: http://13.49.78.21:${port}`);
 });

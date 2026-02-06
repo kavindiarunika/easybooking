@@ -1,0 +1,302 @@
+{
+  "info": {
+    "_postman_id": "product-api-collection",
+    "name": "Product Management API",
+    "description": "Complete API collection for testing product management endpoints",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Products - Public",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/all?page=1&limit=10",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "all"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                },
+                {
+                  "key": "search",
+                  "value": "",
+                  "disabled": true
+                },
+                {
+                  "key": "category",
+                  "value": "",
+                  "disabled": true
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/details/{{PRODUCT_ID}}",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "details", "{{PRODUCT_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Add Review",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"userId\": \"customer123\",\n  \"rating\": 4,\n  \"comment\": \"Great product, very satisfied!\"\n}"
+            },
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/review/{{PRODUCT_ID}}",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "review", "{{PRODUCT_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products - Protected (Vendor)",
+      "item": [
+        {
+          "name": "Add Product",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VENDOR_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Test Product",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "This is a test product description",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "9999",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "electronics",
+                  "type": "text"
+                },
+                {
+                  "key": "size",
+                  "value": "L",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "50",
+                  "type": "text"
+                },
+                {
+                  "key": "email",
+                  "value": "vendor@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "ownerEmail",
+                  "value": "vendor@example.com",
+                  "type": "text"
+                },
+                {
+                  "key": "whatsapp",
+                  "value": "923001234567",
+                  "type": "text"
+                },
+                {
+                  "key": "mainImage",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/add",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "add"]
+            }
+          }
+        },
+        {
+          "name": "Get Vendor Products",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VENDOR_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/vendor/products?ownerEmail=vendor@example.com",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "vendor", "products"],
+              "query": [
+                {
+                  "key": "ownerEmail",
+                  "value": "vendor@example.com"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Vendor Stats",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VENDOR_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/vendor/stats?ownerEmail=vendor@example.com",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "vendor", "stats"],
+              "query": [
+                {
+                  "key": "ownerEmail",
+                  "value": "vendor@example.com"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VENDOR_TOKEN}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Updated Product Name",
+                  "type": "text",
+                  "disabled": true
+                },
+                {
+                  "key": "price",
+                  "value": "12999",
+                  "type": "text"
+                },
+                {
+                  "key": "stock",
+                  "value": "75",
+                  "type": "text"
+                },
+                {
+                  "key": "mainImage",
+                  "type": "file",
+                  "src": "",
+                  "disabled": true
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/update/{{PRODUCT_ID}}",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "update", "{{PRODUCT_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Toggle Product Status",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VENDOR_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/toggle/{{PRODUCT_ID}}",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "toggle", "{{PRODUCT_ID}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{VENDOR_TOKEN}}"
+              }
+            ],
+            "url": {
+              "raw": "{{BACKEND_URL}}/api/product/delete/{{PRODUCT_ID}}",
+              "host": ["{{BACKEND_URL}}"],
+              "path": ["api", "product", "delete", "{{PRODUCT_ID}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Environment Variables",
+      "description": "Set these variables before testing:\n\n1. BACKEND_URL: http://localhost:4000\n2. VENDOR_TOKEN: Get from vendor login response\n3. PRODUCT_ID: Get from add product response or get all products\n\nHow to set variables:\n1. Click \"Environments\" tab\n2. Create new environment \"Product API Testing\"\n3. Add the variables with their values\n4. Select the environment before running requests"
+    }
+  ],
+  "variable": [
+    {
+      "key": "BACKEND_URL",
+      "value": "http://localhost:4000",
+      "type": "string"
+    },
+    {
+      "key": "VENDOR_TOKEN",
+      "value": "your_vendor_token_here",
+      "type": "string"
+    },
+    {
+      "key": "PRODUCT_ID",
+      "value": "your_product_id_here",
+      "type": "string"
+    }
+  ]
+}
