@@ -89,10 +89,8 @@ const ProductRegister = () => {
         password: registerForm.password,
       };
 
-      const res = await axios.post(
-        `${BACKEND_URL}/api/vendor/product-register`,
-        payload,
-      );
+      const res = await axios.post(`${BACKEND_URL}/api/product-vendor/register`, payload);
+
       if (res.data?.vendorToken) {
         // store under both keys so ProtectedRoute will allow access
         localStorage.setItem("productVendorToken", res.data.vendorToken);
