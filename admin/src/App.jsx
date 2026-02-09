@@ -2,11 +2,14 @@ import React, { useState, useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import AddProduct from "./Pages/Product/AddProduct";
 // Components
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 // Pages
+import ShowProduct from "./Pages/Product/ShowProduct";
+import EditProduct from "./Pages/Product/EditProduct";
 import AddTrending from "./Pages/Add/AddTrending";
 import AddStays from "./Pages/Add/AddStays";
 import DeleteTrending from "./Pages/Delete/DeleteTrending";
@@ -31,7 +34,7 @@ import StaysDashboard from "./Pages/Home/StaysDashboard";
 import ShowStays from "./Pages/Show/ShowStays";
 import ShowSafari from "./Pages/Show/ShowSafari";
 import NewStays from "./Pages/NewVendors/NewStays";
-
+import DeleteProduct from "./Pages/Product/DeleteProduct";
 export const backendUrl = import.meta.env.VITE_BACKEND_URL;
 
 function App() {
@@ -273,6 +276,39 @@ function App() {
                   <Route
                     path="/newstays"
                     element={<NewStays token={token} />}
+                  />
+
+                   <Route
+                    path="/addproduct"
+                    element={
+                      <ProtectedRoute>
+                        <AddProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                   <Route
+                    path="/deleteproduct"
+                    element={
+                      <ProtectedRoute>
+                        <DeleteProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                   <Route
+                    path="/editproduct"
+                    element={
+                      <ProtectedRoute>
+                        <EditProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                   <Route
+                    path="/showproducts"
+                    element={
+                      <ProtectedRoute>
+                        <ShowProduct token={token} />
+                      </ProtectedRoute>
+                    }
                   />
                 </Routes>
               </div>

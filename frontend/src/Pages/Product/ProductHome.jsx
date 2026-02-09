@@ -8,14 +8,23 @@ import { useNavigate } from "react-router-dom";
 const ProductHome = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [category, setCategory] = useState("");
+  const [sort, setSort] = useState("");
+  const [search, setSearch] = useState("");
   const navigate = useNavigate();
 
   const fetchProducts = async () => {
     setLoading(true);
     try {
-      const res = await axios.get(
-        `${BACKEND_URL}/api/product/all?page=1&limit=100`,
-      );
+      const res = await axios.get(`${BACKEND_URL}/api/product/all`, {
+        params: {
+          page: 1,
+          limit: 100,
+          category: category || undefined,
+          sort: sort || undefined,
+          search: search || undefined,
+        },
+      });
       if (res.data && res.data.data) setProducts(res.data.data);
     } catch (err) {
       console.error("Failed to fetch products", err);
@@ -26,11 +35,18 @@ const ProductHome = () => {
 
   React.useEffect(() => {
     fetchProducts();
-  }, []);
+  }, [category, sort, search]);
 
   return (
     <div className="bg-white/30 p-6">
-      <ProductHeader />
+      <ProductHeader
+        category={category}
+        onCategoryChange={setCategory}
+        sort={sort}
+        onSortChange={setSort}
+        search={search}
+        onSearch={setSearch}
+      />
       <ProductBanner />
 
       {/*------------------show products-------------- */}
@@ -40,7 +56,7 @@ const ProductHome = () => {
         ) : products.length === 0 ? (
           <div className="text-center py-12">No products found.</div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((p) => (
               <div
                 key={p._id}

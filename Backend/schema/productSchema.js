@@ -13,6 +13,8 @@ const product = new mongoose.Schema(
     price: { type: Number, required: true },
     category: { type: String, required: true },
     mainImage: { type: String, required: true },
+    OtherImages:{type: [String], required: false },
+    colors:{type: [String], required: false },
     size: { type: String, required: false },
     subProducts: [
       {
@@ -21,6 +23,7 @@ const product = new mongoose.Schema(
         subDescription: { type: String },
         subPrice: { type: Number },
         subsize: { type: String },
+        subOtherImages: { type: [String] },
       },
     ],
     whatsapp: { type: String, required: true },

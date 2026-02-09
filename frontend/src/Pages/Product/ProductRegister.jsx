@@ -113,27 +113,27 @@ const ProductRegister = () => {
   };
 
   return (
-    <div className=" flex items-center justify-center bg-white/30 text-white p-24">
-      <div className="flex flex-row gap-8">
+    <div className="flex items-center justify-center bg-white/30 min-h-screen text-white p-4 md:p-24">
+      <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full md:w-auto">
         {/*------------left----------------- */}
-        <div>
+        <div className="hidden md:block">
           <img
             src={productAssets.login}
             alt="Login"
-            className=" object-cover"
+            className="object-cover -mt-8"
           />
         </div>
 
         {/*------------right----------------- */}
-        <div className="">
-          <div className="w-full max-w-4xl bg-gray-800 rounded-lg p-12 border border-gray-700">
+        <div className="w-full md:w-auto md:mt-8">
+          <div className="w-full md:w-[500px] bg-black/50 rounded-lg p-6 md:p-12 border border-gray-700">
             {/* Toggle Tabs */}
-            <div className="flex  gap-12 mb-6 border-b border-gray-700">
+            <div className="flex gap-6 md:gap-12 mb-6 border-b-4 border-green-600">
               <button
                 onClick={() => setIsLogin(false)}
-                className={`pb-3 px-4 font-semibold transition ${
+                className={`pb-3 px-3 md:px-4 font-semibold text-sm md:text-base transition ${
                   !isLogin
-                    ? "border-b-2 border-blue-600 text-blue-400"
+                    ? "border-b-2 border-green-600 text-green-400 prata-regular"
                     : "text-gray-400 hover:text-gray-300"
                 }`}
               >
@@ -141,9 +141,9 @@ const ProductRegister = () => {
               </button>
               <button
                 onClick={() => setIsLogin(true)}
-                className={`pb-3 px-4 font-semibold transition ${
+                className={`pb-3 px-3 md:px-4 font-semibold text-sm md:text-base transition ${
                   isLogin
-                    ? "border-b-2 border-blue-600 text-blue-400"
+                    ? "border-b-2 border-green-600 text-green-400 prata-regular"
                     : "text-gray-400 hover:text-gray-300"
                 }`}
               >
@@ -154,41 +154,44 @@ const ProductRegister = () => {
             {!isLogin ? (
               <>
                 {/* REGISTER FORM */}
-                <h2 className="text-2xl font-semibold mb-4 prata-regular text-center">
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 prata-regular text-center">
                   Welcome to{" "}
                   <span className="text-green-300 prata-regular">
                     SmartsBooking
                   </span>
                 </h2>
 
-                <form onSubmit={handleRegister} className="space-y-4">
+                <form
+                  onSubmit={handleRegister}
+                  className="space-y-3 md:space-y-4"
+                >
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1">
+                    <label className="block text-xs md:text-sm text-gray-300 mb-1">
                       Business Name
                     </label>
                     <input
                       name="businessName"
                       value={registerForm.businessName}
                       onChange={handleRegisterChange}
-                      className="w-full p-2 rounded bg-gray-700 border border-gray-600 active:border-none"
+                      className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1">
+                    <label className="block text-xs md:text-sm text-gray-300 mb-1">
                       Owner / Contact Name
                     </label>
                     <input
                       name="ownerName"
                       value={registerForm.ownerName}
                       onChange={handleRegisterChange}
-                      className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                      className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-1">
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
                         Email
                       </label>
                       <input
@@ -196,26 +199,26 @@ const ProductRegister = () => {
                         name="email"
                         value={registerForm.email}
                         onChange={handleRegisterChange}
-                        className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-sm text-gray-300 mb-1">
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
                         Phone
                       </label>
                       <input
                         name="phone"
                         value={registerForm.phone}
                         onChange={handleRegisterChange}
-                        className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                       />
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
                     <div>
-                      <label className="block text-sm text-gray-300 mb-1">
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
                         Password
                       </label>
                       <input
@@ -223,11 +226,11 @@ const ProductRegister = () => {
                         name="password"
                         value={registerForm.password}
                         onChange={handleRegisterChange}
-                        className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                       />
                     </div>
                     <div>
-                      <label className="block text-sm text-gray-300 mb-1">
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
                         Confirm Password
                       </label>
                       <input
@@ -235,78 +238,64 @@ const ProductRegister = () => {
                         name="confirmPassword"
                         value={registerForm.confirmPassword}
                         onChange={handleRegisterChange}
-                        className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                       />
                     </div>
                   </div>
 
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 items-center mt-6 md:mt-8">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="bg-blue-600 px-4 py-2 rounded font-semibold disabled:opacity-50"
+                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold disabled:opacity-50 transition"
                     >
                       {loading ? "Registering..." : "Register"}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => navigate(-1)}
-                      className="bg-gray-700 px-4 py-2 rounded"
-                    >
-                      Cancel
-                    </button>
+                   
                   </div>
                 </form>
               </>
             ) : (
               <>
                 {/* LOGIN FORM */}
-                <h2 className="text-2xl font-semibold mb-4">
-                  Product Vendor Login
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 prata-regular text-center">
+                  Hello! Welcome back
                 </h2>
-                <p className="text-sm text-gray-300 mb-6">
-                  Sign in to manage your products.
-                </p>
-                <form onSubmit={handleLogin} className="space-y-4">
+
+                <form onSubmit={handleLogin} className="space-y-3 md:space-y-4">
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1">
-                      Email *
+                    <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                      Email
                     </label>
                     <input
                       type="email"
                       name="email"
                       value={loginForm.email}
                       onChange={handleLoginChange}
-                      className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                      className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                     />
                   </div>
                   <div>
-                    <label className="block text-sm text-gray-300 mb-1">
-                      Password *
+                    <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                      Password
                     </label>
                     <input
                       type="password"
                       name="password"
                       value={loginForm.password}
                       onChange={handleLoginChange}
-                      className="w-full p-2 rounded bg-gray-700 border border-gray-600"
+                      className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                     />
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
                     <button
                       type="submit"
                       disabled={loading}
-                      className="bg-blue-600 px-4 py-2 rounded font-semibold disabled:opacity-50"
+                      className="w-full sm:w-auto bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold disabled:opacity-50 transition"
                     >
                       {loading ? "Logging in..." : "Login"}
                     </button>
-                    <button
-                      type="button"
-                      onClick={() => navigate(-1)}
-                      className="bg-gray-700 px-4 py-2 rounded"
-                    >
-                      Cancel
-                    </button>
+                   
                   </div>
                 </form>
               </>

@@ -20,6 +20,7 @@ export const addProduct = async (req, res) => {
       email,
       ownerEmail,
       stock,
+      colors,
     } = req.body;
 
     if (
@@ -65,6 +66,47 @@ export const addProduct = async (req, res) => {
           message: "Image upload failed",
           error: uploadError.message,
         });
+      }
+    }
+
+    // Upload other images if provided
+    let otherImageUrls = [];
+    if (req.files) {
+      const otherImageFiles = Array.isArray(req.files.OtherImages)
+        ? req.files.OtherImages
+        : req.files.OtherImages
+          ? [req.files.OtherImages]
+          : [];
+      for (const img of otherImageFiles) {
+        try {
+          const uploadResult = await new Promise((resolve, reject) => {
+            const stream = cloudinary.uploader.upload_stream(
+              { folder: "products/main", resource_type: "auto" },
+              (error, result) => {
+                if (error) reject(error);
+                else resolve(result);
+              },
+            );
+            stream.end(img.data);
+          });
+          otherImageUrls.push(uploadResult.secure_url);
+        } catch (uploadError) {
+          console.error("Other image upload error:", uploadError);
+        }
+      }
+    }
+
+    // Parse colors array if it's a JSON string
+    let parsedColors = [];
+    if (colors) {
+      if (typeof colors === "string") {
+        try {
+          parsedColors = JSON.parse(colors);
+        } catch (e) {
+          parsedColors = colors.split(",").map((c) => c.trim());
+        }
+      } else if (Array.isArray(colors)) {
+        parsedColors = colors;
       }
     }
 
@@ -116,12 +158,40 @@ export const addProduct = async (req, res) => {
           }
         }
 
+        // Upload sub-product other images if provided
+        let subOtherImageUrls = [];
+        for (let j = 0; j < 5; j++) {
+          const otherImgKey = `subOtherImage${i}_${j}`;
+          if (req.files && req.files[otherImgKey]) {
+            const otherImgFile = req.files[otherImgKey];
+            try {
+              const uploadResult = await new Promise((resolve, reject) => {
+                const stream = cloudinary.uploader.upload_stream(
+                  { folder: "products/subs", resource_type: "auto" },
+                  (error, result) => {
+                    if (error) reject(error);
+                    else resolve(result);
+                  },
+                );
+                stream.end(otherImgFile.data);
+              });
+              subOtherImageUrls.push(uploadResult.secure_url);
+            } catch (uploadError) {
+              console.error(
+                "Sub-product other image upload error:",
+                uploadError,
+              );
+            }
+          }
+        }
+
         subProducts.push({
           subName: subProduct.subName,
           subDescription: subProduct.subDescription,
           subPrice: subProduct.subPrice,
           subsize: subProduct.subsize,
           subImage: subImageUrl,
+          subOtherImages: subOtherImageUrls,
         });
       }
     }
@@ -137,6 +207,8 @@ export const addProduct = async (req, res) => {
       email,
       ownerEmail,
       mainImage: mainImageUrl,
+      OtherImages: otherImageUrls,
+      colors: parsedColors,
       subProducts,
       stock: stock || 0,
       vendorId: req.user.vendorId, // Extract from JWT token
@@ -272,8 +344,17 @@ export const updateProduct = async (req, res) => {
     );
     console.log("[updateProduct] req.body.subProducts:", req.body.subProducts);
     const { id } = req.params;
-    const { name, description, price, category, size, whatsapp, email, stock } =
-      req.body;
+    const {
+      name,
+      description,
+      price,
+      category,
+      size,
+      whatsapp,
+      email,
+      stock,
+      colors,
+    } = req.body;
 
     const product = await productModel.findById(id);
 
@@ -292,6 +373,51 @@ export const updateProduct = async (req, res) => {
     if (whatsapp) product.whatsapp = whatsapp;
     if (email) product.email = email;
     if (stock !== undefined) product.stock = stock;
+
+    // Update colors if provided
+    if (colors) {
+      if (typeof colors === "string") {
+        try {
+          product.colors = JSON.parse(colors);
+        } catch (e) {
+          product.colors = colors.split(",").map((c) => c.trim());
+        }
+      } else if (Array.isArray(colors)) {
+        product.colors = colors;
+      }
+    }
+
+    // Handle OtherImages upload if new files provided
+    if (req.files) {
+      const otherImageFiles = Array.isArray(req.files.OtherImages)
+        ? req.files.OtherImages
+        : req.files.OtherImages
+          ? [req.files.OtherImages]
+          : [];
+      if (otherImageFiles.length > 0) {
+        let otherImageUrls = [];
+        for (const img of otherImageFiles) {
+          try {
+            const uploadResult = await new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream(
+                { folder: "products/main", resource_type: "auto" },
+                (error, result) => {
+                  if (error) reject(error);
+                  else resolve(result);
+                },
+              );
+              stream.end(img.data);
+            });
+            otherImageUrls.push(uploadResult.secure_url);
+          } catch (uploadError) {
+            console.error("Other image upload error:", uploadError);
+          }
+        }
+        if (otherImageUrls.length > 0) {
+          product.OtherImages = otherImageUrls;
+        }
+      }
+    }
 
     // Handle main image update if new file provided
     if (req.files && req.files.mainImage) {
@@ -366,12 +492,43 @@ export const updateProduct = async (req, res) => {
             }
           }
 
+          // Upload sub-product other images if provided
+          let subOtherImageUrls = [];
+          for (let j = 0; j < 5; j++) {
+            const otherImgKey = `subOtherImage${i}_${j}`;
+            if (req.files && req.files[otherImgKey]) {
+              const otherImgFile = req.files[otherImgKey];
+              try {
+                const uploadResult = await new Promise((resolve, reject) => {
+                  const stream = cloudinary.uploader.upload_stream(
+                    { folder: "products/subs", resource_type: "auto" },
+                    (error, result) => {
+                      if (error) reject(error);
+                      else resolve(result);
+                    },
+                  );
+                  stream.end(otherImgFile.data);
+                });
+                subOtherImageUrls.push(uploadResult.secure_url);
+              } catch (uploadError) {
+                console.error(
+                  "Sub-product other image upload error:",
+                  uploadError,
+                );
+              }
+            }
+          }
+
           newSubProducts.push({
             subName: sp.subName,
             subDescription: sp.subDescription,
             subPrice: sp.subPrice,
             subsize: sp.subsize,
             subImage: subImageUrl,
+            subOtherImages:
+              subOtherImageUrls.length > 0
+                ? subOtherImageUrls
+                : sp.subOtherImages || [],
           });
         }
       }

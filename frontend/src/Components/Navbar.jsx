@@ -21,7 +21,7 @@ const Header = () => {
 
         {/* Navbar Links */}
         <div className="hidden md:flex items-end gap-16">
-          <ul className="hidden sm:flex gap-16 text-xl text-white">
+          <ul className="hidden sm:flex gap-16 text-m text-white">
             {[
               { name: "Home", path: "./" },
               { name: "stays", path: "/villa" },
@@ -50,7 +50,7 @@ const Header = () => {
         <div className="md:hidden">
           <IoReorderThreeOutline
             size={32}
-            className="text-white cursor-pointer absolute top-10 right-14"
+            className="text-white cursor-pointer absolute top-4 right-4"
             onClick={toggleMenu}
           />
         </div>
@@ -110,6 +110,15 @@ const Header = () => {
                 }
               >
                 GoTrip
+              </NavLink>
+              <NavLink
+                to="/product"
+                onClick={toggleMenu}
+                className={({ isActive }) =>
+                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                }
+              >
+                Product
               </NavLink>
               <NavLink
                 to="/places"

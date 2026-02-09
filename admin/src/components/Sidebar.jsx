@@ -100,6 +100,38 @@ const Sidebar = () => {
           )}
         </div>
 
+        {/* Product Section */}
+        <div className="mt-2">
+          <div onClick={() => toggleMenu('products')} className={menuHeaderClass}>
+            <div className="flex items-center gap-3">
+              <MdOutlineVilla size={18} className="text-green-400" />
+              <span className="font-medium">Products</span>
+            </div>
+            {openMenus.products ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+          </div>
+          {openMenus.products && (
+            <div className="ml-4 mt-1 space-y-1 border-l-2 border-green-500/30 pl-4">
+            
+              <NavLink to="/addproduct" className={({ isActive }) => linkClass(isActive)}>
+                <FiPlus size={16} />
+                <span>Add New Product</span>
+              </NavLink>
+              <NavLink to="/showproducts" className={({ isActive }) => linkClass(isActive)}>
+                <FiEye size={16} />
+                <span>Show All Products</span>
+              </NavLink>
+              <NavLink to="/deleteproduct" className={({ isActive }) => linkClass(isActive)}>
+                <FiTrash2 size={16} />
+                <span>Delete Product</span>
+              </NavLink>
+              <NavLink to="/editproduct" className={({ isActive }) => linkClass(isActive)}>
+                <FiEdit size={16} />
+                <span>Edit Product</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+
         {/* Travelling Places Section */}
         <div className="mt-2">
           <div onClick={() => toggleMenu('places')} className={menuHeaderClass}>

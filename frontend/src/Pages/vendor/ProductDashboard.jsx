@@ -13,6 +13,7 @@ import {
   FaEyeSlash,
   FaSignOutAlt,
   FaStar,
+  FaImage,
 } from "react-icons/fa";
 import { IoArrowBackOutline } from "react-icons/io5";
 
@@ -50,12 +51,15 @@ const ProductDashboard = () => {
     size: "",
     whatsapp: "",
     email: vendorEmail || "",
+    colors: [],
     subProducts: [],
   });
 
   const [media, setMedia] = useState({
     mainImage: null,
-    subImages: {}, // Store sub-product images by index
+    otherImages: [],
+    subImages: {},
+    subOtherImages: {},
   });
 
   const subImageRefs = useRef({});
@@ -119,6 +123,55 @@ const ProductDashboard = () => {
     setMedia({ ...media, mainImage: e.target.files[0] });
   };
 
+  const handleOtherImagesChange = (e) => {
+    const files = Array.from(e.target.files);
+    setMedia((prev) => ({
+      ...prev,
+      otherImages: [...(prev.otherImages || []), ...files],
+    }));
+  };
+
+  const removeOtherImage = (index) => {
+    setMedia((prev) => ({
+      ...prev,
+      otherImages: prev.otherImages.filter((_, i) => i !== index),
+    }));
+  };
+
+  const handleColorsChange = (e) => {
+    const value = e.target.value;
+    setFormData((prev) => ({
+      ...prev,
+      colors: value
+        .split(",")
+        .map((c) => c.trim())
+        .filter(Boolean),
+    }));
+  };
+
+  const handleSubProductOtherImagesChange = (subIndex, files) => {
+    const fileList = Array.from(files);
+    setMedia((prev) => ({
+      ...prev,
+      subOtherImages: {
+        ...prev.subOtherImages,
+        [subIndex]: [...(prev.subOtherImages?.[subIndex] || []), ...fileList],
+      },
+    }));
+  };
+
+  const removeSubOtherImage = (subIndex, imgIndex) => {
+    setMedia((prev) => ({
+      ...prev,
+      subOtherImages: {
+        ...prev.subOtherImages,
+        [subIndex]: prev.subOtherImages[subIndex].filter(
+          (_, i) => i !== imgIndex,
+        ),
+      },
+    }));
+  };
+
   const handleSubProductImageChange = (index, file) => {
     setMedia((prev) => ({
       ...prev,
@@ -172,6 +225,11 @@ const ProductDashboard = () => {
     formDataToSend.append("whatsapp", formData.whatsapp);
     formDataToSend.append("email", formData.email);
     formDataToSend.append("ownerEmail", vendorEmail);
+
+    // Add colors
+    if (formData.colors && formData.colors.length > 0) {
+      formDataToSend.append("colors", JSON.stringify(formData.colors));
+    }
     // Prepare subProducts payload without File objects
     const cleanedSubProducts = (formData.subProducts || []).map((s) => ({
       subName: s.subName || "",
@@ -195,10 +253,24 @@ const ProductDashboard = () => {
       formDataToSend.append("mainImage", media.mainImage);
     }
 
+    // Add other images
+    if (media.otherImages && media.otherImages.length > 0) {
+      media.otherImages.forEach((img) => {
+        formDataToSend.append("OtherImages", img);
+      });
+    }
+
     // Add sub-product images with proper naming. Prefer file stored on subProducts entry.
     (formData.subProducts || []).forEach((s, index) => {
       const file = s?.subImageFile || media.subImages?.[index];
       if (file) formDataToSend.append(`subImage${index}`, file);
+
+      // Add sub-product other images
+      if (media.subOtherImages?.[index]) {
+        media.subOtherImages[index].forEach((img, imgIdx) => {
+          formDataToSend.append(`subOtherImage${index}_${imgIdx}`, img);
+        });
+      }
     });
 
     try {
@@ -248,6 +320,7 @@ const ProductDashboard = () => {
       size: product.size,
       whatsapp: product.whatsapp,
       email: product.email,
+      colors: product.colors || [],
       // Pre-fill existing subProducts so they are preserved/edited
       subProducts: product.subProducts
         ? product.subProducts.map((s) => ({
@@ -348,14 +421,18 @@ const ProductDashboard = () => {
       size: "",
       whatsapp: "",
       email: vendorEmail || "",
+      colors: [],
       subProducts: [],
+    });
+    setMedia({
+      mainImage: null,
+      otherImages: [],
+      subImages: {},
+      subOtherImages: {},
     });
     setSelectedProduct(null);
     setShowForm(false);
     setaddmore(false);
-    setMedia({ mainImage: null, subImages: {} });
-    setSelectedProduct(null);
-    setShowForm(false);
   };
 
   const handleLogout = () => {
@@ -504,6 +581,23 @@ const ProductDashboard = () => {
               </div>
             )}
 
+            {formData.category === "clothing & textiles" ||
+              (formData.category === "Jewelry & Accessories" && (
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    color
+                  </label>
+                  <input
+                    type="text"
+                    name="colors"
+                    value={formData.colors?.join(", ") || ""}
+                    onChange={handleColorsChange}
+                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                    placeholder="e.g., Red, Blue, Green"
+                  />
+                </div>
+              ))}
+
             {(formData.category === "Dry Food & Spices" ||
               formData.category === "Beverage Products" ||
               formData.category ===
@@ -574,6 +668,18 @@ const ProductDashboard = () => {
                 type="file"
                 accept="image/*"
                 onChange={handleImageChange}
+                className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                Other Images(add less Than 4 images)
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleOtherImagesChange}
                 className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
               />
             </div>
@@ -685,6 +791,50 @@ const ProductDashboard = () => {
                           </p>
                         )}
                       </div>
+
+                      <label className="block text-sm font-semibold mb-2 mt-4">
+                        Other Sub Product Images
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={(e) =>
+                          handleSubProductOtherImagesChange(
+                            index,
+                            e.target.files,
+                          )
+                        }
+                        className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                      />
+                      {media.subOtherImages?.[index] && (
+                        <div className="mt-3">
+                          <p className="text-sm text-gray-300 mb-2">
+                            Selected Images:
+                          </p>
+                          <div className="flex flex-wrap gap-2">
+                            {media.subOtherImages[index].map((img, imgIdx) => (
+                              <div
+                                key={imgIdx}
+                                className="relative bg-gray-700 p-2 rounded flex items-center gap-2"
+                              >
+                                <span className="text-sm text-gray-300">
+                                  {img.name || `Image ${imgIdx + 1}`}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    removeSubOtherImage(index, imgIdx)
+                                  }
+                                  className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>

@@ -145,7 +145,7 @@ const Trending = () => {
                         </p>
                       </div>
 
-                      <button className="mt-2 sm:mt-4 w-full bg-green-500 text-white py-1.5 sm:py-2 rounded-xl hover:bg-green-600 text-sm">
+                      <button className="hidden sm:block mt-2 sm:mt-4 w-full bg-green-500 text-white py-1.5 sm:py-2 rounded-xl hover:bg-green-600 text-sm">
                         View Details
                       </button>
                     </div>
