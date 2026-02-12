@@ -62,7 +62,12 @@ const allowedOrigins = [
   "http://admin.smartsbooking.com",
 ];
 
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: false
+  })
+);
+
 
 {
   /*app.use(
