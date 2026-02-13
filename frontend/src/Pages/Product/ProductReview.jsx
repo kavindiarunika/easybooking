@@ -5,6 +5,7 @@ import { BACKEND_URL } from "../../App";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { IoStar } from "react-icons/io5";
 import { IoStarHalfOutline } from "react-icons/io5";
+import { FaWhatsapp, FaEnvelope } from "react-icons/fa";
 
 const ProductReview = () => {
   const { id } = useParams();
@@ -12,6 +13,7 @@ const ProductReview = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [selectedSubProduct, setSelectedSubProduct] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   const showDebug =
     typeof window !== "undefined" &&
@@ -68,6 +70,45 @@ const ProductReview = () => {
     }
   };
 
+  const getColorHex = (colorName) => {
+    const colorMap = {
+      Red: "#EF4444",
+      Blue: "#3B82F6",
+      Green: "#10B981",
+      Black: "#000000",
+      White: "#FFFFFF",
+      Purple: "#8B5CF6",
+      Yellow: "#FBBF24",
+      Pink: "#F472B6",
+      Orange: "#F97316",
+      Brown: "#A16207",
+      "light blue": "#ADD8E6",
+      "navy blue": "#000080",
+      oracle: "#F80102",
+      gold: "#FFD700",
+      Gray: "#9CA3AF",
+    };
+    return colorMap[colorName] || "#cccccc";
+  };
+
+  const formatPhoneForWhatsApp = (phone) => {
+    if (!phone) return null;
+    // remove all non-digit characters
+    const digits = phone.replace(/\D/g, "");
+    return digits || null;
+  };
+
+  const getWhatsAppLink = () => {
+    const num = formatPhoneForWhatsApp(product?.whatsapp);
+    if (!num) return null;
+    const productLabel = product?.name || "your product";
+    const subLabel = selectedSubProduct?.subName
+      ? ` - ${selectedSubProduct.subName}`
+      : "";
+    const msg = `Hi, I'm interested in ${productLabel}${subLabel}`;
+    return `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
+  };
+
   if (loading) {
     return <div className="text-center py-12">Loading product...</div>;
   }
@@ -77,19 +118,37 @@ const ProductReview = () => {
   }
 
   return (
-    <div className=" bg-white/30 p-6">
+    <div className="bg-white p-6">
       <button
         onClick={() => navigate(-1)}
         className="mb-4 px-3 py-1 rounded text-2xl"
       >
         <IoMdArrowRoundBack />
       </button>
+      <div className="lg:hidden flex gap-4">
+        <h1 className="text-3xl sm:text-5xl font-bold text-black prata-regular ">
+          {product.name}
+        </h1>
+        <div className="flex gap-1 text-xl  sm:text-2xl mt-2 sm:mt-4">
+          <IoStar className="" />
+          <IoStar />
+          <IoStar />
+          <IoStar />
+          <IoStarHalfOutline />
+        </div>
+      </div>
       <div className="grid md:grid-cols-2 gap-8">
         {/* -------- Product Image -------- */}
-        <div className=" rounded overflow-hidden ml-16 mt-8">
-          {selectedSubProduct?.subImage || product.mainImage ? (
+        <div className=" rounded overflow-hidden sm:ml-16 mt-8">
+          {selectedSubProduct?.subImage ||
+          selectedImage ||
+          product.mainImage ? (
             <img
-              src={selectedSubProduct?.subImage || product.mainImage}
+              src={
+                selectedSubProduct?.subImage ||
+                selectedImage ||
+                product.mainImage
+              }
               alt={product.name}
               className="w-auto h-54  sm:h-96 object-cover"
             />
@@ -98,11 +157,33 @@ const ProductReview = () => {
               No Image
             </div>
           )}
+
+          {/* Other Images gallery */}
+          {product.OtherImages && product.OtherImages.length > 0 && (
+            <div className="mt-4 flex gap-3 overflow-x-auto">
+              {product.OtherImages.map((img, idx) => (
+                <img
+                  key={idx}
+                  src={img}
+                  alt={`other-${idx}`}
+                  onClick={() => {
+                    setSelectedImage(img);
+                    setSelectedSubProduct(null);
+                  }}
+                  className={`w-20 h-20 sm:w-32 sm:h-32 object-cover rounded-md cursor-pointer border ${
+                    selectedImage === img
+                      ? "border-blue-500"
+                      : "border-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         {/* -------- Product Details -------- */}
         <div>
-          <div className="flex gap-4">
+          <div className="hidden sm:block flex gap-4">
             <h1 className="text-3xl sm:text-5xl font-bold text-black prata-regular ">
               {product.name}
             </h1>
@@ -150,7 +231,7 @@ const ProductReview = () => {
               ))}
           </div>
 
-          <div className="mt-4">
+          <div className="mt-4 ">
             <p className="text-sm font-semibold mb-2">Available Sizes:</p>
             <div className="flex flex-wrap gap-2">
               {getAllSizes().map((size, idx) => (
@@ -171,36 +252,92 @@ const ProductReview = () => {
             </div>
           </div>
 
+          {product.colors && product.colors.length > 0 && (
+            <div className="mt-4">
+              <p className="text-sm font-semibold mb-2">Available Colors:</p>
+              <div className="flex flex-wrap gap-2">
+                {product.colors.map((color, idx) => (
+                  <div
+                    key={idx}
+                    className="flex items-center gap-2 px-3 py-2 border border-gray-300 rounded bg-white"
+                  >
+                    <div
+                      className={`w-5 h-5 rounded-full ${color === "White" ? "border border-gray-400" : ""}`}
+                      style={{
+                        backgroundColor: getColorHex(color),
+                      }}
+                    />
+                    <span className="text-sm font-medium text-gray-900">
+                      {color}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        
+
           {/* Removed old size display */}
           <p className="mt-4 text-gray-900">
             {selectedSubProduct?.subDescription ||
               product.description ||
               "No description available"}
           </p>
-          {/* Contact Info */}
-          <div className="mt-6 space-y-2">
-            {product.whatsapp && (
-              <a
-                href={`https://wa.me/${product.whatsapp}`}
-                target="_blank"
-                rel="noreferrer"
-                className="block bg-green-500 text-white px-4 py-2 rounded text-center"
-              >
-                Contact via WhatsApp
-              </a>
-            )}
-
-            {product.email && (
-              <a
-                href={`mailto:${product.email}`}
-                className="block bg-blue-500 text-white px-4 py-2 rounded text-center"
-              >
-                Contact via Email
-              </a>
-            )}
+            <div className="flex flex-row gap-4">
+           <div>
+            <p className="text-m  mt-4 mb-2">
+              Conatct US:
+              {selectedSubProduct?.whatsapp
+                ? `${selectedSubProduct.subPrice}`
+                : product.whatsapp
+                  ? `${product.whatsapp}`
+                  : "No contact number"}
+            </p>
           </div>
+           <div>
+            <p className="text-m  mt-4 mb-2">
+              E-mail:
+              {selectedSubProduct?.email
+                ? `${selectedSubProduct.email}`
+                : product.email
+                  ? `${product.email}`
+                  : "No email available"}
+            </p>
+          </div>
+          </div>
+          {/* Contact Info (replaced by fixed floating icons) */}
+          <div className="mt-6" />
         </div>
+
+        
       </div>
+
+      {/* Fixed floating contact icons (bottom-right) */}
+      {(product.whatsapp || product.email) && (
+        <div className="fixed right-4 bottom-6 z-50 flex flex-col gap-3">
+          {product.whatsapp && (
+            <a
+              href={getWhatsAppLink()}
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Contact via WhatsApp"
+              className="w-12 h-12 rounded-full flex items-center justify-center bg-green-500 text-white shadow-lg hover:scale-105 transition-transform"
+            >
+              <FaWhatsapp />
+            </a>
+          )}
+
+          {product.email && (
+            <a
+              href={`mailto:${product.email}`}
+              title="Contact via Email"
+              className="w-12 h-12 rounded-full flex items-center justify-center bg-blue-600 text-white shadow-lg hover:scale-105 transition-transform"
+            >
+              <FaEnvelope />
+            </a>
+          )}
+        </div>
+      )}
 
       {/* -------- Review Section (Optional UI) -------- */}
       <div className="hidden mt-12">

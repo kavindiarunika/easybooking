@@ -288,7 +288,7 @@ const AddProduct = () => {
           {/* Product Name */}
           <div>
             <label className="block text-sm font-semibold mb-2">
-              Product Name *
+              Product Name
             </label>
             <input
               type="text"
@@ -304,7 +304,7 @@ const AddProduct = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-semibold mb-2">
-                Price (RS) *
+                Price (RS)
               </label>
               <input
                 type="number"
@@ -329,9 +329,7 @@ const AddProduct = () => {
 
           {/* Category */}
           <div>
-            <label className="block text-sm font-semibold mb-2">
-              Category *
-            </label>
+            <label className="block text-sm font-semibold mb-2">Category</label>
             <select
               name="category"
               value={formData.category}
@@ -378,6 +376,74 @@ const AddProduct = () => {
               </select>
             </div>
           )}
+          {formData.category === "Clothing & Textiles" ||
+            (formData.category === "Jewelry & Accessories" && (
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Colors
+                </label>
+                <div className="flex flex-wrap gap-4">
+                  {[
+                    { name: "Red", hex: "#EF4444" },
+                    { name: "light blue", hex: "#ADD8E6" },
+                    { name: "Green", hex: "#10B981" },
+                    { name: "Black", hex: "#000000" },
+                    { name: "Orange", hex: "#F97316" },
+                    { name: "Pink", hex: "#F472B6" },
+                    {name: "Purple", hex: "#8B5CF6" },
+                    {name: "Yellow", hex: "#FBBF24" },
+                    {name: "Brown", hex: "#A16207" },
+                    {name: "Gray", hex: "#9CA3AF" },
+                    {name: "navy blue", hex: "#000080" },
+                    {name: "oracle", hex: "#F80102" },
+                    {name: "gold", hex: "#FFD700" },
+
+                    { name: "White", hex: "#FFFFFF", border: true },
+                  ].map((color) => (
+                    <button
+                      key={color.name}
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => {
+                          const colors = prev.colors.includes(color.name)
+                            ? prev.colors.filter((c) => c !== color.name)
+                            : [...prev.colors, color.name];
+                          return { ...prev, colors };
+                        });
+                      }}
+                      className={`flex items-center gap-2 px-4 py-2 rounded border-2 transition ${
+                        formData.colors.includes(color.name)
+                          ? "border-blue-600 bg-blue-50"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                    >
+                      <div
+                        className={`w-6 h-6 rounded-full ${
+                          color.border ? "border border-gray-300" : ""
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span className="font-medium text-sm">{color.name}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            ))}
+          {formData.category === "Jewelry & Accessories" ||
+            formData.category === "Ayurvedic & Natural Products" ||
+            formData.category === " Traditional Handicrafts & Cultural Items" ||
+            (formData.category === "Dry Food & Spices" && (
+              <div>
+                <label className="block text-sm font-semibold mb-2">Size</label>
+                <input
+                  name="size"
+                  value={formData.size}
+                  onChange={handleInputChange}
+                  className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                />
+                Grams
+              </div>
+            ))}
 
           {/* WhatsApp */}
           <div>
@@ -409,7 +475,7 @@ const AddProduct = () => {
           {/* Description */}
           <div>
             <label className="block text-sm font-semibold mb-2">
-              Description *
+              Description
             </label>
             <textarea
               name="description"

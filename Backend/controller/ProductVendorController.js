@@ -189,3 +189,14 @@ export const updateProductVendorProfile = async (req, res) => {
     });
   }
 };
+
+// Get all product vendors (admin)
+export const getAllProductVendors = async (req, res) => {
+  try {
+    const vendors = await ProductVendorAuth.find().select("-password");
+    res.status(200).json({ success: true, data: vendors });
+  } catch (error) {
+    console.error("Get All Product Vendors Error:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};

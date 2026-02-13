@@ -1,6 +1,10 @@
 import React, { useState, useContext } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { IoReorderThreeOutline, IoClose } from "react-icons/io5";
+import { AiOutlineHome } from "react-icons/ai";
+import { MdHotel } from "react-icons/md";
+import { RiSafariFill } from "react-icons/ri";
+import { FaBoxOpen, FaMapMarkerAlt } from "react-icons/fa";
 import { assets } from "../assets/Assest";
 import { TravelContext } from "../Context/TravelContext";
 
@@ -21,28 +25,35 @@ const Header = () => {
 
         {/* Navbar Links */}
         <div className="hidden md:flex items-end gap-16">
-          <ul className="hidden sm:flex gap-16 text-m text-white">
+          <ul className="hidden sm:flex gap-12 text-m">
             {[
-              { name: "Home", path: "./" },
-              { name: "stays", path: "/villa" },
-               {name:"GoTrip" , path:"/safarihome"},
-                {name:"product" , path:"/product"},
-              {name:"traveling places", path:"/places" },
-             
-              
-            ].map((item, index) => (
-              <li key={index} className="relative group cursor-pointer pb-1">
-                <NavLink
-                  to={item.path}
-                  onClick={item.onClick}
-                  className="flex flex-col items-center gap-1 text-green-400"
-                >
-                  <p>{item.name}</p>
-                  {/* White underline only on hover */}
-                  <span className="absolute left-0 -bottom-0.5 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
-                </NavLink>
-              </li>
-            ))}
+              { name: "Home", path: "./", icon: AiOutlineHome },
+              { name: "stays", path: "/villa", icon: MdHotel },
+              { name: "GoTrip", path: "/safarihome", icon: RiSafariFill },
+              { name: "product", path: "/product", icon: FaBoxOpen },
+              {
+                name: "traveling places",
+                path: "/places",
+                icon: FaMapMarkerAlt,
+              },
+            ].map((item, index) => {
+              const Icon = item.icon;
+              return (
+                <li key={index} className="relative group cursor-pointer pb-1">
+                  <NavLink
+                    to={item.path}
+                    onClick={item.onClick}
+                    className="flex items-center gap-2 text-white"
+                  >
+                    <Icon className="text-white w-5 h-5" />
+                    <div className="relative">
+                      <p className="capitalize">{item.name}</p>
+                      <span className="absolute left-0 -bottom-0.5 w-0 h-[2px] bg-white transition-all duration-300 group-hover:w-full"></span>
+                    </div>
+                  </NavLink>
+                </li>
+              );
+            })}
           </ul>
         </div>
 
@@ -59,7 +70,9 @@ const Header = () => {
       {/*------------------- Mobile Menu Overlay -------------------*/}
       <div
         className={`fixed inset-0 bg-black/50 transition-opacity duration-300 z-40 md:hidden ${
-          isOpen ? "opacity-100 visible pointer-events-auto" : "opacity-0 invisible pointer-events-none"
+          isOpen
+            ? "opacity-100 visible pointer-events-auto"
+            : "opacity-0 invisible pointer-events-none"
         }`}
         onClick={toggleMenu}
       >
@@ -87,57 +100,62 @@ const Header = () => {
                 to="./"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
-                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                  isActive
+                    ? "text-cyan-300 flex items-center gap-3"
+                    : "hover:text-cyan-300 flex items-center gap-3"
                 }
               >
-                Home
+                <AiOutlineHome className="text-white w-5 h-5" /> Home
               </NavLink>
 
               <NavLink
                 to="/villa"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
-                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                  isActive
+                    ? "text-cyan-300 flex items-center gap-3"
+                    : "hover:text-cyan-300 flex items-center gap-3"
                 }
               >
-                Hotels
+                <MdHotel className="text-white w-5 h-5" /> Hotels
               </NavLink>
               <NavLink
                 to="/safarihome"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
-                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                  isActive
+                    ? "text-cyan-300 flex items-center gap-3"
+                    : "hover:text-cyan-300 flex items-center gap-3"
                 }
               >
-                GoTrip
+                <RiSafariFill className="text-white w-5 h-5" /> GoTrip
               </NavLink>
               <NavLink
                 to="/product"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
-                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                  isActive
+                    ? "text-cyan-300 flex items-center gap-3"
+                    : "hover:text-cyan-300 flex items-center gap-3"
                 }
               >
-                Product
+                <FaBoxOpen className="text-white w-5 h-5" /> Product
               </NavLink>
               <NavLink
                 to="/places"
                 onClick={toggleMenu}
                 className={({ isActive }) =>
-                  isActive ? "text-cyan-300" : "hover:text-cyan-300"
+                  isActive
+                    ? "text-cyan-300 flex items-center gap-3"
+                    : "hover:text-cyan-300 flex items-center gap-3"
                 }
               >
-                Travel Places
+                <FaMapMarkerAlt className="text-white w-5 h-5" /> Travel Places
               </NavLink>
-
-             
             </div>
           </div>
         </div>
       </div>
-
-    
-     
     </div>
   );
 };

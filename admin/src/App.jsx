@@ -8,6 +8,7 @@ import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 // Pages
+import ShowProductAcount from "./Pages/Product/ShowProductAcount";
 import ShowProduct from "./Pages/Product/ShowProduct";
 import EditProduct from "./Pages/Product/EditProduct";
 import AddTrending from "./Pages/Add/AddTrending";
@@ -299,6 +300,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <EditProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                   <Route
+                    path="/showproductAccount"
+                    element={
+                      <ProtectedRoute>
+                        <ShowProductAcount token={token} />
                       </ProtectedRoute>
                     }
                   />

@@ -412,6 +412,27 @@ const ProductDashboard = () => {
     }
   };
 
+  const getColorHex = (colorName) => {
+    const colorMap = {
+      Red: "#EF4444",
+      Blue: "#3B82F6",
+      Green: "#10B981",
+      Black: "#000000",
+      White: "#FFFFFF",
+      Purple: "#8B5CF6",
+      Yellow: "#FBBF24",
+      Pink: "#F472B6",
+      Orange: "#F97316",
+      Brown: "#A16207",
+      "light blue": "#ADD8E6",
+      "navy blue": "#000080",
+      oracle: "#F80102",
+      gold: "#FFD700",
+      Gray: "#9CA3AF",
+    };
+    return colorMap[colorName] || "#cccccc";
+  };
+
   const resetForm = () => {
     setFormData({
       name: "",
@@ -503,7 +524,7 @@ const ProductDashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-semibold mb-2">
-                  Product Name *
+                  Product Name
                 </label>
                 <input
                   type="text"
@@ -581,22 +602,60 @@ const ProductDashboard = () => {
               </div>
             )}
 
-            {formData.category === "clothing & textiles" ||
-              (formData.category === "Jewelry & Accessories" && (
-                <div>
-                  <label className="block text-sm font-semibold mb-2">
-                    color
-                  </label>
-                  <input
-                    type="text"
-                    name="colors"
-                    value={formData.colors?.join(", ") || ""}
-                    onChange={handleColorsChange}
-                    className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
-                    placeholder="e.g., Red, Blue, Green"
-                  />
+            {(formData.category === "Clothing & Textiles" ||
+              formData.category === "Jewelry & Accessories") && (
+              <div>
+                <label className="block text-sm font-semibold mb-2">
+                  Colors
+                </label>
+                <div className="flex flex-wrap gap-3">
+                  {[
+                    { name: "Red", hex: "#EF4444" },
+                    { name: "light blue", hex: "#ADD8E6" },
+                    { name: "Green", hex: "#10B981" },
+                    { name: "Black", hex: "#000000" },
+                    { name: "Orange", hex: "#F97316" },
+                    { name: "Pink", hex: "#F472B6" },
+                    { name: "Purple", hex: "#8B5CF6" },
+                    { name: "Yellow", hex: "#FBBF24" },
+                    { name: "Brown", hex: "#A16207" },
+                    { name: "Gray", hex: "#9CA3AF" },
+                    { name: "navy blue", hex: "#000080" },
+                    { name: "oracle", hex: "#F80102" },
+                    { name: "gold", hex: "#FFD700" },
+                    { name: "White", hex: "#FFFFFF", border: true },
+                  ].map((color) => (
+                    <button
+                      key={color.name}
+                      type="button"
+                      onClick={() => {
+                        setFormData((prev) => {
+                          const colors = prev.colors.includes(color.name)
+                            ? prev.colors.filter((c) => c !== color.name)
+                            : [...prev.colors, color.name];
+                          return { ...prev, colors };
+                        });
+                      }}
+                      className={`flex items-center gap-2 px-3 py-2 rounded border-2 transition ${
+                        formData.colors.includes(color.name)
+                          ? "border-blue-500 bg-gray-600"
+                          : "border-gray-600 bg-gray-700 hover:border-gray-500"
+                      }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-full flex-shrink-0 ${
+                          color.border ? "border-2 border-gray-400" : ""
+                        }`}
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span className="text-sm text-gray-100 whitespace-nowrap">
+                        {color.name}
+                      </span>
+                    </button>
+                  ))}
                 </div>
-              ))}
+              </div>
+            )}
 
             {(formData.category === "Dry Food & Spices" ||
               formData.category === "Beverage Products" ||
@@ -883,6 +942,7 @@ const ProductDashboard = () => {
                 <th className="px-6 py-4 text-left">Product Name</th>
                 <th className="px-6 py-4 text-left">Category</th>
                 <th className="px-6 py-4 text-left">Price</th>
+                <th className="px-6 py-4 text-left">Colors</th>
                 <th className="px-6 py-4 text-left">Rating</th>
                 <th className="px-6 py-4 text-left">Status</th>
                 <th className="px-6 py-4 text-left">Actions</th>
@@ -896,7 +956,28 @@ const ProductDashboard = () => {
                 >
                   <td className="px-6 py-4">{product.name}</td>
                   <td className="px-6 py-4 capitalize">{product.category}</td>
-                  <td className="px-6 py-4">Rs. {product.price}</td>
+                  <td className="px-6 py-4">
+                    <div className="space-y-2">
+                      <div className="font-semibold">Rs. {product.price}</div>
+                      {product.colors && product.colors.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {product.colors.map((color, idx) => (
+                            <div key={idx} className="flex items-center gap-1">
+                              <div
+                                className={`w-4 h-4 rounded-full ${color === "White" ? "border border-gray-400" : ""}`}
+                                style={{
+                                  backgroundColor: getColorHex(color),
+                                }}
+                              />
+                              <span className="text-xs text-gray-300">
+                                {color}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </td>
                   <td className="px-6 py-4">
                     {product.rating > 0 ? (
                       <span className="flex items-center gap-1">

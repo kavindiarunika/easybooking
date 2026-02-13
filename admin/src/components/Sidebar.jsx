@@ -120,6 +120,10 @@ const Sidebar = () => {
                 <FiEye size={16} />
                 <span>Show All Products</span>
               </NavLink>
+              <NavLink to="/showproductAccount" className={({ isActive }) => linkClass(isActive)}>
+                <FiEye size={16} />
+                <span>Show Product Account</span>
+              </NavLink>
               <NavLink to="/deleteproduct" className={({ isActive }) => linkClass(isActive)}>
                 <FiTrash2 size={16} />
                 <span>Delete Product</span>
