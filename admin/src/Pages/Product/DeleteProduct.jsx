@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
-import { backendUrl  } from "../../App";
+import { backendUrl } from "../../App";
 import "react-toastify/dist/ReactToastify.css";
 import {
   FaTrash,
@@ -29,7 +29,7 @@ const DeleteProduct = () => {
   const fetchAllProducts = async () => {
     setLoading(true);
     try {
-      const response = await axios.get(`${backendUrl }/api/product/all`, {
+      const response = await axios.get(`${backendUrl}/api/product/all`, {
         params: { limit: 1000 },
       });
       const allProducts = response.data.data || [];
@@ -77,7 +77,10 @@ const DeleteProduct = () => {
     }
 
     try {
-      await axios.delete(`${backendUrl }/api/product/delete/${id}`);
+      const token = localStorage.getItem("token");
+      await axios.delete(`${backendUrl}/api/product/delete/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       toast.success("Product deleted successfully");
       fetchAllProducts();
     } catch (error) {
@@ -88,7 +91,14 @@ const DeleteProduct = () => {
 
   const handleToggleStatus = async (id) => {
     try {
-      await axios.patch(`${BACKEND_URL}/api/product/toggle/${id}`, {});
+      const token = localStorage.getItem("token");
+      await axios.patch(
+        `${backendUrl}/api/product/toggle/${id}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        },
+      );
       toast.success("Product status updated");
       fetchAllProducts();
     } catch (error) {

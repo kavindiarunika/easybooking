@@ -14,13 +14,11 @@ const connectDB = async () => {
     // Avoid printing credentials in logs
     console.log(
       "Connecting to MongoDB:",
-      uri.replace(/:\/\/.*@/, "://<user>:<pass>@")
+      uri.replace(/:\/\/.*@/, "://<user>:<pass>@"),
     );
 
     // Use safer connection options and allow longer server selection time
     const options = {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
       serverSelectionTimeoutMS: 30000, // 30s to select a server
       socketTimeoutMS: 45000,
     };
@@ -37,7 +35,7 @@ const connectDB = async () => {
       } catch (err) {
         console.error(
           `MongoDB connection attempt ${attempt} failed:`,
-          err.message || err
+          err.message || err,
         );
         if (attempt >= maxRetries) throw err;
         const delay = attempt * 2000; // incremental backoff
@@ -54,7 +52,7 @@ const connectDB = async () => {
       error.syscall === "querySrv"
     ) {
       console.error(
-        "DNS or connection issue detected. Check your internet connection, the Atlas cluster name, and make sure your IP is allowlisted in MongoDB Atlas (or use 0.0.0.0/0 for testing)."
+        "DNS or connection issue detected. Check your internet connection, the Atlas cluster name, and make sure your IP is allowlisted in MongoDB Atlas (or use 0.0.0.0/0 for testing).",
       );
     }
 

@@ -49,7 +49,7 @@ const ProductDashboard = () => {
     price: "",
     category: "",
     size: "",
-    whatsapp: "",
+    whatsapp: "+94",
     email: vendorEmail || "",
     colors: [],
     subProducts: [],
@@ -160,6 +160,22 @@ const ProductDashboard = () => {
     }));
   };
 
+  const handleInputChanges = (e) => {
+    const { name, value } = e.target;
+
+    if (name === "whatsapp") {
+      // Always keep +94 at beginning
+      let newValue = value;
+      if (!newValue.startsWith("+94")) {
+        newValue = "+94" + newValue.replace("+94", "");
+      }
+
+      setFormData({ ...formData, [name]: newValue });
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
+
   const removeSubOtherImage = (subIndex, imgIndex) => {
     setMedia((prev) => ({
       ...prev,
@@ -210,6 +226,11 @@ const ProductDashboard = () => {
 
     if (!selectedProduct && !media.mainImage) {
       toast.error("Main image is required");
+      return;
+    }
+
+    if (!storedToken) {
+      toast.error("Not authenticated. Please log in as a vendor.");
       return;
     }
 
@@ -304,7 +325,15 @@ const ProductDashboard = () => {
       resetForm();
     } catch (error) {
       console.error("Error saving product:", error);
-      toast.error(error.response?.data?.message || "Error saving product");
+      let errorMsg = "Error saving product";
+      if (error.response?.status === 401) {
+        errorMsg = "Session expired. Please log in again.";
+      } else if (error.response?.data?.message) {
+        errorMsg = error.response.data.message;
+      } else if (error.message) {
+        errorMsg = error.message;
+      }
+      toast.error(errorMsg);
     } finally {
       setUploading(false);
     }
@@ -680,16 +709,17 @@ const ProductDashboard = () => {
               </div>
             )}
 
-            <div>
-              <label className="block text-sm font-semibold mb-2">
-                WhatsApp
-              </label>
+            <div className="flex">
+              <span className="bg-gray-600 text-white px-3 flex items-center rounded-l">
+                +94
+              </span>
               <input
                 type="tel"
                 name="whatsapp"
                 value={formData.whatsapp}
                 onChange={handleInputChange}
-                className="w-full bg-gray-700 border border-gray-600 rounded p-2 text-white"
+                className="w-full bg-gray-700 border border-gray-600 rounded-r p-2 text-white"
+                placeholder="712345678"
               />
             </div>
 

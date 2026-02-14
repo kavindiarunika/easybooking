@@ -13,17 +13,21 @@ const product = new mongoose.Schema(
     price: { type: Number, required: true },
     category: { type: String, required: true },
     mainImage: { type: String, required: true },
-    OtherImages:{type: [String], required: false },
-    colors:{type: [String], required: false },
+    mainImagePublicId: { type: String, required: false }, // Cloudinary public_id for main image
+    OtherImages: { type: [String], required: false },
+    OtherImagesPublicIds: { type: [String], required: false }, // Cloudinary public_ids for other images
+    colors: { type: [String], required: false },
     size: { type: String, required: false },
     subProducts: [
       {
         subImage: { type: String },
+        subImagePublicId: { type: String, required: false }, // Cloudinary public_id for sub image
         subName: { type: String },
         subDescription: { type: String },
         subPrice: { type: Number },
         subsize: { type: String },
         subOtherImages: { type: [String] },
+        subOtherImagesPublicIds: { type: [String], required: false }, // Cloudinary public_ids for sub other images
       },
     ],
     whatsapp: { type: String, required: true },

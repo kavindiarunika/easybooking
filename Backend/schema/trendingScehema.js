@@ -17,15 +17,26 @@ const TrendingSchema = new mongoose.Schema(
       type: [String],
       default: [],
     },
+    otherimagesPublicIds: {
+      type: [String],
+      default: [],
+    },
     mainImage: String,
+    mainImagePublicId: String,
 
     image: String,
+    imagePublicId: String,
     image1: String,
+    image1PublicId: String,
     image2: String,
+    image2PublicId: String,
     image3: String,
+    image3PublicId: String,
     image4: String,
+    image4PublicId: String,
 
     videoUrl: String,
+    videoPublicId: String,
 
     location: String,
     country: String,
@@ -34,13 +45,13 @@ const TrendingSchema = new mongoose.Schema(
     address: String,
     contact: String,
     paid: { type: Boolean, default: false },
-    paidAt:{ type: Date, default: Date.now },
-    expireAt:{type:Date},
+    paidAt: { type: Date, default: Date.now },
+    expireAt: { type: Date },
     ownerEmail: { type: String, required: true },
 
     availableThings: [String],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
 export default mongoose.model("Trending", TrendingSchema);

@@ -1,6 +1,10 @@
 import safari from "../schema/safariSchema.js";
 import mongoose from "mongoose";
 import cloudinary from "../cloudinary/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  deleteMultipleFromCloudinary,
+} from "../utils/cloudinaryHelper.js";
 import fs from "fs";
 
 const uploadimage = async (file, folder) => {
@@ -21,12 +25,15 @@ const uploadimage = async (file, folder) => {
         console.warn(
           "Failed to unlink temp file:",
           file.path,
-          unlinkErr.message || unlinkErr
+          unlinkErr.message || unlinkErr,
         );
       }
     }
 
-    return result.secure_url;
+    return {
+      secure_url: result.secure_url,
+      public_id: result.public_id,
+    };
   } catch (err) {
     console.error("Cloudinary upload error for file:", file.originalname, err);
     const message = err.message || "Upload failed";
@@ -39,7 +46,7 @@ const uploadimage = async (file, folder) => {
     } catch (cleanupErr) {
       console.warn(
         "Failed to cleanup temp after upload error:",
-        cleanupErr.message || cleanupErr
+        cleanupErr.message || cleanupErr,
       );
     }
     throw e;
@@ -58,12 +65,10 @@ export const createSfari = async (req, res) => {
     if (req.user.role === "admin") {
       const { email } = req.body;
       if (!email || String(email).trim() === "") {
-        return res
-          .status(400)
-          .json({
-            message:
-              "Owner email is required when admin creates a safari profile",
-          });
+        return res.status(400).json({
+          message:
+            "Owner email is required when admin creates a safari profile",
+        });
       }
       ownerEmail = email;
     } else if (req.user.role === "vendor") {
@@ -78,11 +83,9 @@ export const createSfari = async (req, res) => {
     if (ownerEmail) {
       const exists = await safari.findOne({ email: ownerEmail });
       if (exists) {
-        return res
-          .status(409)
-          .json({
-            message: "A safari profile already exists for this account",
-          });
+        return res.status(409).json({
+          message: "A safari profile already exists for this account",
+        });
       }
     }
 
@@ -140,7 +143,7 @@ export const createSfari = async (req, res) => {
     if (!req.files?.mainImage) {
       console.log(
         "mainImage missing, files present:",
-        Object.keys(req.files || {})
+        Object.keys(req.files || {}),
       );
       return res.status(400).json({
         message: "main image is required",
@@ -151,26 +154,26 @@ export const createSfari = async (req, res) => {
     const mainImage = await uploadimage(req.files.mainImage[0], "safari/main");
 
     // Safely upload guider image if provided
-    const GuiderImage = req.files?.GuiderImage
+    const GuiderImageData = req.files?.GuiderImage
       ? await uploadimage(req.files.GuiderImage[0], "safari/guider")
       : null;
 
-    let vehicleImage = [];
+    let vehicleImageData = [];
     if (req.files.vehicleImage) {
-      vehicleImage = await Promise.all(
-        req.files.vehicleImage.map((img) => uploadimage(img, "safari/vehicle"))
+      vehicleImageData = await Promise.all(
+        req.files.vehicleImage.map((img) => uploadimage(img, "safari/vehicle")),
       );
     }
 
-    let otherimages = [];
+    let otherimagesData = [];
     if (req.files?.otherimages) {
-      otherimages = await Promise.all(
-        req.files.otherimages.map((img) => uploadimage(img, "safari/gallery"))
+      otherimagesData = await Promise.all(
+        req.files.otherimages.map((img) => uploadimage(img, "safari/gallery")),
       );
     }
 
     // Safely upload short video if provided
-    const shortvideo = req.files?.shortvideo
+    const shortvideoData = req.files?.shortvideo
       ? await uploadimage(req.files.shortvideo[0], "safari/video")
       : null;
 
@@ -186,13 +189,18 @@ export const createSfari = async (req, res) => {
       whatsapp,
       totalDays,
       email: ownerEmail,
-      mainImage: mainImage,
-      otherimages: otherimages,
-      shortvideo: shortvideo,
+      mainImage: mainImage.secure_url,
+      mainImagePublicId: mainImage.public_id,
+      otherimages: otherimagesData.map((img) => img.secure_url),
+      otherimagesPublicIds: otherimagesData.map((img) => img.public_id),
+      shortvideo: shortvideoData ? shortvideoData.secure_url : null,
+      shortvideosPublicId: shortvideoData ? shortvideoData.public_id : null,
       VehicleType: VehicleType,
-      vehicleImage: vehicleImage,
+      vehicleImage: vehicleImageData.map((img) => img.secure_url),
+      vehicleImagePublicIds: vehicleImageData.map((img) => img.public_id),
       GuiderName: GuiderName,
-      GuiderImage: GuiderImage,
+      GuiderImage: GuiderImageData ? GuiderImageData.secure_url : null,
+      GuiderImagePublicId: GuiderImageData ? GuiderImageData.public_id : null,
       GuiderExperience: GuiderExperience,
     });
 
@@ -284,10 +292,17 @@ export const updateSafari = async (req, res) => {
 
     if (req.files?.mainImage) {
       try {
-        safariDoc.mainImage = await uploadimage(
+        // Delete old main image from Cloudinary
+        if (safariDoc.mainImagePublicId) {
+          await deleteFromCloudinary(safariDoc.mainImagePublicId);
+        }
+
+        const mainImageData = await uploadimage(
           req.files.mainImage[0],
-          "safari/main"
+          "safari/main",
         );
+        safariDoc.mainImage = mainImageData.secure_url;
+        safariDoc.mainImagePublicId = mainImageData.public_id;
       } catch (uploadErr) {
         console.error("Failed to upload mainImage during update:", uploadErr);
         return res
@@ -298,8 +313,22 @@ export const updateSafari = async (req, res) => {
 
     if (req.files?.otherimages) {
       try {
-        safariDoc.otherimages = await Promise.all(
-          req.files.otherimages.map((img) => uploadimage(img, "safari/gallery"))
+        // Delete old other images from Cloudinary
+        if (
+          safariDoc.otherimagesPublicIds &&
+          safariDoc.otherimagesPublicIds.length > 0
+        ) {
+          await deleteMultipleFromCloudinary(safariDoc.otherimagesPublicIds);
+        }
+
+        const otherimagesData = await Promise.all(
+          req.files.otherimages.map((img) =>
+            uploadimage(img, "safari/gallery"),
+          ),
+        );
+        safariDoc.otherimages = otherimagesData.map((img) => img.secure_url);
+        safariDoc.otherimagesPublicIds = otherimagesData.map(
+          (img) => img.public_id,
         );
       } catch (uploadErr) {
         console.error("Failed to upload otherimages during update:", uploadErr);
@@ -311,15 +340,27 @@ export const updateSafari = async (req, res) => {
 
     if (req.files?.vehicleImage) {
       try {
-        safariDoc.vehicleImage = await Promise.all(
+        // Delete old vehicle images from Cloudinary
+        if (
+          safariDoc.vehicleImagePublicIds &&
+          safariDoc.vehicleImagePublicIds.length > 0
+        ) {
+          await deleteMultipleFromCloudinary(safariDoc.vehicleImagePublicIds);
+        }
+
+        const vehicleImageData = await Promise.all(
           req.files.vehicleImage.map((img) =>
-            uploadimage(img, "safari/vehicle")
-          )
+            uploadimage(img, "safari/vehicle"),
+          ),
+        );
+        safariDoc.vehicleImage = vehicleImageData.map((img) => img.secure_url);
+        safariDoc.vehicleImagePublicIds = vehicleImageData.map(
+          (img) => img.public_id,
         );
       } catch (uploadErr) {
         console.error(
           "Failed to upload vehicleImage during update:",
-          uploadErr
+          uploadErr,
         );
         return res
           .status(uploadErr.http_code || 400)
@@ -329,10 +370,17 @@ export const updateSafari = async (req, res) => {
 
     if (req.files?.GuiderImage) {
       try {
-        safariDoc.GuiderImage = await uploadimage(
+        // Delete old guider image from Cloudinary
+        if (safariDoc.GuiderImagePublicId) {
+          await deleteFromCloudinary(safariDoc.GuiderImagePublicId);
+        }
+
+        const guiderImageData = await uploadimage(
           req.files.GuiderImage[0],
-          "safari/guider"
+          "safari/guider",
         );
+        safariDoc.GuiderImage = guiderImageData.secure_url;
+        safariDoc.GuiderImagePublicId = guiderImageData.public_id;
       } catch (uploadErr) {
         console.error("Failed to upload GuiderImage during update:", uploadErr);
         return res
@@ -342,10 +390,17 @@ export const updateSafari = async (req, res) => {
     }
     if (req.files?.shortvideo) {
       try {
-        safariDoc.shortvideo = await uploadimage(
+        // Delete old short video from Cloudinary
+        if (safariDoc.shortvideosPublicId) {
+          await deleteFromCloudinary(safariDoc.shortvideosPublicId);
+        }
+
+        const shortvideoData = await uploadimage(
           req.files.shortvideo[0],
-          "safari/video"
+          "safari/video",
         );
+        safariDoc.shortvideo = shortvideoData.secure_url;
+        safariDoc.shortvideosPublicId = shortvideoData.public_id;
       } catch (uploadErr) {
         console.error("Failed to upload shortvideo during update:", uploadErr);
         return res
@@ -371,6 +426,34 @@ export const deleteSafari = async (req, res) => {
     const { id } = req.params;
     const deleted = await safari.findByIdAndDelete(id);
     if (!deleted) return res.status(404).json({ message: "Safari not found" });
+
+    // Delete all images from Cloudinary
+    if (deleted.mainImagePublicId) {
+      await deleteFromCloudinary(deleted.mainImagePublicId);
+    }
+
+    if (
+      deleted.otherimagesPublicIds &&
+      deleted.otherimagesPublicIds.length > 0
+    ) {
+      await deleteMultipleFromCloudinary(deleted.otherimagesPublicIds);
+    }
+
+    if (
+      deleted.vehicleImagePublicIds &&
+      deleted.vehicleImagePublicIds.length > 0
+    ) {
+      await deleteMultipleFromCloudinary(deleted.vehicleImagePublicIds);
+    }
+
+    if (deleted.GuiderImagePublicId) {
+      await deleteFromCloudinary(deleted.GuiderImagePublicId);
+    }
+
+    if (deleted.shortvideosPublicId) {
+      await deleteFromCloudinary(deleted.shortvideosPublicId);
+    }
+
     return res.status(200).json({ message: "safari deleted" });
   } catch (error) {
     console.error("deleteSafari error:", error);

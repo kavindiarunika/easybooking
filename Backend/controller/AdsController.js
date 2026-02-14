@@ -1,5 +1,9 @@
 import AdsSchema from "../schema/Ads.js";
 import cloudinary from "../cloudinary/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  uploadToCloudinary,
+} from "../utils/cloudinaryHelper.js";
 
 export const addads = async (req, res) => {
   try {
@@ -11,15 +15,20 @@ export const addads = async (req, res) => {
       const media = [];
 
       for (const file of files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder,
-          resource_type: "auto",
-        });
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder,
+            resource_type: "auto",
+          });
 
-        media.push({
-          url: result.secure_url,
-          type: result.resource_type,
-        });
+          media.push({
+            url: result.secure_url,
+            type: result.resource_type,
+            public_id: result.public_id, // Save public_id
+          });
+        } catch (error) {
+          console.error(`Upload error for ${folder}:`, error);
+        }
       }
       return media;
     };
@@ -51,15 +60,20 @@ export const updateAds = async (req, res) => {
       const media = [];
 
       for (const file of files) {
-        const result = await cloudinary.uploader.upload(file.path, {
-          folder,
-          resource_type: "auto",
-        });
+        try {
+          const result = await cloudinary.uploader.upload(file.path, {
+            folder,
+            resource_type: "auto",
+          });
 
-        media.push({
-          url: result.secure_url,
-          type: result.resource_type,
-        });
+          media.push({
+            url: result.secure_url,
+            type: result.resource_type,
+            public_id: result.public_id, // Save public_id
+          });
+        } catch (error) {
+          console.error(`Upload error for ${folder}:`, error);
+        }
       }
       return media;
     };
@@ -70,9 +84,34 @@ export const updateAds = async (req, res) => {
       return res.status(404).json({ message: "Ads not found" });
     }
 
+    // Delete old images from Cloudinary before uploading new ones
+    if (villaad) {
+      if (ads.villaad && ads.villaad.length > 0) {
+        for (const media of ads.villaad) {
+          if (media.public_id) await deleteFromCloudinary(media.public_id);
+        }
+      }
+    }
+
+    if (homeAd) {
+      if (ads.homeAd && ads.homeAd.length > 0) {
+        for (const media of ads.homeAd) {
+          if (media.public_id) await deleteFromCloudinary(media.public_id);
+        }
+      }
+    }
+
+    if (goTripAd) {
+      if (ads.goTripAd && ads.goTripAd.length > 0) {
+        for (const media of ads.goTripAd) {
+          if (media.public_id) await deleteFromCloudinary(media.public_id);
+        }
+      }
+    }
+
     // Upload only if new files are sent
     const villaMedia = await uploadFiles(villaad, "ads/villaads");
-    const homeMedia  = await uploadFiles(homeAd, "ads/homeads");
+    const homeMedia = await uploadFiles(homeAd, "ads/homeads");
     const goTripMedia = await uploadFiles(goTripAd, "ads/gotripads");
 
     // Update fields only if new media exists
@@ -83,7 +122,6 @@ export const updateAds = async (req, res) => {
     await ads.save();
 
     res.status(200).json({ message: "Ads updated successfully", ads });
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
@@ -112,10 +150,22 @@ export const deleteAds = async (req, res) => {
       return res.status(400).json({ message: "Type parameter is required" });
     }
 
+    // Find the ad first to get public_ids before deletion
+    const ads = await AdsSchema.findOne();
+    if (ads && ads[type]) {
+      const mediaIndex = ads[type].findIndex(
+        (item) => item._id.toString() === id,
+      );
+      if (mediaIndex !== -1 && ads[type][mediaIndex].public_id) {
+        // Delete from Cloudinary
+        await deleteFromCloudinary(ads[type][mediaIndex].public_id);
+      }
+    }
+
     const deleteAd = await AdsSchema.findOneAndUpdate(
       {},
       { $pull: { [type]: { _id: id } } },
-      { new: true }
+      { new: true },
     );
 
     if (!deleteAd) {

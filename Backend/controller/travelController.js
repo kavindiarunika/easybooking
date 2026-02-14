@@ -1,5 +1,9 @@
 import TravelPlace from "../schema/travelingSchema.js";
 import cloudinary from "../cloudinary/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  deleteMultipleFromCloudinary,
+} from "../utils/cloudinaryHelper.js";
 
 /* Upload image to Cloudinary */
 const uploadImage = async (file, folder) => {
@@ -9,7 +13,10 @@ const uploadImage = async (file, folder) => {
     folder: folder,
   });
 
-  return result.secure_url;
+  return {
+    secure_url: result.secure_url,
+    public_id: result.public_id,
+  };
 };
 
 /* ================= CREATE ================= */
@@ -47,18 +54,18 @@ export const createTravelPlace = async (req, res) => {
     }
 
     // Upload main image
-    const mainImage = await uploadImage(
+    const mainImageData = await uploadImage(
       req.files.mainImage[0],
-      "travelplaces/main"
+      "travelplaces/main",
     );
 
     // Upload other images
-    let otherimages = [];
+    let otherimagesData = [];
     if (req.files?.otherimages) {
-      otherimages = await Promise.all(
+      otherimagesData = await Promise.all(
         req.files.otherimages.map((img) =>
-          uploadImage(img, "travelplaces/gallery")
-        )
+          uploadImage(img, "travelplaces/gallery"),
+        ),
       );
     }
 
@@ -66,8 +73,10 @@ export const createTravelPlace = async (req, res) => {
       name,
       description,
       district,
-      mainImage,
-      otherimages,
+      mainImage: mainImageData.secure_url,
+      mainImagePublicId: mainImageData.public_id,
+      otherimages: otherimagesData.map((img) => img.secure_url),
+      otherimagesPublicIds: otherimagesData.map((img) => img.public_id),
     });
 
     await travelPlace.save();
@@ -106,6 +115,16 @@ export const deleteTravelPlace = async (req, res) => {
     });
     if (!place) {
       return res.status(404).json({ massage: "place not found" });
+    }
+
+    // Delete main image from Cloudinary
+    if (place.mainImagePublicId) {
+      await deleteFromCloudinary(place.mainImagePublicId);
+    }
+
+    // Delete other images from Cloudinary
+    if (place.otherimagesPublicIds && place.otherimagesPublicIds.length > 0) {
+      await deleteMultipleFromCloudinary(place.otherimagesPublicIds);
     }
 
     await TravelPlace.deleteOne({ _id: place._id });

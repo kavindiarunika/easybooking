@@ -279,7 +279,7 @@ function App() {
                     element={<NewStays token={token} />}
                   />
 
-                   <Route
+                  <Route
                     path="/addproduct"
                     element={
                       <ProtectedRoute>
@@ -287,7 +287,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
-                   <Route
+                  <Route
                     path="/deleteproduct"
                     element={
                       <ProtectedRoute>
@@ -295,7 +295,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
-                   <Route
+                  <Route
                     path="/editproduct"
                     element={
                       <ProtectedRoute>
@@ -303,7 +303,23 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
-                   <Route
+                  <Route
+                    path="/editproduct/:id"
+                    element={
+                      <ProtectedRoute>
+                        <EditProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/admin/products/edit/:id"
+                    element={
+                      <ProtectedRoute>
+                        <EditProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/showproductAccount"
                     element={
                       <ProtectedRoute>
@@ -311,7 +327,7 @@ function App() {
                       </ProtectedRoute>
                     }
                   />
-                   <Route
+                  <Route
                     path="/showproducts"
                     element={
                       <ProtectedRoute>

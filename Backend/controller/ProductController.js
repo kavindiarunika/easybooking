@@ -1,6 +1,10 @@
 import productModel from "../schema/productSchema.js";
 import axios from "axios";
 import cloudinary from "../cloudinary/cloudinary.js";
+import {
+  deleteFromCloudinary,
+  deleteMultipleFromCloudinary,
+} from "../utils/cloudinaryHelper.js";
 
 // Add new product
 export const addProduct = async (req, res) => {
@@ -45,6 +49,7 @@ export const addProduct = async (req, res) => {
 
     // Upload main image to Cloudinary using SDK
     let mainImageUrl = "";
+    let mainImagePublicId = "";
     if (req.files.mainImage) {
       const mainImageFile = req.files.mainImage;
       try {
@@ -59,6 +64,7 @@ export const addProduct = async (req, res) => {
           stream.end(mainImageFile.data);
         });
         mainImageUrl = uploadResult.secure_url;
+        mainImagePublicId = uploadResult.public_id; // Save public_id
       } catch (uploadError) {
         console.error("Main image upload error:", uploadError);
         return res.status(500).json({
@@ -71,6 +77,7 @@ export const addProduct = async (req, res) => {
 
     // Upload other images if provided
     let otherImageUrls = [];
+    let otherImagesPublicIds = [];
     if (req.files) {
       const otherImageFiles = Array.isArray(req.files.OtherImages)
         ? req.files.OtherImages
@@ -90,6 +97,7 @@ export const addProduct = async (req, res) => {
             stream.end(img.data);
           });
           otherImageUrls.push(uploadResult.secure_url);
+          otherImagesPublicIds.push(uploadResult.public_id); // Save public_id
         } catch (uploadError) {
           console.error("Other image upload error:", uploadError);
         }
@@ -132,6 +140,7 @@ export const addProduct = async (req, res) => {
       for (let i = 0; i < parsedSubProducts.length; i++) {
         const subProduct = parsedSubProducts[i];
         let subImageUrl = "";
+        let subImagePublicId = "";
 
         // Upload sub-product image if exists (express-fileupload stores files in req.files)
         if (req.files && req.files[`subImage${i}`]) {
@@ -148,6 +157,7 @@ export const addProduct = async (req, res) => {
               stream.end(subImageFile.data);
             });
             subImageUrl = uploadResult.secure_url;
+            subImagePublicId = uploadResult.public_id; // Save public_id
           } catch (uploadError) {
             console.error("Sub-product image upload error:", uploadError);
             return res.status(500).json({
@@ -160,6 +170,7 @@ export const addProduct = async (req, res) => {
 
         // Upload sub-product other images if provided
         let subOtherImageUrls = [];
+        let subOtherImagesPublicIds = [];
         for (let j = 0; j < 5; j++) {
           const otherImgKey = `subOtherImage${i}_${j}`;
           if (req.files && req.files[otherImgKey]) {
@@ -176,6 +187,7 @@ export const addProduct = async (req, res) => {
                 stream.end(otherImgFile.data);
               });
               subOtherImageUrls.push(uploadResult.secure_url);
+              subOtherImagesPublicIds.push(uploadResult.public_id); // Save public_id
             } catch (uploadError) {
               console.error(
                 "Sub-product other image upload error:",
@@ -191,7 +203,9 @@ export const addProduct = async (req, res) => {
           subPrice: subProduct.subPrice,
           subsize: subProduct.subsize,
           subImage: subImageUrl,
+          subImagePublicId: subImagePublicId, // Save public_id
           subOtherImages: subOtherImageUrls,
+          subOtherImagesPublicIds: subOtherImagesPublicIds, // Save public_ids
         });
       }
     }
@@ -207,7 +221,9 @@ export const addProduct = async (req, res) => {
       email,
       ownerEmail,
       mainImage: mainImageUrl,
+      mainImagePublicId: mainImagePublicId, // Save public_id
       OtherImages: otherImageUrls,
+      OtherImagesPublicIds: otherImagesPublicIds, // Save public_ids
       colors: parsedColors,
       subProducts,
       stock: stock || 0,
@@ -395,7 +411,23 @@ export const updateProduct = async (req, res) => {
           ? [req.files.OtherImages]
           : [];
       if (otherImageFiles.length > 0) {
+        // Delete old other images from Cloudinary
+        if (
+          product.OtherImagesPublicIds &&
+          product.OtherImagesPublicIds.length > 0
+        ) {
+          for (const publicId of product.OtherImagesPublicIds) {
+            try {
+              await cloudinary.uploader.destroy(publicId);
+              console.log(`Deleted image from Cloudinary: ${publicId}`);
+            } catch (deleteError) {
+              console.error(`Failed to delete image ${publicId}:`, deleteError);
+            }
+          }
+        }
+
         let otherImageUrls = [];
+        let otherImagesPublicIds = [];
         for (const img of otherImageFiles) {
           try {
             const uploadResult = await new Promise((resolve, reject) => {
@@ -409,12 +441,14 @@ export const updateProduct = async (req, res) => {
               stream.end(img.data);
             });
             otherImageUrls.push(uploadResult.secure_url);
+            otherImagesPublicIds.push(uploadResult.public_id);
           } catch (uploadError) {
             console.error("Other image upload error:", uploadError);
           }
         }
         if (otherImageUrls.length > 0) {
           product.OtherImages = otherImageUrls;
+          product.OtherImagesPublicIds = otherImagesPublicIds;
         }
       }
     }
@@ -423,6 +457,18 @@ export const updateProduct = async (req, res) => {
     if (req.files && req.files.mainImage) {
       const mainImageFile = req.files.mainImage;
       try {
+        // Delete old main image from Cloudinary
+        if (product.mainImagePublicId) {
+          try {
+            await cloudinary.uploader.destroy(product.mainImagePublicId);
+            console.log(
+              `Deleted main image from Cloudinary: ${product.mainImagePublicId}`,
+            );
+          } catch (deleteError) {
+            console.error(`Failed to delete main image:`, deleteError);
+          }
+        }
+
         const uploadResult = await new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
             { folder: "products/main", resource_type: "auto" },
@@ -434,6 +480,7 @@ export const updateProduct = async (req, res) => {
           stream.end(mainImageFile.data);
         });
         product.mainImage = uploadResult.secure_url;
+        product.mainImagePublicId = uploadResult.public_id;
       } catch (uploadError) {
         console.error("Main image upload error:", uploadError);
         return res.status(500).json({
@@ -464,10 +511,26 @@ export const updateProduct = async (req, res) => {
         for (let i = 0; i < parsedSubProducts.length; i++) {
           const sp = parsedSubProducts[i];
           let subImageUrl = sp.subImage || "";
+          let subImagePublicId = sp.subImagePublicId || "";
 
           if (req.files && req.files[`subImage${i}`]) {
             const subImageFile = req.files[`subImage${i}`];
             try {
+              // Delete old sub-product image from Cloudinary
+              if (sp.subImagePublicId) {
+                try {
+                  await cloudinary.uploader.destroy(sp.subImagePublicId);
+                  console.log(
+                    `Deleted sub-product image from Cloudinary: ${sp.subImagePublicId}`,
+                  );
+                } catch (deleteError) {
+                  console.error(
+                    `Failed to delete sub-product image:`,
+                    deleteError,
+                  );
+                }
+              }
+
               const uploadResult = await new Promise((resolve, reject) => {
                 const stream = cloudinary.uploader.upload_stream(
                   { folder: "products/subs", resource_type: "auto" },
@@ -479,6 +542,7 @@ export const updateProduct = async (req, res) => {
                 stream.end(subImageFile.data);
               });
               subImageUrl = uploadResult.secure_url;
+              subImagePublicId = uploadResult.public_id;
             } catch (uploadError) {
               console.error(
                 "Sub-product image upload error during update:",
@@ -494,6 +558,7 @@ export const updateProduct = async (req, res) => {
 
           // Upload sub-product other images if provided
           let subOtherImageUrls = [];
+          let subOtherImagesPublicIds = [];
           for (let j = 0; j < 5; j++) {
             const otherImgKey = `subOtherImage${i}_${j}`;
             if (req.files && req.files[otherImgKey]) {
@@ -510,11 +575,35 @@ export const updateProduct = async (req, res) => {
                   stream.end(otherImgFile.data);
                 });
                 subOtherImageUrls.push(uploadResult.secure_url);
+                subOtherImagesPublicIds.push(uploadResult.public_id);
               } catch (uploadError) {
                 console.error(
                   "Sub-product other image upload error:",
                   uploadError,
                 );
+              }
+            }
+          }
+
+          // If new other images were uploaded, delete old ones and use new list
+          if (subOtherImageUrls.length > 0) {
+            // Delete old sub-product other images from Cloudinary
+            if (
+              sp.subOtherImagesPublicIds &&
+              sp.subOtherImagesPublicIds.length > 0
+            ) {
+              for (const publicId of sp.subOtherImagesPublicIds) {
+                try {
+                  await cloudinary.uploader.destroy(publicId);
+                  console.log(
+                    `Deleted sub-product other image from Cloudinary: ${publicId}`,
+                  );
+                } catch (deleteError) {
+                  console.error(
+                    `Failed to delete sub-product other image:`,
+                    deleteError,
+                  );
+                }
               }
             }
           }
@@ -525,10 +614,15 @@ export const updateProduct = async (req, res) => {
             subPrice: sp.subPrice,
             subsize: sp.subsize,
             subImage: subImageUrl,
+            subImagePublicId: subImagePublicId,
             subOtherImages:
               subOtherImageUrls.length > 0
                 ? subOtherImageUrls
                 : sp.subOtherImages || [],
+            subOtherImagesPublicIds:
+              subOtherImagesPublicIds.length > 0
+                ? subOtherImagesPublicIds
+                : sp.subOtherImagesPublicIds || [],
           });
         }
       }
@@ -564,6 +658,79 @@ export const deleteProduct = async (req, res) => {
       return res
         .status(404)
         .json({ success: false, message: "Product not found" });
+    }
+
+    // Delete main image from Cloudinary
+    if (product.mainImagePublicId) {
+      try {
+        await cloudinary.uploader.destroy(product.mainImagePublicId);
+        console.log(
+          `Deleted main image from Cloudinary: ${product.mainImagePublicId}`,
+        );
+      } catch (deleteError) {
+        console.error(
+          `Failed to delete main image from Cloudinary:`,
+          deleteError,
+        );
+      }
+    }
+
+    // Delete other images from Cloudinary
+    if (
+      product.OtherImagesPublicIds &&
+      product.OtherImagesPublicIds.length > 0
+    ) {
+      for (const publicId of product.OtherImagesPublicIds) {
+        try {
+          await cloudinary.uploader.destroy(publicId);
+          console.log(`Deleted other image from Cloudinary: ${publicId}`);
+        } catch (deleteError) {
+          console.error(
+            `Failed to delete image ${publicId} from Cloudinary:`,
+            deleteError,
+          );
+        }
+      }
+    }
+
+    // Delete sub-product images from Cloudinary
+    if (product.subProducts && product.subProducts.length > 0) {
+      for (const subProduct of product.subProducts) {
+        // Delete sub-product main image
+        if (subProduct.subImagePublicId) {
+          try {
+            await cloudinary.uploader.destroy(subProduct.subImagePublicId);
+            console.log(
+              `Deleted sub-product image from Cloudinary: ${subProduct.subImagePublicId}`,
+            );
+          } catch (deleteError) {
+            console.error(
+              `Failed to delete sub-product image from Cloudinary:`,
+              deleteError,
+            );
+          }
+        }
+
+        // Delete sub-product other images
+        if (
+          subProduct.subOtherImagesPublicIds &&
+          subProduct.subOtherImagesPublicIds.length > 0
+        ) {
+          for (const publicId of subProduct.subOtherImagesPublicIds) {
+            try {
+              await cloudinary.uploader.destroy(publicId);
+              console.log(
+                `Deleted sub-product other image from Cloudinary: ${publicId}`,
+              );
+            } catch (deleteError) {
+              console.error(
+                `Failed to delete sub-product other image ${publicId} from Cloudinary:`,
+                deleteError,
+              );
+            }
+          }
+        }
+      }
     }
 
     res.status(200).json({
