@@ -16,6 +16,7 @@ import adsRouter from "./router/adsRouter.js";
 import productRouter from "./router/productRoute.js";
 import productVendorRoute from "./router/productVendorRoute.js";
 import helmet from "helmet";
+import trendingcommentrouter from "./router/trendingCommentRoute.js";
 
 const app = express();
 const port = process.env.PORT || 4000;
@@ -132,6 +133,8 @@ app.use((req, res, next) => {
 
 // Login/Admin route
 app.use("/api/admin", loginrouter);
+
+app.use("/api/trendingcomments", trendingcommentrouter);
 
 // Protected API routes
 app.use("/api/trending", trendrouter);

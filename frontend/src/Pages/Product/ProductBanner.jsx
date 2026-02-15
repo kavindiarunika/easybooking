@@ -7,7 +7,7 @@ const ProductBanner = () => {
 
   return (
     <div className="mx-4 md:mx-24 mt-4 mb-4">
-      <div className="w-full h-[60vh] md:h-[70vh] rounded-lg overflow-hidden relative">
+      <div className="hidden sm:block w-full h-[60vh] md:h-[70vh] rounded-lg overflow-hidden relative">
         
         {/* Background Image */}
         <img
@@ -54,6 +54,18 @@ const ProductBanner = () => {
           </div>
         </div>
       </div>
+      <div className="flex gap-2">
+       <button className="lg:hidden bg-white text-black px-6 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition w-full sm:w-auto">
+              Shop Now
+            </button>
+
+            <button
+              onClick={() => navigate("/product/register")}
+              className="lg:hidden border border-white px-6 py-2 rounded-md text-sm font-medium hover:bg-white hover:text-black transition w-full sm:w-auto"
+            >
+              Register
+            </button>
+            </div>
     </div>
   );
 };

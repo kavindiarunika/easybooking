@@ -14,6 +14,7 @@ import {
   FaEnvelope,
 } from "react-icons/fa";
 import api from "../../api";
+import HotelComments from "../../Components/HotelComments";
 
 // ---------------- Helper Components ----------------
 const InfoCard = ({ icon, title, value }) => (
@@ -138,21 +139,15 @@ const Trending = () => {
       {/* Back */}
       <div className=" flex flex-row items-center justify-between  gap-4 mb-4">
         <div className="flex gap-4">
-           <button
-          onClick={() => navigate("/villa")}
-          className="flex items-center gap-2 mb-6"
-        >
-          <IoArrowBackOutline size={26} />
-        </button>
+          <button
+            onClick={() => navigate("/villa")}
+            className="flex items-center gap-2 mb-6"
+          >
+            <IoArrowBackOutline size={26} />
+          </button>
 
-    <h1 className="text-2xl font-bold text-cyan-400 mb-6">{item.name}</h1>
-
+          <h1 className="text-2xl font-bold text-cyan-400 mb-6">{item.name}</h1>
         </div>
-       
-       
-
-
-      
       </div>
 
       {/* ================= GALLERY ================= */}
@@ -337,6 +332,11 @@ const Trending = () => {
             </button>
           </form>
         </div>
+      </div>
+
+      {/* HOTEL COMMENTS SECTION */}
+      <div className="mt-12">
+        <HotelComments hotelId={item._id || item.name} />
       </div>
 
       {/* WHATSAPP & EMAIL */}

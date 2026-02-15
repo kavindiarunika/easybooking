@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import Home from "./Pages/Home/Home";
 import Navbar from "./Components/Navbar";
@@ -35,9 +35,18 @@ export const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const App = () => {
+  
+
   const location =
     useLocation().pathname.includes("/vendor") ||
     useLocation().pathname.includes("/product");
+
+  
+
+ 
+    
+      
+  
   return (
     <div className="bg-black">
       {!location && <Navbar />}
