@@ -295,7 +295,7 @@ export const registervendor = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Use hotelName as the category (stores the selected option like car, van, restaurant, villas, houses, hotels, etc.)
-    const vendorCategory = hotelName || category || "stays";
+    const vendorCategory = category || "stays";
 
     const newVendor = new vendor({
       email,
