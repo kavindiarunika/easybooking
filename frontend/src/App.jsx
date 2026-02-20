@@ -48,7 +48,7 @@ const App = () => {
       
   
   return (
-    <div className="bg-black">
+    <div className="bg-blue-200">
       {!location && <Navbar />}
 
       <Scroll />

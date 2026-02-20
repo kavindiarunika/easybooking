@@ -29,7 +29,7 @@ const VisitingPlaces = () => {
     <div className="ml-2 sm:ml-8 mt-4 mr-4 sm:mr-16">
       {/* Header */}
       <div className="flex justify-between items-center mb-4">
-        <h2 className="text-xl sm:text-2xl font-bold text-green-200">
+        <h2 className="text-xl sm:text-2xl font-bold text-black">
           Travel Sri Lanka
         </h2>
 
@@ -45,7 +45,7 @@ const VisitingPlaces = () => {
       <div className="grid grid-cols-3 sm:grid-cols-6 gap-4">
         {places.map((place) => (
           <div key={place._id} className="p-2">
-            <div className="rounded-lg shadow-md overflow-hidden text-white text-center">
+            <div className="rounded-lg bg-white p-2 shadow-md overflow-hidden text-slate-800 text-center">
               <button
                 onClick={() =>
                   navigate(`/places/${place.district.toLowerCase()}`)

@@ -3,7 +3,8 @@ import { useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../../App.jsx";
 import { toast } from "react-toastify";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate, Link, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import {
   FaHotel,
   FaEnvelope,
@@ -256,6 +257,18 @@ const Register = () => {
 
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
+  const location = useLocation();
+
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(location.search);
+      const tab = params.get("tab") || params.get("login");
+      if (tab === "login" || tab === "true") setsignIn(true);
+    } catch (e) {
+      // ignore
+    }
+  }, [location.search]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name === "country") {
@@ -486,21 +499,21 @@ const Register = () => {
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-8 filter blur-3xl opacity-30 animate-pulse"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-slate-800 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse delay-1000"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-slate-800 rounded-full mix-blend-multiply filter blur-3xl opacity-20"></div>
       </div>
 
       {/* Back to Home */}
       <Link
         to="/"
-        className="absolute top-6 left-6 flex items-center gap-2 text-white/80 hover:text-white transition-colors"
+        className="absolute top-6 left-6 flex items-center gap-2 text-black hover:text-white transition-colors"
       >
         <FaArrowLeft />
         <span>Back to Home</span>
       </Link>
 
       <div className="relative w-full max-w-5xl">
-        <div className="bg-white/10 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
+        <div className="bg-slate-800 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden border border-white/20">
           <div className="flex flex-col lg:flex-row">
             {/* Left Side - Branding */}
             <div className="lg:w-5/12 bg-green-200/20 p-8 lg:p-12 flex flex-col justify-center items-center text-white">
@@ -518,7 +531,7 @@ const Register = () => {
 
                 <div className="space-y-4 text-left">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
+                    <div className="w-10 h-10 bg-slate-700 rounded-full flex items-center justify-center">
                       <span className="text-lg .prata-regular">
                         <MdLocalOffer />
                       </span>

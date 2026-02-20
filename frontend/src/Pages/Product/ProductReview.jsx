@@ -283,7 +283,7 @@ const ProductReview = () => {
               product.description ||
               "No description available"}
           </p>
-            <div className="flex flex-row gap-4">
+            <div className="mt-2 flex flex-col sm:flex-row  sm:gap-4">
            <div>
             <p className="text-m  mt-4 mb-2">
               Conatct US:

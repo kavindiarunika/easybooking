@@ -5,6 +5,8 @@ import { AiOutlineArrowRight } from "react-icons/ai";
 import Slider from "react-slick";
 import { BACKEND_URL } from "../App";
 import HomeAds from "../Components/HomeAds";
+import { IoIosStar } from "react-icons/io";
+import { IoIosStarHalf } from "react-icons/io";
 
 const Trending = () => {
   const { navigate, addtrend, setaddtrend } = useContext(TravelContext);
@@ -20,14 +22,14 @@ const Trending = () => {
     autoplay: true,
     autoplaySpeed: 3000,
     pauseOnHover: true,
-    slidesToShow: 4,
-    slidesToScroll: 4,
+    slidesToShow: 6,
+    slidesToScroll: 6,
     responsive: [
       { breakpoint: 1024, settings: { slidesToShow: 3, slidesToScroll: 3 } },
       {
         breakpoint: 768,
         settings: {
-          slidesToShow: 3,
+          slidesToShow: 4,
           slidesToScroll: 1,
           centerMode: true,
           centerPadding: "15px",
@@ -36,7 +38,7 @@ const Trending = () => {
       {
         breakpoint: 480,
         settings: {
-          slidesToShow: 2,
+          slidesToShow: 3,
           slidesToScroll: 1,
           centerMode: true,
           centerPadding: "10px",
@@ -104,54 +106,37 @@ const Trending = () => {
           {/* ================= CATEGORY SECTION ================= */}
           <div>
             <div className="flex justify-between items-center mb-8">
-              <h2 className="text-2xl sm:text-2xl font-bold capitalize text-green-200">
+              <h2 className="text-xl sm:text-2xl font-bold capitalize text-black">
                 {category}s
               </h2>
 
               <button
                 onClick={() => navigate(`/villa/${category}`)}
-                className="flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-xl hover:bg-green-700"
+                className="flex items-center gap-2 bg-green-600 text-white px-2 sm:px-4 py-1 sm:py-2 rounded-xl hover:bg-green-700"
               >
                 More <AiOutlineArrowRight />
               </button>
             </div>
 
             <Slider {...sliderSettings}>
-              {items.map((item, i) => (
-                <div key={i} className="px-2">
-                  <div
-                    onClick={() => navigate(`/trending/${item.name}`)}
-                    className="h-[220px] sm:h-[380px] w-[150px] sm:w-full cursor-pointer rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition bg-gradient-to-br from-indigo-200 via-purple-200 to-pink-200 flex flex-col"
-                  >
-                    <div className="relative">
-                           <img
-                      src={item.mainImage || item.image || item.image1}
-                      alt={item.name}
-                      className=" h-[90px] sm:h-[200px] w-full object-cover"
-                    />
-                     <h1 className="absolute top-2 right-2 bg-green-300 text-black rounded-full p-4">-10%</h1>
-                    </div>
-                  
-                    <div className="flex flex-col justify-between flex-1 p-3 sm:p-4">
-                      <div>
-                        <h3 className="font-semibold text-sm sm:text-lg truncate">
-                          {item.name}
-                        </h3>
-                        <p className="text-green-700 font-bold mt-1 sm:mt-2 text-sm">
-                          Rs. {item.price?.toLocaleString() || "N/A"}
-                        </p>
-                        <p className="text-sm text-gray-800 line-clamp-2">
-                        {item.description}
-                        </p>
-                      </div>
-
-                      <button className="hidden sm:block mt-2 sm:mt-4 w-full bg-green-500 text-white py-1.5 sm:py-2 rounded-xl hover:bg-green-600 text-sm">
-                        View Details
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              ))}
+              {items.slice(0,5).map((hotel , index ) =>(
+                <div  key={index}>
+                         <div className='bg-white rounded-2xl p-2 relative h-64 sm:h-96'>
+                             <p className='absolute top-2 right-4 bg-green-500 text-black px-2 py-1 text-xs sm:text-m rounded-md'>Rs.{hotel.price}</p>
+                             <img src={hotel.mainImage ||hotel.image || hotel.image1} alt={hotel.name} className='w-full  object-cover rounded-lg shadow-md h-24 sm:h-42 ' />
+                             <div className='flex items-center justify-between'>
+                                     <h1 className='prata-regular text-sm sm:text-m mt-2 sm:mt-4 mb-2 sm:mb-4 '>{hotel.name}</h1>
+                                    
+             
+                             </div>
+                            
+                             <p className='line-clamp-3 sm:line-clamp-4 text-gray-700 mb-2  text-xs sm:text-sm' >{hotel.description}</p>  
+                              <div className='hidden sm:block sm:flex gap-1 text-amber-300'>
+             <IoIosStar /><IoIosStar /><IoIosStar /><IoIosStar /><IoIosStarHalf />
+                                     </div>
+                             </div>
+                             </div>
+                     ))}
             </Slider>
           </div>
 

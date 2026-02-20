@@ -28,8 +28,8 @@ const Safari = () => {
   return (
     <section className="w-full py-16 px-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-12 p-4 rounded-xl shadow-md">
-        <h2 className="text-2xl font-bold text-green-200">
+      <div className="flex items-center justify-between mb-12 p-4 rounded-xl ">
+        <h2 className="text-2xl font-bold text-black">
           Safari Packages
         </h2>
         <Link to="/safarihome">

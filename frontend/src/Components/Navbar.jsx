@@ -15,9 +15,9 @@ const Header = () => {
   const toggleMenu = () => setIsOpen(!isOpen);
 
   return (
-    <div className="w-full z-50 absolute top-0 left-0 prata-regular bg-slate-500/10 backdrop-blur-md">
+    <div className="w-full z-50 absolute top-0 left-0 prata-regular bg-slate-800/80 backdrop-blur-md">
       {/*------------------- PC View -------------------*/}
-      <div className="max-w-7xl mx-auto px-4  flex justify-between items-center">
+      <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
         {/* Logo */}
         <Link to="./">
           <img src={assets.logo} alt="logo" className="w-34" />
@@ -57,13 +57,19 @@ const Header = () => {
           </ul>
         </div>
 
-        {/*------------------- Hamburger Icon -------------------*/}
-        <div className="md:hidden">
-          <IoReorderThreeOutline
-            size={32}
-            className="text-white cursor-pointer absolute top-4 right-4"
+        {/*------------------- Hamburger Icon (mobile) -------------------*/}
+        <div className="md:hidden flex items-center z-50">
+          <button
             onClick={toggleMenu}
-          />
+            aria-label={isOpen ? "Close menu" : "Open menu"}
+            className="text-white focus:outline-none p-2"
+          >
+            {isOpen ? (
+              <IoClose size={28} className="text-white -mt-4" />
+            ) : (
+              <IoReorderThreeOutline size={28} className="text-white" />
+            )}
+          </button>
         </div>
       </div>
 
@@ -78,24 +84,20 @@ const Header = () => {
       >
         {/*------------------- Mobile Menu Side Panel -------------------*/}
         <div
-          className={`fixed top-0 right-0 h-full w-3/4 max-w-xs bg-green-300 text-white transition-transform duration-300 ease-in-out z-50 pointer-events-auto ${
+          className={`fixed top-0 right-0 h-full w-3/4 max-w-xs bg-blue-300 text-white transition-transform duration-300 ease-in-out z-50 pointer-events-auto ${
             isOpen ? "translate-x-0" : "translate-x-full"
           }`}
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex flex-col h-full">
             {/* Header Section */}
-            <div className="flex justify-between items-center p-4 border-b border-cyan-700 bg-green-800/90 ">
-              <p className="font-extrabold text-xl">Explorer Menu</p>
-              <IoClose
-                size={30}
-                className="cursor-pointer text-white hover:text-red-500 transition"
-                onClick={toggleMenu}
-              />
+            <div className="flex justify-between items-center p-4 border-b border-cyan-700 bg-slate-800/80  ">
+              <p className="font-extrabold text-xl mt-2">Explorer Menu</p>
+              
             </div>
 
             {/* Menu Links */}
-            <div className="flex flex-col gap-6 p-6 text-lg font-medium bg-green-900/90 flex-grow rounded-l-xl">
+            <div className="flex flex-col gap-6 p-6 text-lg font-medium bg-slate-800/80  flex-grow rounded-l-xl  ">
               <NavLink
                 to="./"
                 onClick={toggleMenu}

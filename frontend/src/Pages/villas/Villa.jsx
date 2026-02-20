@@ -227,11 +227,11 @@ const Villa = () => {
 
   const countryFilters = [
     { label: "All Countries", value: "all" },
-    { label: "🇱🇰 Sri Lanka", value: "Sri Lanka" },
-    { label: "🇮🇳 India", value: "India" },
-    { label: "🇲🇻 Maldives", value: "Maldives" },
-    { label: "🇹🇭 Thailand", value: "Thailand" },
-    { label: "🌍 Other", value: "Other" },
+    { label: "Sri Lanka", value: "Sri Lanka" },
+    { label: "India", value: "India" },
+    { label: "Maldives", value: "Maldives" },
+    { label: "Thailand", value: "Thailand" },
+   
   ];
 
   // Get districts based on selected country
@@ -309,7 +309,7 @@ const Villa = () => {
   const cityFilters = getCityFilters();
 
   return (
-    <section className="w-full py-16 px-4 md:px-16 bg-slate-950">
+    <section className="w-full py-16 px-4 md:px-16">
       <p className="w-full h-24"></p>
       <VillaAd />
       {/* Mobile filter toggle button - visible only on small screens */}
@@ -560,7 +560,7 @@ const Villa = () => {
               <button
                 key={filter.value}
                 onClick={() => setSelectedCategory(filter.value)}
-                className={`px-6 py-2 rounded-full font-semibold text-sm transition-all duration-300 ${
+                className={`px-4 sm:px-6 py-2 h-8 sm:h-10 rounded-full font-semibold text-sm transition-all duration-300 ${
                   selectedCategory === filter.value
                     ? "bg-green-500 text-white shadow-lg shadow-green-500/50"
                     : "bg-gray-700 text-gray-200 hover:bg-gray-600"
@@ -569,15 +569,10 @@ const Villa = () => {
                 {filter.label}
               </button>
             ))}
-            <div className="sm:ml-48 hidden sm:block ">
-              <SearchBar
-                value={searchName}
-                onChange={(e) => setsearchName(e.target.value)}
-              />
-            </div>
+
           </div>
 
-          <div className="mb-4 mt-2 sm:hidden md:hidden">
+          <div className="mb-4 mt-2 ">
             <SearchBar
               value={searchName}
               onChange={(e) => setsearchName(e.target.value)}
@@ -585,7 +580,7 @@ const Villa = () => {
           </div>
 
           {/* Cards Grid */}
-          <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-3 sm:grid-cols-3 lg:grid-cols-4 gap-2  sm:gap-8">
             {currentData.length > 0 ? (
               currentData.map((item, index) => (
                 <div
@@ -614,11 +609,11 @@ const Villa = () => {
                           <img
                             src={images[0]}
                             alt={item.name}
-                            className="w-full h-48 sm:h-64 object-cover rounded-t-3xl group-hover:scale-110 transition-transform duration-500"
+                            className="w-full h-40 sm:h-56 object-cover rounded-t-3xl group-hover:scale-110 transition-transform duration-500"
                           />
 
                           {/* Overlay */}
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-500 rounded-t-3xl"></div>
+                          <div className="relative inset-0 bg-black/0 group-hover:bg-black/25 transition-all duration-500 rounded-t-3xl"></div>
 
                           {images.length > 5 && (
                             <div
@@ -634,34 +629,29 @@ const Villa = () => {
                         </>
                       );
                     })()}
+                     <div className="absolute top-2 right-2 text-black bg-green-500 p-1 font-bold text-sm rounded-lg">
+                        Rs. {item.price ? item.price.toLocaleString() : "N/A"}
+                      </div>
                   </div>
 
                   {/* Content */}
-                  <div className="p-5 flex flex-col gap-3">
+                  <div className="p-2 sm:p-5 flex flex-col gap-1  sm:gap-3">
                     {/* Name and Price */}
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 sm:gap-0">
-                      <h3 className="text-lg font-semibold text-gray-900">
+                      <h3 className="text-sm sm:text-lg  font-semibold text-gray-900">
                         {item.name}
                       </h3>
-                      <div className="text-green-600 font-bold text-lg">
-                        Rs. {item.price ? item.price.toLocaleString() : "N/A"}
-                      </div>
+                     
                     </div>
 
                     {/* Short description */}
-                    <p className="hidden sm:block text-gray-600 text-sm">
+                    <p className=" line-clamp-3 text-gray-600 text-sm">
                       {item.description.length > 100
                         ? item.description.substring(0, 100) + "..."
                         : item.description}
                     </p>
 
-                    {/* Button */}
-                    <button
-                      onClick={() => navigate(`/trending/${item.name}`)}
-                      className="mt-2 w-full bg-green-500 text-white py-2 rounded-xl text-sm font-medium hover:bg-green-600 transition flex items-center justify-center gap-2 transform hover:scale-105"
-                    >
-                      View Details <AiOutlineArrowRight />
-                    </button>
+                  
                   </div>
                 </div>
               ))

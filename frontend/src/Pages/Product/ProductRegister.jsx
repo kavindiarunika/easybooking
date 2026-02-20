@@ -9,7 +9,7 @@ import { productAssets } from "../../assets/Product/productAssets";
 const ProductRegister = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [isLogin, setIsLogin] = useState(false);
+  const [isLogin, setIsLogin] = useState(true);
   const [registerForm, setRegisterForm] = useState({
     businessName: "",
     ownerName: "",
@@ -22,6 +22,14 @@ const ProductRegister = () => {
     email: "",
     password: "",
   });
+  const [showReset, setShowReset] = useState(false);
+  const [resetForm, setResetForm] = useState({
+    email: "",
+    otp: "",
+    newPassword: "",
+    confirmNewPassword: "",
+  });
+  const [otpSent, setOtpSent] = useState(false);
 
   const handleRegisterChange = (e) => {
     setRegisterForm({ ...registerForm, [e.target.name]: e.target.value });
@@ -29,6 +37,10 @@ const ProductRegister = () => {
 
   const handleLoginChange = (e) => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
+  };
+
+  const handleResetChange = (e) => {
+    setResetForm({ ...resetForm, [e.target.name]: e.target.value });
   };
 
   const handleLogin = async (e) => {
@@ -63,6 +75,68 @@ const ProductRegister = () => {
     }
   };
 
+  const handleResetSubmit = async (e) => {
+    e.preventDefault();
+    // Two-step flow: first send OTP, then confirm with otp + new password
+    if (!otpSent) {
+      if (!resetForm.email) {
+        toast.error("Please enter your email");
+        return;
+      }
+      setLoading(true);
+      try {
+        const res = await axios.post(
+          `${BACKEND_URL}/api/product-vendor/request-password-reset`,
+          { email: resetForm.email },
+        );
+        toast.success(res.data?.message || "OTP sent to email");
+        setOtpSent(true);
+      } catch (err) {
+        console.error(err);
+        toast.error(err.response?.data?.message || "Request failed");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+
+    // confirm reset
+    if (!resetForm.otp || !resetForm.newPassword) {
+      toast.error("Please fill OTP and new password");
+      return;
+    }
+    if (resetForm.newPassword !== resetForm.confirmNewPassword) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/api/product-vendor/confirm-password-reset`,
+        {
+          email: resetForm.email,
+          otp: resetForm.otp,
+          newPassword: resetForm.newPassword,
+        },
+      );
+      toast.success(res.data?.message || "Password reset successful");
+      setShowReset(false);
+      setOtpSent(false);
+      setResetForm({
+        email: "",
+        otp: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Reset failed");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleRegister = async (e) => {
     e.preventDefault();
     if (
@@ -79,7 +153,6 @@ const ProductRegister = () => {
       return;
     }
 
-    setLoading(true);
     try {
       const payload = {
         businessName: registerForm.businessName,
@@ -89,7 +162,10 @@ const ProductRegister = () => {
         password: registerForm.password,
       };
 
-      const res = await axios.post(`${BACKEND_URL}/api/product-vendor/register`, payload);
+      const res = await axios.post(
+        `${BACKEND_URL}/api/product-vendor/register`,
+        payload,
+      );
 
       if (res.data?.vendorToken) {
         // store under both keys so ProtectedRoute will allow access
@@ -124,7 +200,7 @@ const ProductRegister = () => {
 
         {/*------------right----------------- */}
         <div className="w-full md:w-auto md:mt-8">
-          <div className="w-full md:w-[500px] bg-black/50 rounded-lg p-6 md:p-12 border border-gray-700">
+          <div className="w-full md:w-[500px] bg-slate-800 rounded-lg p-6 md:p-12 border border-gray-700">
             {/* Toggle Tabs */}
             <div className="flex gap-6 md:gap-12 mb-6 border-b-4 border-green-600">
               <button
@@ -249,7 +325,6 @@ const ProductRegister = () => {
                     >
                       {loading ? "Registering..." : "Register"}
                     </button>
-                   
                   </div>
                 </form>
               </>
@@ -285,6 +360,120 @@ const ProductRegister = () => {
                       className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                     />
                   </div>
+                  <div className="flex justify-end mt-1">
+                    <button
+                      type="button"
+                      onClick={() => setShowReset((s) => !s)}
+                      className="text-sm text-green-300 hover:text-green-200"
+                    >
+                      Forgot password?
+                    </button>
+                  </div>
+
+                  {showReset && (
+                    <div className="space-y-3 md:space-y-4 mt-3 p-3 bg-gray-900/30 rounded">
+                      {!otpSent ? (
+                        <>
+                          <div>
+                            <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              name="email"
+                              value={resetForm.email}
+                              onChange={handleResetChange}
+                              className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                            />
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={() => setShowReset(false)}
+                              className="px-3 py-1 rounded bg-gray-700"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleResetSubmit}
+                              disabled={loading}
+                              className="px-3 py-1 rounded bg-green-600"
+                            >
+                              {loading ? "Sending..." : "Send OTP"}
+                            </button>
+                          </div>
+                        </>
+                      ) : (
+                        <>
+                          <div>
+                            <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                              OTP
+                            </label>
+                            <input
+                              type="text"
+                              name="otp"
+                              value={resetForm.otp}
+                              onChange={handleResetChange}
+                              className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                            />
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+                            <div>
+                              <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                                New Password
+                              </label>
+                              <input
+                                type="password"
+                                name="newPassword"
+                                value={resetForm.newPassword}
+                                onChange={handleResetChange}
+                                className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                                Confirm New Password
+                              </label>
+                              <input
+                                type="password"
+                                name="confirmNewPassword"
+                                value={resetForm.confirmNewPassword}
+                                onChange={handleResetChange}
+                                className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                              />
+                            </div>
+                          </div>
+                          <div className="flex gap-2 justify-end">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setShowReset(false);
+                                setOtpSent(false);
+                                setResetForm({
+                                  email: "",
+                                  otp: "",
+                                  newPassword: "",
+                                  confirmNewPassword: "",
+                                });
+                              }}
+                              className="px-3 py-1 rounded bg-gray-700"
+                            >
+                              Cancel
+                            </button>
+                            <button
+                              type="button"
+                              onClick={handleResetSubmit}
+                              disabled={loading}
+                              className="px-3 py-1 rounded bg-green-600"
+                            >
+                              {loading ? "Resetting..." : "Reset Password"}
+                            </button>
+                          </div>
+                        </>
+                      )}
+                    </div>
+                  )}
                   <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
                     <button
                       type="submit"
@@ -293,7 +482,6 @@ const ProductRegister = () => {
                     >
                       {loading ? "Logging in..." : "Login"}
                     </button>
-                   
                   </div>
                 </form>
               </>

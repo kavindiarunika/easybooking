@@ -38,7 +38,7 @@ const ProductHome = () => {
   }, [category, sort, search]);
 
   return (
-    <div className="bg-white/30 p-6">
+    <div className="bg-white/30 p-2">
       <ProductHeader
         category={category}
         onCategoryChange={setCategory}
@@ -56,7 +56,7 @@ const ProductHome = () => {
         ) : products.length === 0 ? (
           <div className="text-center py-12">No products found.</div>
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          <div className="grid grid-cols-3 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {products.map((p) => (
               <div
                 key={p._id}
@@ -64,7 +64,7 @@ const ProductHome = () => {
                 onClick={() => navigate(`/product/review/${p._id}`)}
                 className="bg-white rounded shadow overflow-hidden cursor-pointer hover:shadow-lg transition"
               >
-                <div className="h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
+                <div className="h-32 sm:h-48 bg-gray-100 flex items-center justify-center overflow-hidden">
                   {p.mainImage ? (
                     <img
                       src={p.mainImage}

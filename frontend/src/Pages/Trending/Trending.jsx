@@ -18,11 +18,11 @@ import HotelComments from "../../Components/HotelComments";
 
 // ---------------- Helper Components ----------------
 const InfoCard = ({ icon, title, value }) => (
-  <div className="flex items-center gap-3 bg-gray-800/50 p-4 rounded-xl shadow w-full">
+  <div className="flex items-center gap-3  p-4 rounded-xl shadow w-full">
     {icon}
     <div>
       <p className="font-semibold">{title}</p>
-      <p className="text-blue-200">{value}</p>
+      <p className="text-slate-800">{value}</p>
     </div>
   </div>
 );
@@ -134,19 +134,19 @@ const Trending = () => {
   };
 
   return (
-    <div className="bg-gray-900 text-white min-h-screen px-6 py-10">
+    <div className="bg-blue-200 text-black min-h-screen px-6 py-10">
       <p className="h-30 w-full"></p>
       {/* Back */}
       <div className=" flex flex-row items-center justify-between  gap-4 mb-4">
         <div className="flex gap-4">
           <button
-            onClick={() => navigate("/villa")}
+            onClick={() => navigate(-1)}
             className="flex items-center gap-2 mb-6"
           >
             <IoArrowBackOutline size={26} />
           </button>
 
-          <h1 className="text-2xl font-bold text-cyan-400 mb-6">{item.name}</h1>
+          <h1 className="prata-regular text-2xl font-bold text-black mb-6">{item.name}</h1>
         </div>
       </div>
 
@@ -229,7 +229,7 @@ const Trending = () => {
       </div>
 
       {/* ================= CONTENT ================= */}
-      <div className="grid lg:grid-cols-3 gap-10">
+      <div className="grid lg:grid-cols-3 gap-10 text-black">
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6">
           <InfoCard
@@ -258,9 +258,9 @@ const Trending = () => {
             value={item.price}
           />
 
-          <div className="bg-gray-800/50 p-4 rounded-xl">
+          <div className="p-4 rounded-xl">
             <h3 className="font-semibold mb-2">Description</h3>
-            <p className="text-blue-200">{item.description}</p>
+            <p className="text-gray-900">{item.description}</p>
           </div>
 
           {/* VIDEO */}

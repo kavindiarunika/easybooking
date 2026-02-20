@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { backendUrl } from "../../App";
+import { toast } from "react-toastify";
 
 const ShowProductAcount = () => {
   const [vendors, setVendors] = useState([]);
@@ -24,6 +25,38 @@ const ShowProductAcount = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  const [deletingId, setDeletingId] = useState(null);
+
+  const handleDelete = async (id, email) => {
+    const ok = window.confirm(
+      `Are you sure you want to delete ${email || id}? This cannot be undone.`,
+    );
+    if (!ok) return;
+
+    setDeletingId(id);
+    try {
+      const token = localStorage.getItem("adminToken");
+      const res = await axios.delete(`${backendUrl}/api/product-vendor/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      toast.success(res.data?.message || "Vendor deleted");
+      // refresh list
+      await fetchVendors();
+    } catch (err) {
+      console.error(
+        "Failed to delete vendor:",
+        err.config?.url,
+        err.response?.status,
+        err.response?.data,
+        err.message,
+      );
+      const msg = err.response?.data?.message || err.message || "Delete failed";
+      toast.error(msg);
+    } finally {
+      setDeletingId(null);
     }
   };
 
@@ -70,6 +103,33 @@ const ShowProductAcount = () => {
                     {v.createdAt
                       ? new Date(v.createdAt).toLocaleDateString()
                       : "-"}
+                  </td>
+                  <td className="p-3 text-right">
+                    <button
+                      onClick={async () => {
+                        const ok = window.confirm(
+                          `Are you sure you want to delete ${v.email}? This cannot be undone.`,
+                        );
+                        if (!ok) return;
+                        try {
+                          const token = localStorage.getItem("adminToken");
+                          await axios.delete(
+                            `${backendUrl}/api/product-vendor/${v._id}`,
+                            {
+                              headers: { Authorization: `Bearer ${token}` },
+                            },
+                          );
+                          // refresh list
+                          fetchVendors();
+                        } catch (err) {
+                          console.error("Failed to delete vendor", err);
+                          alert(err.response?.data?.message || "Delete failed");
+                        }
+                      }}
+                      className="px-3 py-1 bg-red-600 text-white rounded"
+                    >
+                      Delete
+                    </button>
                   </td>
                 </tr>
               ))}

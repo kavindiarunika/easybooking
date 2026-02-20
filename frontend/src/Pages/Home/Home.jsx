@@ -29,7 +29,7 @@ const Home = () => {
   }, [location]);
 
   return (
-    <div className="bg-slate-950">
+    <div className="bg-blue-200">
     
       <Hero />
 
@@ -37,7 +37,7 @@ const Home = () => {
       <HomeAdvertisement />
 
     
-     <div className="w-full relative"> 
+     <div className=" w-full relative"> 
         <Trending />
       </div>
      <div className="w-full relative "> 

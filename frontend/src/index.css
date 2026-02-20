@@ -53,13 +53,13 @@
 /* Desktop & default gap */
 .slick-slider .slick-slide {
   box-sizing: border-box;
-  padding: 0 12px;
+  padding: 0 16px;
 }
 
 /* Mobile gap (safe for iOS Safari) */
 @media (max-width: 640px) {
   .slick-slider .slick-slide {
-    padding: 0 16px;
+    padding: 0 3px;
   }
 }
 

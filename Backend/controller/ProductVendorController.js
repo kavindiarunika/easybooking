@@ -1,6 +1,7 @@
 import ProductVendorAuth from "../schema/ProductVendorAuth.js";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
+import nodemailer from "nodemailer";
 
 // Register Product Vendor
 export const registerProductVendor = async (req, res) => {
@@ -198,5 +199,137 @@ export const getAllProductVendors = async (req, res) => {
   } catch (error) {
     console.error("Get All Product Vendors Error:", error);
     res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/* ======================================================
+   EMAIL HELPER FOR PRODUCT VENDOR
+====================================================== */
+const sendOtpEmail = async (email, otp) => {
+  const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+  });
+
+  await transporter.sendMail({
+    from: process.env.EMAIL_USER,
+    to: email,
+    subject: "Password Reset OTP",
+    text: `Your password reset code is ${otp}. It is valid for 10 minutes.`,
+  });
+};
+
+/* ======================================================
+   REQUEST PASSWORD RESET (sends OTP)
+   POST /api/product-vendor/request-password-reset
+====================================================== */
+export const requestPasswordReset = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, message: "Email is required" });
+    }
+
+    const vendor = await ProductVendorAuth.findOne({ email });
+    if (!vendor) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Vendor not found" });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    vendor.otp = otp;
+    vendor.otpExpireAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+    await vendor.save();
+
+    await sendOtpEmail(email, otp);
+
+    return res
+      .status(200)
+      .json({ success: true, message: "OTP sent to email" });
+  } catch (error) {
+    console.error("Request Password Reset Error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/* ======================================================
+   CONFIRM PASSWORD RESET (verify OTP + set new password)
+   POST /api/product-vendor/confirm-password-reset
+====================================================== */
+export const confirmPasswordReset = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Email, otp and newPassword are required",
+      });
+    }
+
+    const vendor = await ProductVendorAuth.findOne({ email });
+    if (!vendor) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Vendor not found" });
+    }
+
+    if (!vendor.otp || !vendor.otpExpireAt) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No reset requested or OTP expired" });
+    }
+
+    if (vendor.otp !== otp) {
+      return res.status(400).json({ success: false, message: "Invalid OTP" });
+    }
+
+    if (new Date() > new Date(vendor.otpExpireAt)) {
+      return res
+        .status(400)
+        .json({ success: false, message: "OTP has expired" });
+    }
+
+    const hashed = await bcrypt.hash(newPassword, 10);
+    vendor.password = hashed;
+    vendor.otp = undefined;
+    vendor.otpExpireAt = undefined;
+    await vendor.save();
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Password has been reset" });
+  } catch (error) {
+    console.error("Confirm Password Reset Error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+/* ======================================================
+   DELETE PRODUCT VENDOR (ADMIN)
+   DELETE /api/product-vendor/:id
+====================================================== */
+export const deleteProductVendor = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const vendorData = await ProductVendorAuth.findByIdAndDelete(id);
+    if (!vendorData) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Vendor not found" });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, message: "Product vendor deleted successfully" });
+  } catch (error) {
+    console.error("Delete Product Vendor Error:", error);
+    return res.status(500).json({ success: false, message: "Server error" });
   }
 };

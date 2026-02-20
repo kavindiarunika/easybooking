@@ -199,10 +199,10 @@ const HotelComments = ({ hotelId }) => {
   }
 
   return (
-    <section className="w-full py-8 px-4 bg-gradient-to-b from-gray-900 to-gray-800 rounded-lg">
+    <section className="w-full py-8 px-4  rounded-lg">
       {/* Header */}
       <div className="flex gap-4 mb-8 border-b border-gray-700 pb-4">
-        <h3 className="text-xl font-bold text-blue-400 inter-regular">
+        <h3 className="text-xl font-bold text-green-600 inter-regular">
           Guest Comments
         </h3>
         <p className="text-gray-400 inter-regular">

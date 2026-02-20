@@ -32,8 +32,8 @@ const AboutSection = () => {
     
       {/* Header */}
       <div className="text-center mb-4 sm:mb-12">
-        <h2 className="text-4xl font-bold text-gray-100 mb-4">About Our Service</h2>
-        <p className="text-yellow-100 text-lg max-w-2xl mx-auto">
+        <h2 className="text-4xl font-bold text-black mb-4">About Our Service</h2>
+        <p className="text-green-800 text-lg max-w-2xl mx-auto">
           We help you book hotels easily, find the best places to stay, and make your travel experience unforgettable.
         </p>
       </div>

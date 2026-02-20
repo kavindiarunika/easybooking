@@ -18,7 +18,7 @@ const Safarihome = () => {
         
         {/* ---------------- LEFT SIDE (Categories) ---------------- */}
         <div className="w-full lg:w-1/4">
-          <p className="prata-regular text-xl sm:text-2xl text-green-200 mb-4">
+          <p className="prata-regular text-xl sm:text-2xl text-black mb-4">
             Choose Category
           </p>
 
@@ -40,7 +40,7 @@ const Safarihome = () => {
                 ${
                   selectedCategory === ""
                     ? "bg-green-400/30 text-black font-bold"
-                    : "text-white hover:text-green-200"
+                    : "text-slate-600 hover:text-green-800"
                 }`}
             >
               All
@@ -54,7 +54,7 @@ const Safarihome = () => {
                   ${
                     selectedCategory === category
                       ? "bg-green-400/30 text-black font-bold"
-                      : "text-white hover:text-green-200"
+                      : "text-slate-600 hover:text-green-600"
                   }`}
               >
                 {category.charAt(0).toUpperCase() + category.slice(1)}

@@ -20,7 +20,7 @@ const VillaAd = () => {
   }, []);
   return (
     <div className="">
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className="grid grid-cols-2 sm:grid-cols-2 gap-6">
         {Array.isArray(ads.villaad) &&
           ads.villaad.map((ad, index) => (
             <div key={index} className="rounded-2xl overflow-hidden shadow-lg">
@@ -29,7 +29,7 @@ const VillaAd = () => {
                   src={ad.url}
                   controls
                   crossOrigin="anonymous"
-                  className="w-full h-[220px] sm:h-[400px] object-cover"
+                  className="w-auto h-[220px] sm:h-[400px] object-cover"
                 />
               ) : (
                 <img
