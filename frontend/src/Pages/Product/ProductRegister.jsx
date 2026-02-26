@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { toast } from "react-toastify";
 import { BACKEND_URL } from "../../App";
 import { productAssets } from "../../assets/Product/productAssets";
 
@@ -10,6 +9,8 @@ const ProductRegister = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
+  const [isForgotPassword, setIsForgotPassword] = useState(false);
+  const [forgotPasswordStep, setForgotPasswordStep] = useState("email"); // "email", "otp", "reset"
   const [registerForm, setRegisterForm] = useState({
     businessName: "",
     ownerName: "",
@@ -22,14 +23,12 @@ const ProductRegister = () => {
     email: "",
     password: "",
   });
-  const [showReset, setShowReset] = useState(false);
-  const [resetForm, setResetForm] = useState({
+  const [forgotPasswordForm, setForgotPasswordForm] = useState({
     email: "",
     otp: "",
     newPassword: "",
     confirmNewPassword: "",
   });
-  const [otpSent, setOtpSent] = useState(false);
 
   const handleRegisterChange = (e) => {
     setRegisterForm({ ...registerForm, [e.target.name]: e.target.value });
@@ -39,8 +38,11 @@ const ProductRegister = () => {
     setLoginForm({ ...loginForm, [e.target.name]: e.target.value });
   };
 
-  const handleResetChange = (e) => {
-    setResetForm({ ...resetForm, [e.target.name]: e.target.value });
+  const handleForgotPasswordChange = (e) => {
+    setForgotPasswordForm({
+      ...forgotPasswordForm,
+      [e.target.name]: e.target.value,
+    });
   };
 
   const handleLogin = async (e) => {
@@ -75,68 +77,6 @@ const ProductRegister = () => {
     }
   };
 
-  const handleResetSubmit = async (e) => {
-    e.preventDefault();
-    // Two-step flow: first send OTP, then confirm with otp + new password
-    if (!otpSent) {
-      if (!resetForm.email) {
-        toast.error("Please enter your email");
-        return;
-      }
-      setLoading(true);
-      try {
-        const res = await axios.post(
-          `${BACKEND_URL}/api/product-vendor/request-password-reset`,
-          { email: resetForm.email },
-        );
-        toast.success(res.data?.message || "OTP sent to email");
-        setOtpSent(true);
-      } catch (err) {
-        console.error(err);
-        toast.error(err.response?.data?.message || "Request failed");
-      } finally {
-        setLoading(false);
-      }
-      return;
-    }
-
-    // confirm reset
-    if (!resetForm.otp || !resetForm.newPassword) {
-      toast.error("Please fill OTP and new password");
-      return;
-    }
-    if (resetForm.newPassword !== resetForm.confirmNewPassword) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const res = await axios.post(
-        `${BACKEND_URL}/api/product-vendor/confirm-password-reset`,
-        {
-          email: resetForm.email,
-          otp: resetForm.otp,
-          newPassword: resetForm.newPassword,
-        },
-      );
-      toast.success(res.data?.message || "Password reset successful");
-      setShowReset(false);
-      setOtpSent(false);
-      setResetForm({
-        email: "",
-        otp: "",
-        newPassword: "",
-        confirmNewPassword: "",
-      });
-    } catch (err) {
-      console.error(err);
-      toast.error(err.response?.data?.message || "Reset failed");
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleRegister = async (e) => {
     e.preventDefault();
     if (
@@ -153,6 +93,7 @@ const ProductRegister = () => {
       return;
     }
 
+    setLoading(true);
     try {
       const payload = {
         businessName: registerForm.businessName,
@@ -186,6 +127,78 @@ const ProductRegister = () => {
     }
   };
 
+  const handleForgotPasswordRequest = async (e) => {
+    e.preventDefault();
+    if (!forgotPasswordForm.email) {
+      toast.error("Please enter your email");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/api/product-vendor/forgot-password`,
+        {
+          email: forgotPasswordForm.email,
+        },
+      );
+      toast.success("OTP sent to your email");
+      setForgotPasswordStep("otp");
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleResetPassword = async (e) => {
+    e.preventDefault();
+    if (!forgotPasswordForm.otp || !forgotPasswordForm.newPassword) {
+      toast.error("Please fill all fields");
+      return;
+    }
+
+    if (
+      forgotPasswordForm.newPassword !== forgotPasswordForm.confirmNewPassword
+    ) {
+      toast.error("Passwords do not match");
+      return;
+    }
+
+    if (forgotPasswordForm.newPassword.length < 6) {
+      toast.error("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        `${BACKEND_URL}/api/product-vendor/reset-password`,
+        {
+          email: forgotPasswordForm.email,
+          otp: forgotPasswordForm.otp,
+          newPassword: forgotPasswordForm.newPassword,
+        },
+      );
+      toast.success("Password reset successfully");
+      setIsForgotPassword(false);
+      setForgotPasswordStep("email");
+      setForgotPasswordForm({
+        email: "",
+        otp: "",
+        newPassword: "",
+        confirmNewPassword: "",
+      });
+      setIsLogin(true);
+    } catch (err) {
+      console.error(err);
+      toast.error(err.response?.data?.message || "Failed to reset password");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex items-center justify-center bg-white/30 min-h-screen text-white p-4 md:p-24">
       <div className="flex flex-col md:flex-row gap-4 md:gap-8 w-full md:w-auto">
@@ -200,7 +213,7 @@ const ProductRegister = () => {
 
         {/*------------right----------------- */}
         <div className="w-full md:w-auto md:mt-8">
-          <div className="w-full md:w-[500px] bg-slate-800 rounded-lg p-6 md:p-12 border border-gray-700">
+          <div className="w-full md:w-[500px] bg-black/50 rounded-lg p-6 md:p-12 border border-gray-700">
             {/* Toggle Tabs */}
             <div className="flex gap-6 md:gap-12 mb-6 border-b-4 border-green-600">
               <button
@@ -328,6 +341,130 @@ const ProductRegister = () => {
                   </div>
                 </form>
               </>
+            ) : isForgotPassword ? (
+              <>
+                {/* FORGOT PASSWORD FORM */}
+                <h2 className="text-xl md:text-2xl font-semibold mb-4 md:mb-6 prata-regular text-center">
+                  Reset Password
+                </h2>
+
+                {forgotPasswordStep === "email" ? (
+                  <form
+                    onSubmit={handleForgotPasswordRequest}
+                    className="space-y-3 md:space-y-4"
+                  >
+                    <div>
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                        Email Address
+                      </label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={forgotPasswordForm.email}
+                        onChange={handleForgotPasswordChange}
+                        placeholder="Enter your registered email"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                    <p className="text-xs text-gray-400 mt-2">
+                      We'll send you a verification code to reset your password.
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold disabled:opacity-50 transition"
+                      >
+                        {loading ? "Sending OTP..." : "Send OTP"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setIsForgotPassword(false);
+                          setForgotPasswordForm({
+                            email: "",
+                            otp: "",
+                            newPassword: "",
+                            confirmNewPassword: "",
+                          });
+                        }}
+                        className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded font-semibold transition"
+                      >
+                        Back to Login
+                      </button>
+                    </div>
+                  </form>
+                ) : forgotPasswordStep === "otp" ? (
+                  <form
+                    onSubmit={handleResetPassword}
+                    className="space-y-3 md:space-y-4"
+                  >
+                    <div>
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                        Verification Code
+                      </label>
+                      <input
+                        type="text"
+                        name="otp"
+                        value={forgotPasswordForm.otp}
+                        onChange={handleForgotPasswordChange}
+                        placeholder="Enter 6-digit OTP"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                        New Password
+                      </label>
+                      <input
+                        type="password"
+                        name="newPassword"
+                        value={forgotPasswordForm.newPassword}
+                        onChange={handleForgotPasswordChange}
+                        placeholder="Enter new password (min 6 characters)"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs md:text-sm text-gray-300 mb-1">
+                        Confirm Password
+                      </label>
+                      <input
+                        type="password"
+                        name="confirmNewPassword"
+                        value={forgotPasswordForm.confirmNewPassword}
+                        onChange={handleForgotPasswordChange}
+                        placeholder="Confirm new password"
+                        className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
+                      />
+                    </div>
+                    <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full sm:w-auto bg-green-600 hover:bg-green-700 px-4 py-2 rounded font-semibold disabled:opacity-50 transition"
+                      >
+                        {loading ? "Resetting..." : "Reset Password"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotPasswordStep("email");
+                          setForgotPasswordForm({
+                            ...forgotPasswordForm,
+                            otp: "",
+                            newPassword: "",
+                            confirmNewPassword: "",
+                          });
+                        }}
+                        className="w-full sm:w-auto bg-gray-600 hover:bg-gray-700 px-4 py-2 rounded font-semibold transition"
+                      >
+                        Back
+                      </button>
+                    </div>
+                  </form>
+                ) : null}
+              </>
             ) : (
               <>
                 {/* LOGIN FORM */}
@@ -360,120 +497,15 @@ const ProductRegister = () => {
                       className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
                     />
                   </div>
-                  <div className="flex justify-end mt-1">
+                  <div className="flex justify-end">
                     <button
                       type="button"
-                      onClick={() => setShowReset((s) => !s)}
-                      className="text-sm text-green-300 hover:text-green-200"
+                      onClick={() => setIsForgotPassword(true)}
+                      className="text-xs text-green-400 hover:text-green-300 transition"
                     >
-                      Forgot password?
+                      Forgot Password?
                     </button>
                   </div>
-
-                  {showReset && (
-                    <div className="space-y-3 md:space-y-4 mt-3 p-3 bg-gray-900/30 rounded">
-                      {!otpSent ? (
-                        <>
-                          <div>
-                            <label className="block text-xs md:text-sm text-gray-300 mb-1">
-                              Email
-                            </label>
-                            <input
-                              type="email"
-                              name="email"
-                              value={resetForm.email}
-                              onChange={handleResetChange}
-                              className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
-                            />
-                          </div>
-                          <div className="flex gap-2 justify-end">
-                            <button
-                              type="button"
-                              onClick={() => setShowReset(false)}
-                              className="px-3 py-1 rounded bg-gray-700"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleResetSubmit}
-                              disabled={loading}
-                              className="px-3 py-1 rounded bg-green-600"
-                            >
-                              {loading ? "Sending..." : "Send OTP"}
-                            </button>
-                          </div>
-                        </>
-                      ) : (
-                        <>
-                          <div>
-                            <label className="block text-xs md:text-sm text-gray-300 mb-1">
-                              OTP
-                            </label>
-                            <input
-                              type="text"
-                              name="otp"
-                              value={resetForm.otp}
-                              onChange={handleResetChange}
-                              className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
-                            />
-                          </div>
-                          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
-                            <div>
-                              <label className="block text-xs md:text-sm text-gray-300 mb-1">
-                                New Password
-                              </label>
-                              <input
-                                type="password"
-                                name="newPassword"
-                                value={resetForm.newPassword}
-                                onChange={handleResetChange}
-                                className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
-                              />
-                            </div>
-                            <div>
-                              <label className="block text-xs md:text-sm text-gray-300 mb-1">
-                                Confirm New Password
-                              </label>
-                              <input
-                                type="password"
-                                name="confirmNewPassword"
-                                value={resetForm.confirmNewPassword}
-                                onChange={handleResetChange}
-                                className="w-full p-2 rounded border border-gray-600 bg-gray-800/50 text-white focus:outline-none focus:border-green-500"
-                              />
-                            </div>
-                          </div>
-                          <div className="flex gap-2 justify-end">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setShowReset(false);
-                                setOtpSent(false);
-                                setResetForm({
-                                  email: "",
-                                  otp: "",
-                                  newPassword: "",
-                                  confirmNewPassword: "",
-                                });
-                              }}
-                              className="px-3 py-1 rounded bg-gray-700"
-                            >
-                              Cancel
-                            </button>
-                            <button
-                              type="button"
-                              onClick={handleResetSubmit}
-                              disabled={loading}
-                              className="px-3 py-1 rounded bg-green-600"
-                            >
-                              {loading ? "Resetting..." : "Reset Password"}
-                            </button>
-                          </div>
-                        </>
-                      )}
-                    </div>
-                  )}
                   <div className="flex flex-col sm:flex-row gap-2 mt-6 md:mt-8">
                     <button
                       type="submit"
@@ -487,7 +519,6 @@ const ProductRegister = () => {
               </>
             )}
           </div>
-          <ToastContainer position="top-center" />
         </div>
       </div>
     </div>

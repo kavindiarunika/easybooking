@@ -78,8 +78,8 @@ const Product = () => {
   return (
     <section className="w-full py-16 px-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-12 p-4 rounded-xl">
-        <h2 className="text-xl sm:text-2xl font-bold text-black"> Products</h2>
+      <div className="flex items-center justify-between mb-12 p-4 rounded-xl shadow-md">
+        <h2 className="text-xl sm:text-4xl font-bold text-blue-200"> Products</h2>
         <Link to="/product">
           <button className="text-sm flex items-center gap-2 bg-green-600 text-white px-2 sm:px-4 py-2 rounded-xl hover:bg-green-700 transition">
            More<AiOutlineArrowRight />
@@ -93,7 +93,7 @@ const Product = () => {
           <Slider {...slickSettings}>
             {products.map((item) => (
               <Link
-                to={`/product/${item._id}`}
+                to={`/product/review/${item._id}`}
                 key={item._id}
                 className="group px-2"
               >

@@ -1,12 +1,18 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { backendUrl } from "../../App";
-import { toast } from "react-toastify";
+import { FiEdit2, FiTrash2, FiLock } from "react-icons/fi";
 
 const ShowProductAcount = () => {
   const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [editingVendor, setEditingVendor] = useState(null);
+  const [editForm, setEditForm] = useState({});
+  const [passwordModal, setPasswordModal] = useState(null);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [actionLoading, setActionLoading] = useState(false);
 
   const fetchVendors = async () => {
     setLoading(true);
@@ -28,41 +34,115 @@ const ShowProductAcount = () => {
     }
   };
 
-  const [deletingId, setDeletingId] = useState(null);
-
-  const handleDelete = async (id, email) => {
-    const ok = window.confirm(
-      `Are you sure you want to delete ${email || id}? This cannot be undone.`,
-    );
-    if (!ok) return;
-
-    setDeletingId(id);
-    try {
-      const token = localStorage.getItem("adminToken");
-      const res = await axios.delete(`${backendUrl}/api/product-vendor/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      toast.success(res.data?.message || "Vendor deleted");
-      // refresh list
-      await fetchVendors();
-    } catch (err) {
-      console.error(
-        "Failed to delete vendor:",
-        err.config?.url,
-        err.response?.status,
-        err.response?.data,
-        err.message,
-      );
-      const msg = err.response?.data?.message || err.message || "Delete failed";
-      toast.error(msg);
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   useEffect(() => {
     fetchVendors();
   }, []);
+
+  // Handle Edit
+  const handleEditClick = (vendor) => {
+    setEditingVendor(vendor._id);
+    setEditForm({
+      businessName: vendor.businessName,
+      ownerName: vendor.ownerName,
+      email: vendor.email,
+      phone: vendor.phone,
+    });
+  };
+
+  const handleEditSubmit = async () => {
+    if (!editForm.businessName || !editForm.ownerName || !editForm.email) {
+      alert("Please fill in all required fields");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.put(
+        `${backendUrl}/api/product-vendor/update/${editingVendor}`,
+        editForm,
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      console.log("Update response:", response.data);
+      alert("Vendor updated successfully!");
+      setEditingVendor(null);
+      setEditForm({});
+      fetchVendors();
+    } catch (err) {
+      console.error("Edit error:", err);
+      alert(err.response?.data?.message || "Failed to update vendor");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle Delete
+  const handleDelete = async (vendorId) => {
+    if (!window.confirm("Are you sure you want to delete this vendor account? This action cannot be undone.")) {
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await axios.delete(`${backendUrl}/api/product-vendor/delete/${vendorId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      console.log("Delete response:", response.data);
+      alert("Vendor deleted successfully!");
+      fetchVendors();
+    } catch (err) {
+      console.error("Delete error:", err);
+      alert(err.response?.data?.message || "Failed to delete vendor");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Handle Password Change
+  const handlePasswordChange = async () => {
+    if (!newPassword || !confirmPassword) {
+      alert("Please fill in all password fields");
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      const token = localStorage.getItem("adminToken");
+      console.log("Changing password for vendor:", passwordModal);
+      console.log("Backend URL:", backendUrl);
+      console.log("Full URL:", `${backendUrl}/api/product-vendor/change-password/${passwordModal}`);
+      
+      const response = await axios.put(
+        `${backendUrl}/api/product-vendor/change-password/${passwordModal}`,
+        { password: newPassword },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      
+      console.log("Password change response:", response.data);
+      alert("Password changed successfully!");
+      setPasswordModal(null);
+      setNewPassword("");
+      setConfirmPassword("");
+      fetchVendors();
+    } catch (err) {
+      console.error("Password change error:", err);
+      console.error("Error details:", err.response?.data);
+      alert(err.response?.data?.message || err.message || "Failed to change password");
+    } finally {
+      setActionLoading(false);
+    }
+  };
 
   return (
     <div className="p-6">
@@ -89,6 +169,7 @@ const ShowProductAcount = () => {
                 <th className="p-3 text-left">Email</th>
                 <th className="p-3 text-left">Contact</th>
                 <th className="p-3 text-left">Registered</th>
+                <th className="p-3 text-left">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -104,30 +185,30 @@ const ShowProductAcount = () => {
                       ? new Date(v.createdAt).toLocaleDateString()
                       : "-"}
                   </td>
-                  <td className="p-3 text-right">
+                  <td className="p-3 flex gap-2">
                     <button
-                      onClick={async () => {
-                        const ok = window.confirm(
-                          `Are you sure you want to delete ${v.email}? This cannot be undone.`,
-                        );
-                        if (!ok) return;
-                        try {
-                          const token = localStorage.getItem("adminToken");
-                          await axios.delete(
-                            `${backendUrl}/api/product-vendor/${v._id}`,
-                            {
-                              headers: { Authorization: `Bearer ${token}` },
-                            },
-                          );
-                          // refresh list
-                          fetchVendors();
-                        } catch (err) {
-                          console.error("Failed to delete vendor", err);
-                          alert(err.response?.data?.message || "Delete failed");
-                        }
-                      }}
-                      className="px-3 py-1 bg-red-600 text-white rounded"
+                      onClick={() => handleEditClick(v)}
+                      className="px-3 py-1.5 bg-blue-500 text-white rounded hover:bg-blue-600 transition flex items-center gap-1 text-sm"
+                      title="Edit vendor"
                     >
+                      <FiEdit2 size={16} />
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => setPasswordModal(v._id)}
+                      className="px-3 py-1.5 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition flex items-center gap-1 text-sm"
+                      title="Change password"
+                    >
+                      <FiLock size={16} />
+                      Password
+                    </button>
+                    <button
+                      onClick={() => handleDelete(v._id)}
+                      disabled={actionLoading}
+                      className="px-3 py-1.5 bg-red-500 text-white rounded hover:bg-red-600 transition flex items-center gap-1 text-sm disabled:opacity-50"
+                      title="Delete vendor"
+                    >
+                      <FiTrash2 size={16} />
                       Delete
                     </button>
                   </td>
@@ -141,6 +222,119 @@ const ShowProductAcount = () => {
       <div className="mt-4 text-sm text-gray-600">
         Total Vendors: <span className="font-semibold">{vendors.length}</span>
       </div>
+
+      {/* Edit Modal */}
+      {editingVendor && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4">Edit Vendor Account</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-1">Business Name *</label>
+                <input
+                  type="text"
+                  value={editForm.businessName}
+                  onChange={(e) => setEditForm({ ...editForm, businessName: e.target.value })}
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Owner Name *</label>
+                <input
+                  type="text"
+                  value={editForm.ownerName}
+                  onChange={(e) => setEditForm({ ...editForm, ownerName: e.target.value })}
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Email *</label>
+                <input
+                  type="email"
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Phone</label>
+                <input
+                  type="text"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={() => setEditingVendor(null)}
+                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleEditSubmit}
+                disabled={actionLoading}
+                className="flex-1 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition font-semibold disabled:opacity-50"
+              >
+                {actionLoading ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Password Change Modal */}
+      {passwordModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+            <h3 className="text-xl font-bold mb-4">Change Vendor Password</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-semibold mb-1">New Password *</label>
+                <input
+                  type="password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
+                  placeholder="Enter new password"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-yellow-500"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-1">Confirm Password *</label>
+                <input
+                  type="password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  placeholder="Confirm new password"
+                  className="w-full border border-gray-300 rounded px-3 py-2 focus:outline-none focus:border-yellow-500"
+                />
+              </div>
+              <p className="text-xs text-gray-600">Password must be at least 6 characters long.</p>
+            </div>
+            <div className="flex gap-2 mt-6">
+              <button
+                onClick={() => {
+                  setPasswordModal(null);
+                  setNewPassword("");
+                  setConfirmPassword("");
+                }}
+                className="flex-1 px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition font-semibold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handlePasswordChange}
+                disabled={actionLoading}
+                className="flex-1 px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition font-semibold disabled:opacity-50"
+              >
+                {actionLoading ? "Changing..." : "Change Password"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

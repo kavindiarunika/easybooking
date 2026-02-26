@@ -5,24 +5,33 @@ import {
   getProductVendorProfile,
   updateProductVendorProfile,
   getAllProductVendors,
-  requestPasswordReset,
-  confirmPasswordReset,
+  updateProductVendorByAdmin,
   deleteProductVendor,
+  changeProductVendorPassword,
+  forgotPasswordRequest,
+  resetPasswordWithOTP,
 } from "../controller/ProductVendorController.js";
-import verifyToken from "../middleware/verifyToken.js";
-import adminAuth from "../middleware/adminAuth.js";
+import { verifyToken } from "../middleware/verifyToken.js";
 
 const router = express.Router();
 
 // Public routes
 router.post("/register", registerProductVendor);
 router.post("/login", loginProductVendor);
-router.post("/request-password-reset", requestPasswordReset);
-router.post("/confirm-password-reset", confirmPasswordReset);
-router.delete("/:id", adminAuth, deleteProductVendor);
+router.post("/forgot-password", forgotPasswordRequest);
+router.post("/reset-password", resetPasswordWithOTP);
 
 // Admin: list all product vendors
 router.get("/all", verifyToken, getAllProductVendors);
+
+// Admin: update vendor by ID
+router.put("/update/:id", verifyToken, updateProductVendorByAdmin);
+
+// Admin: delete vendor by ID
+router.delete("/delete/:id", verifyToken, deleteProductVendor);
+
+// Admin: change vendor password
+router.put("/change-password/:id", verifyToken, changeProductVendorPassword);
 
 // Protected routes
 router.get("/profile", verifyToken, getProductVendorProfile);

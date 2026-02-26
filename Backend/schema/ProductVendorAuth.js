@@ -21,8 +21,6 @@ const productVendorAuthSchema = new mongoose.Schema(
     phone: {
       type: String,
     },
-    otp: { type: String },
-    otpExpireAt: { type: Date },
     password: {
       type: String,
       required: true,
@@ -42,6 +40,14 @@ const productVendorAuthSchema = new mongoose.Schema(
     createdAt: {
       type: Date,
       default: Date.now,
+    },
+    resetOTP: {
+      type: String,
+      default: null,
+    },
+    resetOTPExpiry: {
+      type: Date,
+      default: null,
     },
   },
   { timestamps: true },

@@ -1066,8 +1066,6 @@ const ProductDashboard = () => {
           </div>
         )}
       </div>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };

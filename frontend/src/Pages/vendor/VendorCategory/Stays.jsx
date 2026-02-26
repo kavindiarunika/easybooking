@@ -47,159 +47,185 @@ const Stays = ({ token }) => {
   // Location data - Countries with their districts and cities
   const locationData = {
     "Sri Lanka": {
-      "Colombo": ["Colombo", "Dehiwala", "Moratuwa", "Kotte", "Maharagama", "Kesbewa"],
-      "Gampaha": ["Negombo", "Gampaha", "Kelaniya", "Wattala", "Ja-Ela", "Minuwangoda"],
-      "Kandy": ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
-      "Galle": ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
-      "Matara": ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
-      "Hambantota": ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
-      "Kalutara": ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
+      Colombo: [
+        "Colombo",
+        "Dehiwala",
+        "Moratuwa",
+        "Kotte",
+        "Maharagama",
+        "Kesbewa",
+      ],
+      Gampaha: [
+        "Negombo",
+        "Gampaha",
+        "Kelaniya",
+        "Wattala",
+        "Ja-Ela",
+        "Minuwangoda",
+      ],
+      Kandy: ["Kandy", "Peradeniya", "Katugastota", "Gampola", "Nawalapitiya"],
+      Galle: ["Galle", "Hikkaduwa", "Ambalangoda", "Unawatuna", "Koggala"],
+      Matara: ["Matara", "Weligama", "Mirissa", "Dickwella", "Tangalle"],
+      Hambantota: ["Hambantota", "Tissamaharama", "Tangalle", "Ambalantota"],
+      Kalutara: ["Kalutara", "Panadura", "Beruwala", "Wadduwa", "Aluthgama"],
       "Nuwara Eliya": ["Nuwara Eliya", "Hatton", "Bandarawela", "Ella"],
-      "Ratnapura": ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
-      "Anuradhapura": ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
-      "Polonnaruwa": ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
-      "Kurunegala": ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
-      "Puttalam": ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
-      "Trincomalee": ["Trincomalee", "Kinniya", "Kantale"],
-      "Batticaloa": ["Batticaloa", "Kattankudy", "Eravur"],
-      "Ampara": ["Ampara", "Kalmunai", "Akkaraipattu"],
-      "Badulla": ["Badulla", "Bandarawela", "Haputale", "Welimada"],
-      "Monaragala": ["Monaragala", "Wellawaya", "Bibile"],
-      "Jaffna": ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
-      "Kilinochchi": ["Kilinochchi"],
-      "Mannar": ["Mannar", "Talaimannar"],
-      "Vavuniya": ["Vavuniya"],
-      "Mullaitivu": ["Mullaitivu"],
-      "Matale": ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
-      "Kegalle": ["Kegalle", "Mawanella", "Rambukkana"]
+      Ratnapura: ["Ratnapura", "Balangoda", "Embilipitiya", "Kuruwita"],
+      Anuradhapura: ["Anuradhapura", "Mihintale", "Kekirawa", "Medawachchiya"],
+      Polonnaruwa: ["Polonnaruwa", "Kaduruwela", "Hingurakgoda"],
+      Kurunegala: ["Kurunegala", "Kuliyapitiya", "Polgahawela", "Mawathagama"],
+      Puttalam: ["Puttalam", "Chilaw", "Wennappuwa", "Kalpitiya"],
+      Trincomalee: ["Trincomalee", "Kinniya", "Kantale"],
+      Batticaloa: ["Batticaloa", "Kattankudy", "Eravur"],
+      Ampara: ["Ampara", "Kalmunai", "Akkaraipattu"],
+      Badulla: ["Badulla", "Bandarawela", "Haputale", "Welimada"],
+      Monaragala: ["Monaragala", "Wellawaya", "Bibile"],
+      Jaffna: ["Jaffna", "Chavakachcheri", "Point Pedro", "Nallur"],
+      Kilinochchi: ["Kilinochchi"],
+      Mannar: ["Mannar", "Talaimannar"],
+      Vavuniya: ["Vavuniya"],
+      Mullaitivu: ["Mullaitivu"],
+      Matale: ["Matale", "Dambulla", "Sigiriya", "Ukuwela"],
+      Kegalle: ["Kegalle", "Mawanella", "Rambukkana"],
     },
-    "India": {
-      "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
-      "Karnataka": ["Bangalore", "Mysore", "Mangalore", "Hubli", "Belgaum"],
-      "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem"],
-      "Kerala": ["Kochi", "Thiruvananthapuram", "Kozhikode", "Thrissur", "Kollam"],
-      "Delhi": ["New Delhi", "Delhi NCR"],
-      "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
-      "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Ajmer"],
+    India: {
+      Maharashtra: ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
+      Karnataka: ["Bangalore", "Mysore", "Mangalore", "Hubli", "Belgaum"],
+      "Tamil Nadu": [
+        "Chennai",
+        "Coimbatore",
+        "Madurai",
+        "Tiruchirappalli",
+        "Salem",
+      ],
+      Kerala: [
+        "Kochi",
+        "Thiruvananthapuram",
+        "Kozhikode",
+        "Thrissur",
+        "Kollam",
+      ],
+      Delhi: ["New Delhi", "Delhi NCR"],
+      Gujarat: ["Ahmedabad", "Surat", "Vadodara", "Rajkot"],
+      Rajasthan: ["Jaipur", "Jodhpur", "Udaipur", "Ajmer"],
       "West Bengal": ["Kolkata", "Darjeeling", "Siliguri", "Howrah"],
-      "Goa": ["Panaji", "Margao", "Vasco da Gama", "Mapusa"]
+      Goa: ["Panaji", "Margao", "Vasco da Gama", "Mapusa"],
     },
-    "Maldives": {
-      "Male": ["Male City", "Hulhumale", "Villimale"],
+    Maldives: {
+      Male: ["Male City", "Hulhumale", "Villimale"],
       "Ari Atoll": ["Mahibadhoo", "Maamigili"],
       "Baa Atoll": ["Eydhafushi", "Thulhaadhoo"],
       "Noonu Atoll": ["Manadhoo", "Holhudhoo"],
-      "Addu Atoll": ["Hithadhoo", "Feydhoo", "Maradhoo"]
+      "Addu Atoll": ["Hithadhoo", "Feydhoo", "Maradhoo"],
     },
-    "Thailand": {
-      "Bangkok": ["Bangkok", "Nonthaburi", "Pak Kret"],
+    Thailand: {
+      Bangkok: ["Bangkok", "Nonthaburi", "Pak Kret"],
       "Chiang Mai": ["Chiang Mai City", "San Kamphaeng", "Doi Saket"],
-      "Phuket": ["Phuket Town", "Patong", "Kata", "Karon"],
-      "Krabi": ["Krabi Town", "Ao Nang", "Railay"],
-      "Pattaya": ["Pattaya City", "Jomtien", "Na Jomtien"],
-      "Koh Samui": ["Chaweng", "Lamai", "Bophut"]
+      Phuket: ["Phuket Town", "Patong", "Kata", "Karon"],
+      Krabi: ["Krabi Town", "Ao Nang", "Railay"],
+      Pattaya: ["Pattaya City", "Jomtien", "Na Jomtien"],
+      "Koh Samui": ["Chaweng", "Lamai", "Bophut"],
     },
-    "Indonesia": {
-      "Bali": ["Denpasar", "Ubud", "Seminyak", "Kuta", "Sanur"],
-      "Jakarta": ["Central Jakarta", "South Jakarta", "North Jakarta"],
-      "Yogyakarta": ["Yogyakarta City", "Sleman"],
+    Indonesia: {
+      Bali: ["Denpasar", "Ubud", "Seminyak", "Kuta", "Sanur"],
+      Jakarta: ["Central Jakarta", "South Jakarta", "North Jakarta"],
+      Yogyakarta: ["Yogyakarta City", "Sleman"],
       "West Java": ["Bandung", "Bogor", "Bekasi"],
-      "East Java": ["Surabaya", "Malang"]
+      "East Java": ["Surabaya", "Malang"],
     },
-    "Malaysia": {
+    Malaysia: {
       "Kuala Lumpur": ["KL City Centre", "Bukit Bintang", "Bangsar"],
-      "Selangor": ["Petaling Jaya", "Shah Alam", "Subang Jaya"],
-      "Penang": ["George Town", "Batu Ferringhi", "Butterworth"],
-      "Johor": ["Johor Bahru", "Iskandar Puteri"],
-      "Sabah": ["Kota Kinabalu", "Sandakan"],
-      "Sarawak": ["Kuching", "Miri"]
+      Selangor: ["Petaling Jaya", "Shah Alam", "Subang Jaya"],
+      Penang: ["George Town", "Batu Ferringhi", "Butterworth"],
+      Johor: ["Johor Bahru", "Iskandar Puteri"],
+      Sabah: ["Kota Kinabalu", "Sandakan"],
+      Sarawak: ["Kuching", "Miri"],
     },
-    "Singapore": {
+    Singapore: {
       "Central Region": ["Orchard", "Marina Bay", "Chinatown", "Little India"],
       "East Region": ["Changi", "Tampines", "Bedok"],
       "West Region": ["Jurong", "Clementi"],
       "North Region": ["Woodlands", "Yishun"],
-      "North-East Region": ["Sengkang", "Punggol"]
+      "North-East Region": ["Sengkang", "Punggol"],
     },
-    "Philippines": {
+    Philippines: {
       "Metro Manila": ["Manila", "Makati", "Quezon City", "Taguig", "Pasig"],
-      "Cebu": ["Cebu City", "Mandaue", "Lapu-Lapu"],
-      "Palawan": ["Puerto Princesa", "El Nido", "Coron"],
-      "Boracay": ["Boracay Island"],
-      "Davao": ["Davao City"]
+      Cebu: ["Cebu City", "Mandaue", "Lapu-Lapu"],
+      Palawan: ["Puerto Princesa", "El Nido", "Coron"],
+      Boracay: ["Boracay Island"],
+      Davao: ["Davao City"],
     },
-    "Vietnam": {
+    Vietnam: {
       "Ho Chi Minh": ["District 1", "District 3", "District 7", "Binh Thanh"],
-      "Hanoi": ["Hoan Kiem", "Ba Dinh", "Tay Ho"],
+      Hanoi: ["Hoan Kiem", "Ba Dinh", "Tay Ho"],
       "Da Nang": ["Da Nang City", "Hoi An"],
       "Nha Trang": ["Nha Trang City"],
-      "Phu Quoc": ["Duong Dong"]
+      "Phu Quoc": ["Duong Dong"],
     },
-    "Nepal": {
-      "Bagmati": ["Kathmandu", "Lalitpur", "Bhaktapur"],
-      "Gandaki": ["Pokhara", "Gorkha"],
-      "Lumbini": ["Lumbini", "Butwal"]
+    Nepal: {
+      Bagmati: ["Kathmandu", "Lalitpur", "Bhaktapur"],
+      Gandaki: ["Pokhara", "Gorkha"],
+      Lumbini: ["Lumbini", "Butwal"],
     },
-    "Bangladesh": {
-      "Dhaka": ["Dhaka City", "Gazipur", "Narayanganj"],
-      "Chittagong": ["Chittagong City", "Cox's Bazar"],
-      "Sylhet": ["Sylhet City"]
+    Bangladesh: {
+      Dhaka: ["Dhaka City", "Gazipur", "Narayanganj"],
+      Chittagong: ["Chittagong City", "Cox's Bazar"],
+      Sylhet: ["Sylhet City"],
     },
-    "Pakistan": {
-      "Punjab": ["Lahore", "Faisalabad", "Rawalpindi"],
-      "Sindh": ["Karachi", "Hyderabad"],
-      "Islamabad": ["Islamabad"]
+    Pakistan: {
+      Punjab: ["Lahore", "Faisalabad", "Rawalpindi"],
+      Sindh: ["Karachi", "Hyderabad"],
+      Islamabad: ["Islamabad"],
     },
     "United Arab Emirates": {
-      "Dubai": ["Dubai City", "Deira", "Jumeirah", "Marina"],
+      Dubai: ["Dubai City", "Deira", "Jumeirah", "Marina"],
       "Abu Dhabi": ["Abu Dhabi City", "Al Ain"],
-      "Sharjah": ["Sharjah City"],
-      "Ajman": ["Ajman City"]
+      Sharjah: ["Sharjah City"],
+      Ajman: ["Ajman City"],
     },
     "Saudi Arabia": {
-      "Riyadh": ["Riyadh City"],
-      "Makkah": ["Mecca", "Jeddah"],
-      "Eastern Province": ["Dammam", "Dhahran", "Khobar"]
+      Riyadh: ["Riyadh City"],
+      Makkah: ["Mecca", "Jeddah"],
+      "Eastern Province": ["Dammam", "Dhahran", "Khobar"],
     },
     "United Kingdom": {
-      "England": ["London", "Manchester", "Birmingham", "Liverpool", "Leeds"],
-      "Scotland": ["Edinburgh", "Glasgow"],
-      "Wales": ["Cardiff", "Swansea"],
-      "Northern Ireland": ["Belfast"]
+      England: ["London", "Manchester", "Birmingham", "Liverpool", "Leeds"],
+      Scotland: ["Edinburgh", "Glasgow"],
+      Wales: ["Cardiff", "Swansea"],
+      "Northern Ireland": ["Belfast"],
     },
     "United States": {
-      "California": ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
+      California: ["Los Angeles", "San Francisco", "San Diego", "San Jose"],
       "New York": ["New York City", "Buffalo", "Albany"],
-      "Florida": ["Miami", "Orlando", "Tampa"],
-      "Texas": ["Houston", "Dallas", "Austin", "San Antonio"],
-      "Nevada": ["Las Vegas", "Reno"]
+      Florida: ["Miami", "Orlando", "Tampa"],
+      Texas: ["Houston", "Dallas", "Austin", "San Antonio"],
+      Nevada: ["Las Vegas", "Reno"],
     },
-    "Australia": {
+    Australia: {
       "New South Wales": ["Sydney", "Newcastle", "Wollongong"],
-      "Victoria": ["Melbourne", "Geelong"],
-      "Queensland": ["Brisbane", "Gold Coast", "Cairns"],
-      "Western Australia": ["Perth", "Fremantle"]
+      Victoria: ["Melbourne", "Geelong"],
+      Queensland: ["Brisbane", "Gold Coast", "Cairns"],
+      "Western Australia": ["Perth", "Fremantle"],
     },
-    "Canada": {
-      "Ontario": ["Toronto", "Ottawa", "Mississauga"],
+    Canada: {
+      Ontario: ["Toronto", "Ottawa", "Mississauga"],
       "British Columbia": ["Vancouver", "Victoria"],
-      "Quebec": ["Montreal", "Quebec City"],
-      "Alberta": ["Calgary", "Edmonton"]
+      Quebec: ["Montreal", "Quebec City"],
+      Alberta: ["Calgary", "Edmonton"],
     },
-    "Germany": {
-      "Bavaria": ["Munich", "Nuremberg"],
-      "Berlin": ["Berlin City"],
-      "Hamburg": ["Hamburg City"],
-      "Hesse": ["Frankfurt", "Wiesbaden"]
+    Germany: {
+      Bavaria: ["Munich", "Nuremberg"],
+      Berlin: ["Berlin City"],
+      Hamburg: ["Hamburg City"],
+      Hesse: ["Frankfurt", "Wiesbaden"],
     },
-    "France": {
+    France: {
       "Île-de-France": ["Paris", "Versailles"],
       "Provence-Alpes-Côte d'Azur": ["Nice", "Marseille", "Cannes"],
-      "Auvergne-Rhône-Alpes": ["Lyon", "Grenoble"]
+      "Auvergne-Rhône-Alpes": ["Lyon", "Grenoble"],
     },
-    "Other": {
-      "Other": ["Other"]
-    }
+    Other: {
+      Other: ["Other"],
+    },
   };
 
   // Get districts for selected country
@@ -212,7 +238,11 @@ const Stays = ({ token }) => {
 
   // Get cities for selected district
   const getCities = () => {
-    if (formData.country && formData.district && locationData[formData.country]?.[formData.district]) {
+    if (
+      formData.country &&
+      formData.district &&
+      locationData[formData.country]?.[formData.district]
+    ) {
       return locationData[formData.country][formData.district];
     }
     return [];
@@ -242,7 +272,7 @@ const Stays = ({ token }) => {
         `${BACKEND_URL}/api/trending/profile?ownerEmail=${vendorEmail}`,
         {
           headers: { Authorization: `Bearer ${storedToken}` },
-        }
+        },
       );
 
       if (res.data && res.data._id) {
@@ -307,7 +337,7 @@ const Stays = ({ token }) => {
     Object.entries(formData).forEach(([key, value]) => {
       if (key === "availableThings") {
         (value ? value.split(",").map((i) => i.trim()) : []).forEach((v) =>
-          fd.append(key, v)
+          fd.append(key, v),
         );
       } else {
         fd.append(key, value);
@@ -332,7 +362,7 @@ const Stays = ({ token }) => {
         res = await axios.put(
           `${BACKEND_URL}/api/trending/update/${selectedId}`,
           fd,
-          { headers: { Authorization: `Bearer ${storedToken}` } }
+          { headers: { Authorization: `Bearer ${storedToken}` } },
         );
       } else {
         // create new profile
@@ -405,7 +435,7 @@ const Stays = ({ token }) => {
                 "image3",
                 "image4",
                 "otherimages",
-              ].includes(key)
+              ].includes(key),
           )
           .map((key) => (
             <div key={key}>
@@ -555,8 +585,6 @@ const Stays = ({ token }) => {
           {hasProfile ? "Save Changes" : "Add Trending"}
         </button>
       </form>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };

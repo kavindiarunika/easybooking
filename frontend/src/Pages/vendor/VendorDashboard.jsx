@@ -851,8 +851,6 @@ const VendorDashboard = () => {
           </a>
         )}
       </div>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };

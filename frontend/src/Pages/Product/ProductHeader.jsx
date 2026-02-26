@@ -1,15 +1,10 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { assets } from "../../assets/Assest";
 
-const ProductHeader = ({
-  category,
-  onCategoryChange,
-  sort,
-  onSortChange,
-  search,
-  onSearch,
-}) => {
+const ProductHeader = ({ search, onSearch }) => {
+  const navigate = useNavigate();
+
   return (
     <div className="bg-slate-800/70 backdrop-blur-md">
       <p className="h-4 w-full"></p>
@@ -20,39 +15,8 @@ const ProductHeader = ({
           <img src={assets.logo} alt="logo" className="w-28 md:w-34" />
         </Link>
 
-      
-        {/*-------------- Category + Sort -------------*/}
-        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full md:w-auto">
-          {/* Category */}
-          <select
-            value={category || ""}
-            onChange={(e) => onCategoryChange?.(e.target.value)}
-            className="border bg-gray-800 border-none h-[42px] md:h-[46px] px-4 text-sm text-gray-300 rounded-md w-full sm:w-auto"
-          >
-            <option value="">All Categories</option>
-            <option>Dry Food & Spices</option>
-            <option>Traditional Handicrafts & Cultural Items</option>
-            <option>Clothing & Textiles</option>
-            <option>Jewelry & Accessories</option>
-            <option>Ayurvedic & Natural Products</option>
-            <option>Souvenirs & Gift Items</option>
-            <option>Home Decor & Art</option>
-            <option>Beverage Products</option>
-          </select>
-
-          {/* Sort */}
-          <select
-            value={sort || ""}
-            onChange={(e) => onSortChange?.(e.target.value)}
-            className="border bg-gray-800 border-none h-[42px] md:h-[46px] px-4 text-sm text-gray-300 rounded-md w-full sm:w-auto"
-          >
-            <option value="">Sort By</option>
-            <option value="asc">Low to High</option>
-            <option value="desc">High to Low</option>
-          </select>
-        </div>
-          {/*-------------- Search Bar -------------*/}
-        <div className="flex items-center border pl-4 gap-2 bg-white/80 border-gray-500/30 h-[42px] md:h-[46px] rounded-full overflow-hidden w-full md:max-w-md">
+        {/*-------------- Search Bar -------------*/}
+        <div className="flex items-center border pl-4 gap-2 bg-white/50 border-gray-500/30 h-[42px] md:h-[46px] rounded-full overflow-hidden w-full md:max-w-md">
           <svg
             xmlns="http://www.w3.org/2000/svg"
             width="22"
@@ -72,6 +36,19 @@ const ProductHeader = ({
           />
         </div>
 
+        {/*-------------- Shop Now & Register Buttons -------------*/}
+        <div className="flex flex-col sm:flex-row gap-3 md:gap-4 w-full md:w-auto">
+          <button className="bg-white text-black px-6 py-2 rounded-md text-sm font-medium hover:bg-gray-200 transition w-full sm:w-auto">
+            Shop Now
+          </button>
+
+          <button
+            onClick={() => navigate("/product/register")}
+            className="border border-white text-white px-6 py-2 rounded-md text-sm font-medium hover:bg-white hover:text-black transition w-full sm:w-auto"
+          >
+            Register
+          </button>
+        </div>
       </div>
     </div>
   );

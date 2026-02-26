@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { BACKEND_URL } from "../../App";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import {
   FaSearch,
   FaThLarge,
@@ -383,8 +383,6 @@ const ProductBrowse = () => {
           )}
         </div>
       </div>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };

@@ -311,8 +311,6 @@ const DeleteProduct = () => {
           </div>
         )}
       </div>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };

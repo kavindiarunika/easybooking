@@ -1,9 +1,8 @@
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
+import { toast } from "react-toastify";
 import { backendUrl } from "../../App";
-import "react-toastify/dist/ReactToastify.css";
 import { FaPlus, FaTrash } from "react-icons/fa";
 import { IoArrowBackOutline } from "react-icons/io5";
 
@@ -18,6 +17,7 @@ const AddProduct = () => {
     price: "",
     category: "",
     size: "",
+    weight: "",
     whatsapp: "",
     email: "",
     ownerEmail: "",
@@ -141,6 +141,7 @@ const AddProduct = () => {
     formDataToSend.append("price", formData.price);
     formDataToSend.append("category", formData.category);
     formDataToSend.append("size", formData.size);
+    formDataToSend.append("weight", formData.weight || "");
     formDataToSend.append("whatsapp", formData.whatsapp);
     formDataToSend.append("email", formData.email);
     formDataToSend.append(
@@ -357,6 +358,41 @@ const AddProduct = () => {
             </select>
           </div>
 
+          {/* Weight (Grams) - For all products */}
+          <div>
+            <label className="block text-sm font-semibold mb-2">
+              Weight (Grams)
+            </label>
+            <select
+              name="weight"
+              value={formData.weight}
+              onChange={handleInputChange}
+              className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select Weight</option>
+              <option value="50g">50g</option>
+              <option value="100g">100g</option>
+              <option value="250g">250g</option>
+              <option value="500g">500g</option>
+              <option value="1kg">1kg</option>
+              <option value="2kg">2kg</option>
+              <option value="5kg">5kg</option>
+              <option value="10kg">10kg</option>
+              <option value="Custom">Custom</option>
+            </select>
+            {formData.weight === "Custom" && (
+              <input
+                type="text"
+                placeholder="Enter custom weight (e.g., 750g, 1.5kg, 3kg)"
+                value={formData.weight}
+                onChange={(e) => {
+                  setFormData({ ...formData, weight: e.target.value });
+                }}
+                className="w-full border border-gray-300 rounded p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            )}
+          </div>
+
           {/* Size (Conditional) */}
           {formData.category === "Clothing & Textiles" && (
             <div>
@@ -390,13 +426,13 @@ const AddProduct = () => {
                     { name: "Black", hex: "#000000" },
                     { name: "Orange", hex: "#F97316" },
                     { name: "Pink", hex: "#F472B6" },
-                    {name: "Purple", hex: "#8B5CF6" },
-                    {name: "Yellow", hex: "#FBBF24" },
-                    {name: "Brown", hex: "#A16207" },
-                    {name: "Gray", hex: "#9CA3AF" },
-                    {name: "navy blue", hex: "#000080" },
-                    {name: "oracle", hex: "#F80102" },
-                    {name: "gold", hex: "#FFD700" },
+                    { name: "Purple", hex: "#8B5CF6" },
+                    { name: "Yellow", hex: "#FBBF24" },
+                    { name: "Brown", hex: "#A16207" },
+                    { name: "Gray", hex: "#9CA3AF" },
+                    { name: "navy blue", hex: "#000080" },
+                    { name: "oracle", hex: "#F80102" },
+                    { name: "gold", hex: "#FFD700" },
 
                     { name: "White", hex: "#FFFFFF", border: true },
                   ].map((color) => (
@@ -434,14 +470,44 @@ const AddProduct = () => {
             formData.category === " Traditional Handicrafts & Cultural Items" ||
             (formData.category === "Dry Food & Spices" && (
               <div>
-                <label className="block text-sm font-semibold mb-2">Size</label>
-                <input
-                  name="size"
-                  value={formData.size}
-                  onChange={handleInputChange}
-                  className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                />
-                Grams
+                <label className="block text-sm font-semibold mb-2">
+                  Weight (Grams)
+                </label>
+                {formData.category === "Dry Food & Spices" ? (
+                  <select
+                    name="size"
+                    value={formData.size}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    <option value="">Select Weight</option>
+                    <option value="50g">50g</option>
+                    <option value="100g">100g</option>
+                    <option value="250g">250g</option>
+                    <option value="500g">500g</option>
+                    <option value="1kg">1kg</option>
+                    <option value="Custom">Custom</option>
+                  </select>
+                ) : (
+                  <input
+                    name="size"
+                    value={formData.size}
+                    onChange={handleInputChange}
+                    className="w-full border border-gray-300 rounded p-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  />
+                )}
+                {formData.category === "Dry Food & Spices" &&
+                  formData.size === "Custom" && (
+                    <input
+                      type="text"
+                      placeholder="Enter custom weight (e.g., 750g, 2kg)"
+                      value={formData.size}
+                      onChange={(e) => {
+                        setFormData({ ...formData, size: e.target.value });
+                      }}
+                      className="w-full border border-gray-300 rounded p-3 mt-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  )}
               </div>
             ))}
 
@@ -565,15 +631,54 @@ const AddProduct = () => {
                     className="w-full border border-gray-300 rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
 
-                  <input
-                    type="text"
-                    placeholder="Size"
-                    value={sub.subsize || ""}
-                    onChange={(e) =>
-                      handleSubProductChange(index, "subsize", e.target.value)
-                    }
-                    className="w-full border border-gray-300 rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  />
+                  {formData.category === "Dry Food & Spices" ? (
+                    <>
+                      <select
+                        value={sub.subsize || ""}
+                        onChange={(e) =>
+                          handleSubProductChange(
+                            index,
+                            "subsize",
+                            e.target.value,
+                          )
+                        }
+                        className="w-full border border-gray-300 rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      >
+                        <option value="">Select Weight</option>
+                        <option value="50g">50g</option>
+                        <option value="100g">100g</option>
+                        <option value="250g">250g</option>
+                        <option value="500g">500g</option>
+                        <option value="1kg">1kg</option>
+                      </select>
+                    </>
+                  ) : formData.category === "Clothing & Textiles" ? (
+                    <select
+                      value={sub.subsize || ""}
+                      onChange={(e) =>
+                        handleSubProductChange(index, "subsize", e.target.value)
+                      }
+                      className="w-full border border-gray-300 rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <option value="">Select Size</option>
+                      <option value="XS">XS</option>
+                      <option value="S">S</option>
+                      <option value="M">M</option>
+                      <option value="L">L</option>
+                      <option value="XL">XL</option>
+                      <option value="XXL">XXL</option>
+                    </select>
+                  ) : (
+                    <input
+                      type="text"
+                      placeholder="Size"
+                      value={sub.subsize || ""}
+                      onChange={(e) =>
+                        handleSubProductChange(index, "subsize", e.target.value)
+                      }
+                      className="w-full border border-gray-300 rounded p-2 mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    />
+                  )}
 
                   <label className="block text-sm font-semibold mb-2">
                     Sub Product Image
@@ -631,8 +736,6 @@ const AddProduct = () => {
           </div>
         </form>
       </div>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };

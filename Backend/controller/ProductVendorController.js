@@ -202,134 +202,284 @@ export const getAllProductVendors = async (req, res) => {
   }
 };
 
-/* ======================================================
-   EMAIL HELPER FOR PRODUCT VENDOR
-====================================================== */
-const sendOtpEmail = async (email, otp) => {
-  const transporter = nodemailer.createTransport({
-    service: "gmail",
-    auth: {
-      user: process.env.EMAIL_USER,
-      pass: process.env.EMAIL_PASS,
-    },
-  });
-
-  await transporter.sendMail({
-    from: process.env.EMAIL_USER,
-    to: email,
-    subject: "Password Reset OTP",
-    text: `Your password reset code is ${otp}. It is valid for 10 minutes.`,
-  });
-};
-
-/* ======================================================
-   REQUEST PASSWORD RESET (sends OTP)
-   POST /api/product-vendor/request-password-reset
-====================================================== */
-export const requestPasswordReset = async (req, res) => {
+// Update Product Vendor by Admin
+export const updateProductVendorByAdmin = async (req, res) => {
   try {
-    const { email } = req.body;
-    if (!email) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Email is required" });
-    }
+    const { id } = req.params;
+    const { businessName, ownerName, email, phone } = req.body;
 
-    const vendor = await ProductVendorAuth.findOne({ email });
-    if (!vendor) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Vendor not found" });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    vendor.otp = otp;
-    vendor.otpExpireAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-    await vendor.save();
-
-    await sendOtpEmail(email, otp);
-
-    return res
-      .status(200)
-      .json({ success: true, message: "OTP sent to email" });
-  } catch (error) {
-    console.error("Request Password Reset Error:", error);
-    return res.status(500).json({ success: false, message: "Server error" });
-  }
-};
-
-/* ======================================================
-   CONFIRM PASSWORD RESET (verify OTP + set new password)
-   POST /api/product-vendor/confirm-password-reset
-====================================================== */
-export const confirmPasswordReset = async (req, res) => {
-  try {
-    const { email, otp, newPassword } = req.body;
-    if (!email || !otp || !newPassword) {
+    // Validation
+    if (!businessName || !ownerName || !email) {
       return res.status(400).json({
         success: false,
-        message: "Email, otp and newPassword are required",
+        message:
+          "Please provide required fields (businessName, ownerName, email)",
       });
     }
 
-    const vendor = await ProductVendorAuth.findOne({ email });
+    // Check if email is already in use by another vendor
+    const existingVendor = await ProductVendorAuth.findOne({
+      email,
+      _id: { $ne: id },
+    });
+    if (existingVendor) {
+      return res.status(400).json({
+        success: false,
+        message: "Email already in use by another vendor",
+      });
+    }
+
+    const vendor = await ProductVendorAuth.findByIdAndUpdate(
+      id,
+      { businessName, ownerName, email, phone },
+      { new: true },
+    ).select("-password");
+
     if (!vendor) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Vendor not found" });
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found",
+      });
     }
 
-    if (!vendor.otp || !vendor.otpExpireAt) {
-      return res
-        .status(400)
-        .json({ success: false, message: "No reset requested or OTP expired" });
-    }
-
-    if (vendor.otp !== otp) {
-      return res.status(400).json({ success: false, message: "Invalid OTP" });
-    }
-
-    if (new Date() > new Date(vendor.otpExpireAt)) {
-      return res
-        .status(400)
-        .json({ success: false, message: "OTP has expired" });
-    }
-
-    const hashed = await bcrypt.hash(newPassword, 10);
-    vendor.password = hashed;
-    vendor.otp = undefined;
-    vendor.otpExpireAt = undefined;
-    await vendor.save();
-
-    return res
-      .status(200)
-      .json({ success: true, message: "Password has been reset" });
+    res.status(200).json({
+      success: true,
+      message: "Vendor updated successfully",
+      data: vendor,
+    });
   } catch (error) {
-    console.error("Confirm Password Reset Error:", error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    console.error("Update vendor error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error updating vendor",
+      error: error.message,
+    });
   }
 };
 
-/* ======================================================
-   DELETE PRODUCT VENDOR (ADMIN)
-   DELETE /api/product-vendor/:id
-====================================================== */
+// Delete Product Vendor
 export const deleteProductVendor = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const vendorData = await ProductVendorAuth.findByIdAndDelete(id);
-    if (!vendorData) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Vendor not found" });
+    const vendor = await ProductVendorAuth.findByIdAndDelete(id);
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found",
+      });
     }
 
-    return res
-      .status(200)
-      .json({ success: true, message: "Product vendor deleted successfully" });
+    res.status(200).json({
+      success: true,
+      message: "Vendor deleted successfully",
+    });
   } catch (error) {
-    console.error("Delete Product Vendor Error:", error);
-    return res.status(500).json({ success: false, message: "Server error" });
+    console.error("Delete vendor error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error deleting vendor",
+      error: error.message,
+    });
+  }
+};
+
+// Change Product Vendor Password (by Admin)
+export const changeProductVendorPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { password } = req.body;
+
+    // Validation
+    if (!password) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide a new password",
+      });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const vendor = await ProductVendorAuth.findByIdAndUpdate(
+      id,
+      { password: hashedPassword },
+      { new: true },
+    ).select("-password");
+
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Vendor not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Password changed successfully",
+      data: vendor,
+    });
+  } catch (error) {
+    console.error("Change password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error changing password",
+      error: error.message,
+    });
+  }
+};
+
+// Request Password Reset - Send OTP to email
+export const forgotPasswordRequest = async (req, res) => {
+  try {
+    const { email } = req.body;
+
+    // Validation
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide email address",
+      });
+    }
+
+    // Check if vendor exists
+    const vendor = await ProductVendorAuth.findOne({ email });
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Email not found",
+      });
+    }
+
+    // Generate OTP (6-digit)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const otpExpiry = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Save OTP to database
+    vendor.resetOTP = otp;
+    vendor.resetOTPExpiry = otpExpiry;
+    await vendor.save();
+
+    // Setup email transporter
+    const transporter = nodemailer.createTransport({
+      service: "gmail",
+      auth: {
+        user: process.env.EMAIL_USER || "your_email@gmail.com",
+        pass: process.env.EMAIL_PASSWORD || "your_app_password",
+      },
+    });
+
+    // Send OTP email
+    const mailOptions = {
+      from: process.env.EMAIL_USER || "your_email@gmail.com",
+      to: email,
+      subject: "Password Reset OTP - SmartsBooking",
+      html: `
+        <h2>Password Reset Request</h2>
+        <p>You requested to reset your password on SmartsBooking.</p>
+        <p>Your OTP is: <strong>${otp}</strong></p>
+        <p>This OTP will expire in 10 minutes.</p>
+        <p>If you did not request this, please ignore this email.</p>
+      `,
+    };
+
+    transporter.sendMail(mailOptions, (error, info) => {
+      if (error) {
+        console.error("Email send error:", error);
+        return res.status(500).json({
+          success: false,
+          message: "Error sending OTP email",
+          error: error.message,
+        });
+      }
+
+      res.status(200).json({
+        success: true,
+        message: "OTP sent to your email",
+      });
+    });
+  } catch (error) {
+    console.error("Forgot password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error processing password reset request",
+      error: error.message,
+    });
+  }
+};
+
+// Verify OTP and Reset Password
+export const resetPasswordWithOTP = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    // Validation
+    if (!email || !otp || !newPassword) {
+      return res.status(400).json({
+        success: false,
+        message: "Please provide email, OTP, and new password",
+      });
+    }
+
+    if (newPassword.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long",
+      });
+    }
+
+    // Find vendor
+    const vendor = await ProductVendorAuth.findOne({ email });
+    if (!vendor) {
+      return res.status(404).json({
+        success: false,
+        message: "Email not found",
+      });
+    }
+
+    // Check OTP
+    if (!vendor.resetOTP || vendor.resetOTP !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    // Check OTP expiry
+    if (!vendor.resetOTPExpiry || new Date() > vendor.resetOTPExpiry) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP has expired",
+      });
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update password and clear OTP
+    vendor.password = hashedPassword;
+    vendor.resetOTP = null;
+    vendor.resetOTPExpiry = null;
+    await vendor.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password reset successfully",
+    });
+  } catch (error) {
+    console.error("Reset password error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Error resetting password",
+      error: error.message,
+    });
   }
 };

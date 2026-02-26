@@ -35,20 +35,12 @@ export const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
 const App = () => {
-  
-
   const location =
     useLocation().pathname.includes("/vendor") ||
     useLocation().pathname.includes("/product");
 
-  
-
- 
-    
-      
-  
   return (
-    <div className="bg-blue-200">
+    <div className="bg-black">
       {!location && <Navbar />}
 
       <Scroll />
@@ -99,7 +91,17 @@ const App = () => {
       {!location && <Footer />}
 
       {/* Toasts (global) */}
-      <ToastContainer position="top-center" />
+      <ToastContainer
+        position="top-center"
+        autoClose={3000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

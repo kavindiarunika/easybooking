@@ -5,10 +5,6 @@ import hero from "./hero.webp";
 
 export const heroImage = [
   hero,
-  home1,
-  home2,
-  home3,
-
 ]
 
 

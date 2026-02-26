@@ -251,17 +251,18 @@ const GoTripDashboard = () => {
               </div>
             ))}
 
-          {Array.isArray(vehicleData?.otherImages) && vehicleData.otherImages.length > 3 && (
-            <div className="absolute top-[60vh] right-20 text-center text-green-400 font-bold text-sm  sm:text-xl hover:text-amber-300">
-              <button
-                onClick={() => setShowForm((s) => !s)}
-                className="h-[10vh] sm:h-[20vh] p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              >
-                View More Photos
-                <CiSaveDown1 className="inline ml-2 w-4 h-4 sm:w-12 sm:h-12" />
-              </button>
-            </div>
-          )}
+          {Array.isArray(vehicleData?.otherImages) &&
+            vehicleData.otherImages.length > 3 && (
+              <div className="absolute top-[60vh] right-20 text-center text-green-400 font-bold text-sm  sm:text-xl hover:text-amber-300">
+                <button
+                  onClick={() => setShowForm((s) => !s)}
+                  className="h-[10vh] sm:h-[20vh] p-2 rounded-lg bg-gray-800/50 hover:bg-gray-700/70 focus:outline-none focus:ring-2 focus:ring-amber-400"
+                >
+                  View More Photos
+                  <CiSaveDown1 className="inline ml-2 w-4 h-4 sm:w-12 sm:h-12" />
+                </button>
+              </div>
+            )}
         </div>
       </div>
 
@@ -280,7 +281,9 @@ const GoTripDashboard = () => {
             <FaStar className="text-yellow-400" />
             <div>
               <p className="font-semibold">Facilities</p>
-              <p className="text-blue-200">{(vehicleData?.facilities || []).join(", ")}</p>
+              <p className="text-blue-200">
+                {(vehicleData?.facilities || []).join(", ")}
+              </p>
             </div>
           </div>
 
@@ -312,7 +315,6 @@ const GoTripDashboard = () => {
           <h3 className="text-m font-semibold mb-4 px-4 py-2 rounded-lg bg-amber-100 text-amber-700 inline-block shadow-sm">
             Quick tips: Fill required fields and upload clear photos
           </h3>
-
           {!showForm && (
             <div className="space-y-4">
               {hasVehicle && vehicleData ? (
@@ -347,7 +349,6 @@ const GoTripDashboard = () => {
               )}
             </div>
           )}
-
           {showForm && (
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="flex flex-col">
@@ -558,7 +559,11 @@ const GoTripDashboard = () => {
                   disabled={loading}
                   className="flex-1 bg-amber-400 text-gray-900 p-3 rounded-lg font-semibold"
                 >
-                  {loading ? "Uploading..." : hasVehicle ? "Update Vehicle" : "Add Vehicle"}
+                  {loading
+                    ? "Uploading..."
+                    : hasVehicle
+                      ? "Update Vehicle"
+                      : "Add Vehicle"}
                 </button>
                 <button
                   type="button"
@@ -569,8 +574,8 @@ const GoTripDashboard = () => {
                 </button>
               </div>
             </form>
-         
-                  )}        </div>
+          )}{" "}
+        </div>
       </div>
 
       {/* Floating contact buttons */}
@@ -594,8 +599,6 @@ const GoTripDashboard = () => {
           </a>
         )}
       </div>
-
-      <ToastContainer position="top-center" />
     </div>
   );
 };
