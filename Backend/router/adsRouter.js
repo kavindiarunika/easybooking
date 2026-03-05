@@ -30,5 +30,7 @@ adsRouter.patch(
 );
 
 adsRouter.get("/getads", getAds);
+// legacy endpoint used by some frontend components
+adsRouter.get("/all", getAds);
 adsRouter.delete("/deleteads/:id", deleteAds);
 export default adsRouter;

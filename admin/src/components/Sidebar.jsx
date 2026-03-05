@@ -1,8 +1,16 @@
 import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
-import { 
-  FiHome, FiPlus, FiTrash2, FiEdit, FiMapPin, FiUsers, 
-  FiChevronDown, FiChevronRight, FiImage, FiCompass
+import {
+  FiHome,
+  FiPlus,
+  FiTrash2,
+  FiEdit,
+  FiMapPin,
+  FiUsers,
+  FiChevronDown,
+  FiChevronRight,
+  FiImage,
+  FiCompass,
 } from "react-icons/fi";
 import { MdOutlineVilla, MdOutlineTravelExplore } from "react-icons/md";
 import { GiElephant } from "react-icons/gi";
@@ -15,52 +23,65 @@ const Sidebar = () => {
     stays: true,
     places: false,
     safari: false,
+    vehicle: false,
   });
 
   const toggleMenu = (menu) => {
-    setOpenMenus(prev => ({ ...prev, [menu]: !prev[menu] }));
+    setOpenMenus((prev) => ({ ...prev, [menu]: !prev[menu] }));
   };
 
-  const linkClass = (isActive) => 
+  const linkClass = (isActive) =>
     `flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all duration-200 text-sm ${
-      isActive 
-        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md" 
+      isActive
+        ? "bg-gradient-to-r from-green-500 to-emerald-600 text-white shadow-md"
         : "text-gray-300 hover:bg-slate-700 hover:text-white"
     }`;
 
-  const menuHeaderClass = "flex items-center justify-between w-full px-4 py-2.5 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all cursor-pointer";
+  const menuHeaderClass =
+    "flex items-center justify-between w-full px-4 py-2.5 text-gray-400 hover:text-white hover:bg-slate-700 rounded-lg transition-all cursor-pointer";
 
   return (
     <div className="w-64 min-h-screen bg-gradient-to-b from-slate-900 to-slate-800 shadow-xl">
       <div className="flex flex-col gap-2 p-4">
-        
         {/* Home */}
         <NavLink to="/" className={({ isActive }) => linkClass(isActive)}>
           <FiHome size={18} />
           <span>Dashboard</span>
         </NavLink>
 
-          <NavLink to="/newstays" className={({ isActive }) => linkClass(isActive)}>
-               
-                <span>New Vendors</span>
-              </NavLink>
+        <NavLink
+          to="/newstays"
+          className={({ isActive }) => linkClass(isActive)}
+        >
+          <span>New Vendors</span>
+        </NavLink>
 
         {/* Advertisements Section */}
         <div className="mt-2">
-          <div onClick={() => toggleMenu('ads')} className={menuHeaderClass}>
+          <div onClick={() => toggleMenu("ads")} className={menuHeaderClass}>
             <div className="flex items-center gap-3">
               <FiImage size={18} className="text-yellow-400" />
               <span className="font-medium">Advertisements</span>
             </div>
-            {openMenus.ads ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+            {openMenus.ads ? (
+              <FiChevronDown size={16} />
+            ) : (
+              <FiChevronRight size={16} />
+            )}
           </div>
           {openMenus.ads && (
             <div className="ml-4 mt-1 space-y-1 border-l-2 border-yellow-500/30 pl-4">
-              <NavLink to="/ads" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/ads"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiImage size={16} />
                 <span>View Ads</span>
               </NavLink>
-              <NavLink to="/addads" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/addads"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiPlus size={16} />
                 <span>Add Ad</span>
               </NavLink>
@@ -70,29 +91,44 @@ const Sidebar = () => {
 
         {/* Stays Section */}
         <div className="mt-2">
-          <div onClick={() => toggleMenu('stays')} className={menuHeaderClass}>
+          <div onClick={() => toggleMenu("stays")} className={menuHeaderClass}>
             <div className="flex items-center gap-3">
               <MdOutlineVilla size={18} className="text-green-400" />
               <span className="font-medium">Stays</span>
             </div>
-            {openMenus.stays ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+            {openMenus.stays ? (
+              <FiChevronDown size={16} />
+            ) : (
+              <FiChevronRight size={16} />
+            )}
           </div>
           {openMenus.stays && (
             <div className="ml-4 mt-1 space-y-1 border-l-2 border-green-500/30 pl-4">
-            
-              <NavLink to="/addstays" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/addstays"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiPlus size={16} />
                 <span>Add New Stay</span>
               </NavLink>
-              <NavLink to="/showstays" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/showstays"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEye size={16} />
                 <span>Show All Stays</span>
               </NavLink>
-              <NavLink to="/deletetrending" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/deletetrending"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiTrash2 size={16} />
                 <span>Delete Stay</span>
               </NavLink>
-              <NavLink to="/edittrending" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/edittrending"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEdit size={16} />
                 <span>Edit Stay</span>
               </NavLink>
@@ -102,33 +138,54 @@ const Sidebar = () => {
 
         {/* Product Section */}
         <div className="mt-2">
-          <div onClick={() => toggleMenu('products')} className={menuHeaderClass}>
+          <div
+            onClick={() => toggleMenu("products")}
+            className={menuHeaderClass}
+          >
             <div className="flex items-center gap-3">
               <MdOutlineVilla size={18} className="text-green-400" />
               <span className="font-medium">Products</span>
             </div>
-            {openMenus.products ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+            {openMenus.products ? (
+              <FiChevronDown size={16} />
+            ) : (
+              <FiChevronRight size={16} />
+            )}
           </div>
           {openMenus.products && (
             <div className="ml-4 mt-1 space-y-1 border-l-2 border-green-500/30 pl-4">
-            
-              <NavLink to="/addproduct" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/addproduct"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiPlus size={16} />
                 <span>Add New Product</span>
               </NavLink>
-              <NavLink to="/showproducts" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/showproducts"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEye size={16} />
                 <span>Show All Products</span>
               </NavLink>
-              <NavLink to="/showproductAccount" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/showproductAccount"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEye size={16} />
                 <span>Show Product Account</span>
               </NavLink>
-              <NavLink to="/deleteproduct" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/deleteproduct"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiTrash2 size={16} />
                 <span>Delete Product</span>
               </NavLink>
-              <NavLink to="/editproduct" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/editproduct"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEdit size={16} />
                 <span>Edit Product</span>
               </NavLink>
@@ -138,20 +195,30 @@ const Sidebar = () => {
 
         {/* Travelling Places Section */}
         <div className="mt-2">
-          <div onClick={() => toggleMenu('places')} className={menuHeaderClass}>
+          <div onClick={() => toggleMenu("places")} className={menuHeaderClass}>
             <div className="flex items-center gap-3">
               <MdOutlineTravelExplore size={18} className="text-blue-400" />
               <span className="font-medium">Travel Places</span>
             </div>
-            {openMenus.places ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+            {openMenus.places ? (
+              <FiChevronDown size={16} />
+            ) : (
+              <FiChevronRight size={16} />
+            )}
           </div>
           {openMenus.places && (
             <div className="ml-4 mt-1 space-y-1 border-l-2 border-blue-500/30 pl-4">
-              <NavLink to="/addtravellingplaces" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/addtravellingplaces"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiPlus size={16} />
                 <span>Add Place</span>
               </NavLink>
-              <NavLink to="/deletetravellingplaces" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/deletetravellingplaces"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiTrash2 size={16} />
                 <span>Delete Place</span>
               </NavLink>
@@ -161,30 +228,81 @@ const Sidebar = () => {
 
         {/* Safari Section */}
         <div className="mt-2">
-          <div onClick={() => toggleMenu('safari')} className={menuHeaderClass}>
+          <div onClick={() => toggleMenu("safari")} className={menuHeaderClass}>
             <div className="flex items-center gap-3">
               <GiElephant size={18} className="text-purple-400" />
               <span className="font-medium">Safari</span>
             </div>
-            {openMenus.safari ? <FiChevronDown size={16} /> : <FiChevronRight size={16} />}
+            {openMenus.safari ? (
+              <FiChevronDown size={16} />
+            ) : (
+              <FiChevronRight size={16} />
+            )}
           </div>
           {openMenus.safari && (
             <div className="ml-4 mt-1 space-y-1 border-l-2 border-purple-500/30 pl-4">
-              <NavLink to="/addsafari" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/addsafari"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiPlus size={16} />
                 <span>Add Safari</span>
               </NavLink>
-              <NavLink to="/showsafari" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/showsafari"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEye size={16} />
                 <span>Show Safari</span>
               </NavLink>
-              <NavLink to="/deletesafari" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/deletesafari"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiTrash2 size={16} />
                 <span>Delete Safari</span>
               </NavLink>
-              <NavLink to="/editsafari" className={({ isActive }) => linkClass(isActive)}>
+              <NavLink
+                to="/editsafari"
+                className={({ isActive }) => linkClass(isActive)}
+              >
                 <FiEdit size={16} />
                 <span>Edit Safari</span>
+              </NavLink>
+            </div>
+          )}
+        </div>
+        {/* Vehicle Section */}
+        <div className="mt-2">
+          <div
+            onClick={() => toggleMenu("vehicle")}
+            className={menuHeaderClass}
+          >
+            <div className="flex items-center gap-3">
+              <FiMapPin size={18} className="text-blue-400" />
+              <span className="font-medium">Vehicles</span>
+            </div>
+            {openMenus.vehicle ? (
+              <FiChevronDown size={16} />
+            ) : (
+              <FiChevronRight size={16} />
+            )}
+          </div>
+          {openMenus.vehicle && (
+            <div className="ml-4 mt-1 space-y-1 border-l-2 border-blue-500/30 pl-4">
+              <NavLink
+                to="/addvehicle"
+                className={({ isActive }) => linkClass(isActive)}
+              >
+                <FiPlus size={16} />
+                <span>Add Vehicle</span>
+              </NavLink>
+              <NavLink
+                to="/deletevehicle"
+                className={({ isActive }) => linkClass(isActive)}
+              >
+                <FiTrash2 size={16} />
+                <span>Delete Vehicle</span>
               </NavLink>
             </div>
           )}
@@ -194,16 +312,21 @@ const Sidebar = () => {
         <hr className="my-4 border-slate-700" />
 
         {/* Vendor Management */}
-        <NavLink to="/vendors/manage" className={({ isActive }) => linkClass(isActive)}>
+        <NavLink
+          to="/vendors/manage"
+          className={({ isActive }) => linkClass(isActive)}
+        >
           <FiUsers size={18} className="text-orange-400" />
           <span>View All Vendors</span>
         </NavLink>
 
-        <NavLink to="/addvendor" className={({ isActive }) => linkClass(isActive)}>
+        <NavLink
+          to="/addvendor"
+          className={({ isActive }) => linkClass(isActive)}
+        >
           <FiPlus size={18} className="text-orange-400" />
           <span>Add Vendor</span>
         </NavLink>
-
       </div>
     </div>
   );

@@ -19,7 +19,9 @@ import EditTrending from "./Pages/edit/Edit";
 import AddTraveling from "./Pages/Add/AddTraveling";
 import DeletePlaces from "./Pages/Delete/DletePlaces";
 import AddSafari from "./Pages/Add/AddSafari";
+import AddVehicle from "./Pages/Add/AddVehicle";
 import DleteSafari from "./Pages/Delete/DleteSafari";
+import DeleteVehicle from "./Pages/Delete/DeleteVehicle";
 import EditSafariPage from "./Pages/edit/EditSafariPage";
 import Home from "./Pages/Home/Home";
 import SafariPaid from "./Pages/Paid/SafariPaid";
@@ -165,10 +167,26 @@ function App() {
                     }
                   />
                   <Route
+                    path="/addvehicle"
+                    element={
+                      <ProtectedRoute>
+                        <AddVehicle token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
                     path="/deletesafari"
                     element={
                       <ProtectedRoute>
                         <DleteSafari token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/deletevehicle"
+                    element={
+                      <ProtectedRoute>
+                        <DeleteVehicle token={token} />
                       </ProtectedRoute>
                     }
                   />
@@ -332,6 +350,14 @@ function App() {
                     element={
                       <ProtectedRoute>
                         <ShowProduct token={token} />
+                      </ProtectedRoute>
+                    }
+                  />
+                  <Route
+                    path="/addvehicle"
+                    element={
+                      <ProtectedRoute>
+                        <AddVehicle token={token} />
                       </ProtectedRoute>
                     }
                   />

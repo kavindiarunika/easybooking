@@ -15,6 +15,7 @@ import Villa from "./Pages/villas/Villa";
 import Safarihome from "./Pages/safari/Safarihome";
 import SafariDetails from "./Pages/safari/SafariDetails";
 import VehicleCard from "./Pages/vehicleRent/VehicleCard";
+import VehicleDetails from "./Pages/vehicleRent/VehicleDetails";
 import Register from "./Pages/Register/Register";
 import { useLocation } from "react-router-dom";
 import GoTrip from "./Pages/vendor/VendorCategory/GoTrip";
@@ -30,6 +31,9 @@ import ProductBrowse from "./Pages/Product/ProductBrowse";
 import ProductRegister from "./Pages/Product/ProductRegister";
 import ProductReview from "./Pages/Product/ProductReview";
 import ProductDashboard from "./Pages/vendor/ProductDashboard";
+import VehicleHome from "./Pages/vehicleRent/VehicleHome";
+import VehicleSignUp from "./Pages/vehicleRent/VehicleSignUP";
+import VehicleDashboard from "./Pages/vehicleRent/VehicleDashboard";
 
 export const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
@@ -54,12 +58,16 @@ const App = () => {
         <Route path="/places/:district?" element={<Visitingplaces />} />
         <Route path="/safarihome" element={<Safarihome />} />
         <Route path="/safaridetails/:id" element={<SafariDetails />} />
-        <Route path="/vehicle" element={<VehicleCard />} />
+        <Route path="/vehicle" element={<VehicleHome />} />
+        <Route path="/vehicle/:id" element={<VehicleDetails />} />
         <Route path="/vendor/register" element={<Register />} />
         <Route path="/product" element={<ProductHome />} />
         <Route path="/product/browse" element={<ProductBrowse />} />
         <Route path="/product/register" element={<ProductRegister />} />
         <Route path="/product/review/:id" element={<ProductReview />} />
+        <Route path="/vehiclesignup" element={<VehicleSignUp />} />
+        <Route path="/vehicle/dashboard" element={<VehicleDashboard />} />
+
         <Route
           path="/vendor/dashboard-products"
           element={

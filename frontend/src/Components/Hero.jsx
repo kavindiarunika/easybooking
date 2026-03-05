@@ -21,7 +21,7 @@ const Hero = () => {
   const current = slides[index];
 
   return (
-    <div className="relative w-full sm:h-screen overflow-hidden text-white h-[60vh]">
+    <div className="relative w-full  overflow-hidden text-white h-[40vh] sm:h-[90vh]">
       {/* Background */}
       <AnimatePresence mode="wait">
         <motion.div
@@ -44,12 +44,12 @@ const Hero = () => {
           initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="text-3xl sm:text-6xl font-extrabold leading-tight"
+          className="text-xl sm:text-6xl font-extrabold leading-tight"
         >
           {current.title}
         </motion.h1>
 
-        <p className="mt-4 text-yellow-400 text-base sm:text-xl">
+        <p className="mt-4 text-yellow-400 text-sm sm:text-xl">
           {current.subtitle}
         </p>
 
@@ -58,7 +58,7 @@ const Hero = () => {
             initial={{ y: 20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-6 px-6 py-3 bg-gradient-to-r bg-white/70 text-black font-bold rounded-full shadow-lg hover:bg-black/80 hover:text-white hover:scale-105 transition-all duration-300"
+            className="mt-6 px-3 sm:px-6 py-3 bg-gradient-to-r bg-white/70 text-black font-bold rounded-full shadow-lg hover:bg-black/80 hover:text-white hover:scale-105 transition-all duration-300"
           >
             Register Now
           </motion.button>

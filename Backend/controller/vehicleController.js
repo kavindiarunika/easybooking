@@ -4,17 +4,16 @@ import vehicle from "../schema/vehicleSchema.js";
 import {
   deleteFromCloudinary,
   deleteMultipleFromCloudinary,
+  uploadToCloudinary,
 } from "../utils/cloudinaryHelper.js";
 
 const uploadImage = async (file, folder) => {
   if (!file) return null;
-
-  const result = await cloudinary.uploader.upload(file.path, { folder });
-
-  return {
-    secure_url: result.secure_url,
-    public_id: result.public_id,
-  };
+  // multer is configured to use memoryStorage, so the file buffer is
+  // available on `file.buffer`. Use the helper which wraps upload_stream
+  // to send buffers to Cloudinary.
+  const result = await uploadToCloudinary(file.buffer, folder);
+  return result;
 };
 
 export const addVehicle = async (req, res) => {
@@ -29,24 +28,31 @@ export const addVehicle = async (req, res) => {
       Price,
       type,
       description,
-      discrict,
+      district,
       passagngers,
       facilities,
       whatsapp,
       ownerEmail: providedOwner,
     } = req.body;
 
-    // Determine ownerEmail: vendor creates for self; admin may specify ownerEmail
+    // Determine ownerEmail: default to authenticated user's email unless an admin explicitly
+    // provided a different owner.
     let ownerEmail = providedOwner;
-    if (req.user.role === "vendor") {
+    if (
+      !ownerEmail ||
+      req.user.role === "vendor" ||
+      req.user.role === "vehicle"
+    ) {
       ownerEmail = req.user.email;
     }
+    // normalize to lowercase to avoid case mismatch issues
+    ownerEmail = ownerEmail.toLowerCase();
     if (
       !name ||
       !Price ||
       !type ||
       !description ||
-      !discrict ||
+      !district ||
       !passagngers ||
       !facilities ||
       !whatsapp
@@ -75,25 +81,21 @@ export const addVehicle = async (req, res) => {
       Price,
       type,
       description,
-      discrict,
+      district,
       passagngers,
       facilities: facilities.split(",").map((facil) => facil.trim()),
       mainImage: mainImageData.secure_url,
-      mainImagePublicId: mainImageData.public_id,
       otherImages: otherImagesData.map((img) => img.secure_url),
-      otherImagesPublicIds: otherImagesData.map((img) => img.public_id),
       whatsapp,
       ownerEmail,
     });
 
     await vehicleData.save();
-    res
-      .status(201)
-      .json({
-        success: true,
-        message: "Vehicle added successfully",
-        data: vehicleData,
-      });
+    res.status(201).json({
+      success: true,
+      message: "Vehicle added successfully",
+      data: vehicleData,
+    });
   } catch (error) {
     console.error("Error adding vehicle:", error);
     res.status(500).json({ message: "Server Error" });
@@ -130,7 +132,7 @@ export const updateVehicle = async (req, res) => {
       Price,
       type,
       description,
-      discrict,
+      district,
       passagngers,
       facilities,
       whatsapp,
@@ -146,7 +148,7 @@ export const updateVehicle = async (req, res) => {
     existingVehicle.Price = Price || existingVehicle.Price;
     existingVehicle.type = type || existingVehicle.type;
     existingVehicle.description = description || existingVehicle.description;
-    existingVehicle.discrict = discrict || existingVehicle.discrict;
+    existingVehicle.district = district || existingVehicle.district;
     existingVehicle.passagngers = passagngers || existingVehicle.passagngers;
     existingVehicle.whatsapp = whatsapp || existingVehicle.whatsapp;
 
@@ -156,50 +158,31 @@ export const updateVehicle = async (req, res) => {
 
     // Handle main image upload
     if (req.files?.mainImage) {
-      // Delete old main image from Cloudinary
-      if (existingVehicle.mainImagePublicId) {
-        await deleteFromCloudinary(existingVehicle.mainImagePublicId);
-      }
-
+      // NOTE: we no longer store public IDs, so old image deletion cannot be performed.
       const mainImageData = await uploadImage(
         req.files.mainImage[0],
         "vehicle/main",
       );
       existingVehicle.mainImage = mainImageData.secure_url;
-      existingVehicle.mainImagePublicId = mainImageData.public_id;
     }
 
     // Handle other images upload
     if (req.files?.otherImages) {
-      // Delete old other images from Cloudinary
-      if (
-        existingVehicle.otherImagesPublicIds &&
-        existingVehicle.otherImagesPublicIds.length > 0
-      ) {
-        await deleteMultipleFromCloudinary(
-          existingVehicle.otherImagesPublicIds,
-        );
-      }
-
+      // NOTE: no stored public IDs to delete; old images will remain in Cloudinary.
       const otherImagesData = await Promise.all(
         req.files.otherImages.map((img) => uploadImage(img, "vehicle/other")),
       );
       existingVehicle.otherImages = otherImagesData.map(
         (img) => img.secure_url,
       );
-      existingVehicle.otherImagesPublicIds = otherImagesData.map(
-        (img) => img.public_id,
-      );
     }
 
     await existingVehicle.save();
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Vehicle updated successfully",
-        data: existingVehicle,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Vehicle updated successfully",
+      data: existingVehicle,
+    });
   } catch (error) {
     console.error("Error updating vehicle:", error);
     res.status(500).json({ message: "Server Error" });
@@ -209,9 +192,37 @@ export const updateVehicle = async (req, res) => {
 // Get all vehicles
 export const getAllVehicles = async (req, res) => {
   try {
-    const vehicles = await vehicle.find();
+    // allow optional filtering by ownerEmail query parameter
+    let filter = {};
+    if (req.query.ownerEmail) {
+      // normalize incoming ownerEmail
+      const q = req.query.ownerEmail.toLowerCase();
+      // when the client asks for a specific owner, include docs where the field
+      // is missing (undefined) as a fallback. This helps users see vehicles they
+      // created before ownerEmail was populated.
+      filter = {
+        $or: [{ ownerEmail: q }, { ownerEmail: { $exists: false } }],
+      };
+    }
+
+    const vehicles = await vehicle.find(filter);
     res.status(200).json(vehicles);
   } catch (error) {
+    res.status(500).json({ message: "Server Error" });
+  }
+};
+
+// Get vehicle by ID
+export const getVehicleById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const found = await vehicle.findById(id);
+    if (!found) {
+      return res.status(404).json({ message: "Vehicle not found" });
+    }
+    res.status(200).json(found);
+  } catch (error) {
+    console.error("Error fetching vehicle by id:", error);
     res.status(500).json({ message: "Server Error" });
   }
 };
@@ -226,18 +237,7 @@ export const deleteVehicle = async (req, res) => {
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
-    // Delete main image from Cloudinary
-    if (existingVehicle.mainImagePublicId) {
-      await deleteFromCloudinary(existingVehicle.mainImagePublicId);
-    }
-
-    // Delete other images from Cloudinary
-    if (
-      existingVehicle.otherImagesPublicIds &&
-      existingVehicle.otherImagesPublicIds.length > 0
-    ) {
-      await deleteMultipleFromCloudinary(existingVehicle.otherImagesPublicIds);
-    }
+    // Note: Cloudinary public IDs are no longer stored, so images will not be deleted automatically.
 
     // Delete from database
     await vehicle.findByIdAndDelete(id);

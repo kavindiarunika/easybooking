@@ -13,6 +13,7 @@ import travelingplacesroute from "./router/travelingplacesroute.js";
 import safariRouter from "./router/safariRoute.js";
 import vendorrouter from "./router/vendorRouter.js";
 import adsRouter from "./router/adsRouter.js";
+import vehicleAuthRouter from "./router/vehicleAuthRouter.js"; // vehicle auth endpoints
 import productRouter from "./router/productRoute.js";
 import productVendorRoute from "./router/productVendorRoute.js";
 import helmet from "helmet";
@@ -65,10 +66,9 @@ const allowedOrigins = [
 
 app.use(
   helmet({
-    contentSecurityPolicy: false
-  })
+    contentSecurityPolicy: false,
+  }),
 );
-
 
 {
   /*app.use(
@@ -152,6 +152,9 @@ app.use("/api/ads", adsRouter);
 app.use("/api/product", productRouter);
 
 app.use("/api/product-vendor", productVendorRoute);
+
+// vehicle auth routes (registration & login)
+app.use("/api/vehicle-auth", vehicleAuthRouter);
 
 app.get("/", (req, res) => res.send("API working."));
 

@@ -12,6 +12,7 @@ import Safari from '../../Components/Safari'
 import Hotels from '../../Components/Hotels'
 import CommingSoon from "../../Components/CommingSoon";
 import Product from "../../Components/Product";
+import VehicleRent from "../../Components/VehicleRent";
 
 const Home = () => {
   const location = useLocation();
@@ -42,6 +43,9 @@ const Home = () => {
       </div>
      <div className="w-full relative "> 
         <Safari/>
+      </div>
+     <div className="w-full relative "> 
+        <VehicleRent/>
       </div>
      <div className="w-full relative "> 
         <Product/>

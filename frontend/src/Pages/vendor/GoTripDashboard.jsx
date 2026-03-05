@@ -48,7 +48,7 @@ const GoTripDashboard = () => {
     Price: "",
     type: "car",
     description: "",
-    discrict: "",
+    district: "",
     passagngers: "",
     facilities: "",
     whatsapp: "",
@@ -91,6 +91,7 @@ const GoTripDashboard = () => {
         setVehicleData(res.data);
         setFormData({
           ...res.data,
+          district: res.data.district || res.data.discrict || "",
           facilities: (res.data.facilities || []).join(", "),
         });
       } else {
@@ -273,7 +274,9 @@ const GoTripDashboard = () => {
             <FaMapMarkerAlt className="text-red-500" />
             <div>
               <p className="font-semibold">District</p>
-              <p className="text-blue-200">{vehicleData?.discrict}</p>
+              <p className="text-blue-200">
+                {vehicleData?.district || vehicleData?.discrict}
+              </p>
             </div>
           </div>
 
@@ -396,8 +399,8 @@ const GoTripDashboard = () => {
                   <label className="mb-1 text-gray-200">District</label>
                   <input
                     type="text"
-                    name="discrict"
-                    value={formData.discrict}
+                    name="district"
+                    value={formData.district}
                     onChange={handleInputChange}
                     className="p-2 rounded-md bg-gray-700 text-white w-full"
                   />

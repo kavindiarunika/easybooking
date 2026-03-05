@@ -56,7 +56,16 @@ const connectDB = async () => {
       );
     }
 
-    process.exit(1);
+    if (process.env.NODE_ENV === "production") {
+      // in production we must abort if database is unreachable
+      process.exit(1);
+    } else {
+      // during development, allow server to continue running so front-end
+      // can at least receive responses (even if they will error).
+      console.warn(
+        "Continuing without a MongoDB connection (development mode).",
+      );
+    }
   }
 };
 

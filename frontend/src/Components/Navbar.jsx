@@ -4,7 +4,7 @@ import { IoReorderThreeOutline, IoClose } from "react-icons/io5";
 import { AiOutlineHome } from "react-icons/ai";
 import { MdHotel } from "react-icons/md";
 import { RiSafariFill } from "react-icons/ri";
-import { FaBoxOpen, FaMapMarkerAlt } from "react-icons/fa";
+import { FaBoxOpen, FaMapMarkerAlt, FaCar } from "react-icons/fa";
 import { assets } from "../assets/Assest";
 import { TravelContext } from "../Context/TravelContext";
 
@@ -13,6 +13,7 @@ const Header = () => {
   const { handleSpecial, navigate } = useContext(TravelContext);
 
   const toggleMenu = () => setIsOpen(!isOpen);
+  const vehicleToken = localStorage.getItem("vehicleToken");
 
   return (
     <div className="w-full z-50 absolute top-0 left-0 prata-regular bg-slate-500/10 backdrop-blur-md">
@@ -30,6 +31,16 @@ const Header = () => {
               { name: "Home", path: "./", icon: AiOutlineHome },
               { name: "stays", path: "/villa", icon: MdHotel },
               { name: "GoTrip", path: "/safarihome", icon: RiSafariFill },
+              { name: "vehicles", path: "/vehicle", icon: FaCar },
+              ...(vehicleToken
+                ? [
+                    {
+                      name: "Dashboard",
+                      path: "/vehicle/dashboard",
+                      icon: FaCar,
+                    },
+                  ]
+                : []),
               { name: "product", path: "/product", icon: FaBoxOpen },
               {
                 name: "traveling places",
@@ -119,6 +130,30 @@ const Header = () => {
               >
                 <MdHotel className="text-white w-5 h-5" /> Hotels
               </NavLink>
+              <NavLink
+                to="/vehicle"
+                onClick={toggleMenu}
+                className={({ isActive }) =>
+                  isActive
+                    ? "text-cyan-300 flex items-center gap-3"
+                    : "hover:text-cyan-300 flex items-center gap-3"
+                }
+              >
+                <FaCar className="text-white w-5 h-5" /> Vehicles
+              </NavLink>
+              {vehicleToken && (
+                <NavLink
+                  to="/vehicle/dashboard"
+                  onClick={toggleMenu}
+                  className={({ isActive }) =>
+                    isActive
+                      ? "text-cyan-300 flex items-center gap-3"
+                      : "hover:text-cyan-300 flex items-center gap-3"
+                  }
+                >
+                  <FaCar className="text-white w-5 h-5" /> Dashboard
+                </NavLink>
+              )}
               <NavLink
                 to="/safarihome"
                 onClick={toggleMenu}

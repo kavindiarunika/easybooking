@@ -14,10 +14,22 @@ const HomeAdvertisement = () => {
   const fetchAds = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`${BACKEND_URL}/api/ads/all`);
-      if (response.data.success && response.data.data) {
-        setAds(response.data.data.slice(0, 3)); // Show top 3 ads
+      // backend only exposes getads endpoint, which returns an object containing
+      // arrays (homeAd, villaad, goTripAd). we'll use the homeAd array for the
+      // home page and fall back gracefully if the shape changes.
+      const response = await axios.get(`${BACKEND_URL}/api/ads/getads`);
+      const data = response.data || {};
+      // prefer homeAd, otherwise fall back to any array we can flatten
+      let list = [];
+      if (Array.isArray(data.homeAd)) {
+        list = data.homeAd;
+      } else {
+        // combine whatever arrays are present
+        Object.values(data).forEach((val) => {
+          if (Array.isArray(val)) list = list.concat(val);
+        });
       }
+      setAds(list.slice(0, 3));
     } catch (err) {
       setError("Failed to load advertisements");
       console.error("Error fetching ads:", err);
@@ -62,10 +74,11 @@ const HomeAdvertisement = () => {
             >
               {/* Image Container */}
               <div className="relative h-48 md:h-56 overflow-hidden bg-gray-200">
-                {ad.image ? (
+                {/* image/url normalization */}
+                {ad.url || ad.image ? (
                   <img
-                    src={ad.image}
-                    alt={ad.title}
+                    src={ad.url || ad.image}
+                    alt={ad.title || "Advertisement"}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
@@ -82,12 +95,16 @@ const HomeAdvertisement = () => {
 
               {/* Content Container */}
               <div className="p-4">
-                <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
-                  {ad.title}
-                </h3>
-                <p className="text-gray-600 text-sm mb-3 line-clamp-2">
-                  {ad.description}
-                </p>
+                {ad.title && (
+                  <h3 className="text-lg font-bold text-gray-800 mb-2 line-clamp-2">
+                    {ad.title}
+                  </h3>
+                )}
+                {ad.description && (
+                  <p className="text-gray-600 text-sm mb-3 line-clamp-2">
+                    {ad.description}
+                  </p>
+                )}
 
                 {/* Ad Details */}
                 <div className="flex items-center justify-between mb-4">
