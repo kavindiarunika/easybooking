@@ -35,6 +35,11 @@ import VehicleHome from "./Pages/vehicleRent/VehicleHome";
 import VehicleSignUp from "./Pages/vehicleRent/VehicleSignUP";
 import VehicleDashboard from "./Pages/vehicleRent/VehicleDashboard";
 
+// informational pages
+import About from "./Pages/Info/About";
+import Privacy from "./Pages/Info/Privacy";
+import Contact from "./Pages/Info/Contact";
+
 export const BACKEND_URL =
   import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
 
@@ -76,6 +81,11 @@ const App = () => {
             </ProtectedRoute>
           }
         />
+
+        {/* informational routes */}
+        <Route path="/about" element={<About />} />
+        <Route path="/privacy" element={<Privacy />} />
+        <Route path="/contact" element={<Contact />} />
         <Route path="/vendor/dashboard-stays" element={<VendorDashboard />} />
         <Route path="/vendor/dashboard-gotrip" element={<GoTripDashboard />} />
         <Route

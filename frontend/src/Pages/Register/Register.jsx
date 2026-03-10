@@ -48,6 +48,7 @@ const Register = () => {
     hotelType: "",
     vehicleType: "",
     password: "",
+    agreePrivacy: false, // new checkbox field
   });
 
   // Location data - Countries with their districts and cities
@@ -257,7 +258,11 @@ const Register = () => {
   const [loginData, setLoginData] = useState({ email: "", password: "" });
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
+    if (type === "checkbox") {
+      setformData({ ...formData, [name]: checked });
+      return;
+    }
     if (name === "country") {
       setformData({ ...formData, country: value, district: "", city: "" });
     } else if (name === "district") {
@@ -278,6 +283,11 @@ const Register = () => {
     // Validate required fields
     if (!formData.email || !formData.phone || !formData.password) {
       toast.error("Email, phone, and password are required");
+      setLoading(false);
+      return;
+    }
+    if (!formData.agreePrivacy) {
+      toast.error("You must agree to our privacy policy");
       setLoading(false);
       return;
     }
@@ -956,6 +966,27 @@ const Register = () => {
                     >
                       {showPassword ? <FaEyeSlash /> : <FaEye />}
                     </button>
+                  </div>
+
+                  {/* Privacy Policy Agreement */}
+                  <div className="flex items-center gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      name="agreePrivacy"
+                      checked={formData.agreePrivacy}
+                      onChange={handleChange}
+                      className="w-4 h-4 rounded border-white/30 bg-white/10"
+                      required
+                    />
+                    <label className="text-white/70">
+                      I agree to the{" "}
+                      <Link
+                        to="/privacy"
+                        className="text-blue-300 hover:text-blue-200 underline"
+                      >
+                        Privacy Policy
+                      </Link>
+                    </label>
                   </div>
 
                   {/* Submit Button */}

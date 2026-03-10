@@ -18,7 +18,6 @@ const Footer = () => {
         <div>
           <div className="flex items-center gap-3 mb-4">
             <img src={assets.logo} alt="logo" className="w-24 sm:w-52 h-auto" />
-         
           </div>
           <p className="text-gray-300 text-sm leading-relaxed">
             Explore the breathtaking beauty of Sri Lanka — from serene highlands
@@ -46,13 +45,28 @@ const Footer = () => {
                 About Us
               </Link>
             </li>
-          
+            <li>
+              <Link
+                to="/privacy"
+                className="hover:text-green-400 transition-all duration-300"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                to="/contact"
+                className="hover:text-green-400 transition-all duration-300"
+              >
+                Contact
+              </Link>
+            </li>
             <li>
               <Link
                 to="/trending"
                 className="hover:text-green-400 transition-all duration-300"
               >
-                 Hotels
+                Hotels
               </Link>
             </li>
           </ul>
@@ -62,15 +76,13 @@ const Footer = () => {
         <div>
           <h4 className="text-lg font-semibold text-white mb-4">Contact</h4>
           <ul className="flex flex-col gap-3 text-sm text-gray-300">
-           
-              
             <li className="flex items-center gap-2 hover:text-green-400 transition">
               <FaEnvelope className="text-green-400" />
-             codebuilterit@gmail.com
+              codebuilterit@gmail.com
             </li>
             <li className="flex items-center gap-2 hover:text-green-400 transition">
               <FaPhone className="text-green-400" />
-            076 211 2626
+              076 211 2626
             </li>
           </ul>
         </div>
@@ -108,9 +120,7 @@ const Footer = () => {
       <div className="border-t border-green-700 mt-12 pt-6 text-center text-sm text-gray-400">
         © {new Date().getFullYear()} codebuilder (pvt) ltd.
         <br />
-        <span className="text-gray-500">
-       http://Codebuilder.it.com
-        </span>
+        <span className="text-gray-500">http://Codebuilder.it.com</span>
       </div>
     </footer>
   );

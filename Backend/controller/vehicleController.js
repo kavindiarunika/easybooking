@@ -9,16 +9,14 @@ import {
 
 const uploadImage = async (file, folder) => {
   if (!file) return null;
-  // multer is configured to use memoryStorage, so the file buffer is
-  // available on `file.buffer`. Use the helper which wraps upload_stream
-  // to send buffers to Cloudinary.
+  
   const result = await uploadToCloudinary(file.buffer, folder);
   return result;
 };
 
 export const addVehicle = async (req, res) => {
   try {
-    // Require authentication
+    
     if (!req.user) {
       return res.status(401).json({ message: "Authentication required" });
     }
