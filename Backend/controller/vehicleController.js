@@ -9,14 +9,13 @@ import {
 
 const uploadImage = async (file, folder) => {
   if (!file) return null;
-  
+
   const result = await uploadToCloudinary(file.buffer, folder);
   return result;
 };
 
 export const addVehicle = async (req, res) => {
   try {
-    
     if (!req.user) {
       return res.status(401).json({ message: "Authentication required" });
     }
@@ -83,7 +82,9 @@ export const addVehicle = async (req, res) => {
       passagngers,
       facilities: facilities.split(",").map((facil) => facil.trim()),
       mainImage: mainImageData.secure_url,
+      mainImageId: mainImageData.public_id,
       otherImages: otherImagesData.map((img) => img.secure_url),
+      otherImagesIds: otherImagesData.map((img) => img.public_id),
       whatsapp,
       ownerEmail,
     });
@@ -156,22 +157,30 @@ export const updateVehicle = async (req, res) => {
 
     // Handle main image upload
     if (req.files?.mainImage) {
-      // NOTE: we no longer store public IDs, so old image deletion cannot be performed.
+      if (existingVehicle.mainImageId) {
+        await deleteFromCloudinary(existingVehicle.mainImageId);
+      }
       const mainImageData = await uploadImage(
         req.files.mainImage[0],
         "vehicle/main",
       );
       existingVehicle.mainImage = mainImageData.secure_url;
+      existingVehicle.mainImageId = mainImageData.public_id;
     }
 
     // Handle other images upload
     if (req.files?.otherImages) {
-      // NOTE: no stored public IDs to delete; old images will remain in Cloudinary.
+      if (Array.isArray(existingVehicle.otherImagesIds)) {
+        await deleteMultipleFromCloudinary(existingVehicle.otherImagesIds);
+      }
       const otherImagesData = await Promise.all(
         req.files.otherImages.map((img) => uploadImage(img, "vehicle/other")),
       );
       existingVehicle.otherImages = otherImagesData.map(
         (img) => img.secure_url,
+      );
+      existingVehicle.otherImagesIds = otherImagesData.map(
+        (img) => img.public_id,
       );
     }
 
@@ -235,7 +244,13 @@ export const deleteVehicle = async (req, res) => {
       return res.status(404).json({ message: "Vehicle not found" });
     }
 
-    // Note: Cloudinary public IDs are no longer stored, so images will not be deleted automatically.
+    // Delete images from Cloudinary (if we have IDs)
+    if (existingVehicle.mainImageId) {
+      await deleteFromCloudinary(existingVehicle.mainImageId);
+    }
+    if (Array.isArray(existingVehicle.otherImagesIds)) {
+      await deleteMultipleFromCloudinary(existingVehicle.otherImagesIds);
+    }
 
     // Delete from database
     await vehicle.findByIdAndDelete(id);

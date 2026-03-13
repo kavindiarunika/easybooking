@@ -2,11 +2,13 @@ import home1 from "./home1.webp";
 import home2 from "./home2.webp";
 import home3 from "./home3.webp";
 import hero from "./hero.webp";
-
-export const heroImage = [
+import about from "./about.png";
+import contact from "./contact.png";
+export const heroImage = {
   hero,
-]
-
+  about,
+  contact,
+};
 
 const homepageImages = [
   {
@@ -27,7 +29,6 @@ const homepageImages = [
       "Let every step of your adventure bring new experiences, joy, and unforgettable sights.",
     background: home3,
   },
- 
 ];
 
 export default homepageImages;

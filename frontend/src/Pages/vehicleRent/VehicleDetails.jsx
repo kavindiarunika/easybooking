@@ -89,7 +89,10 @@ const VehicleDetails = () => {
                 label="District"
                 value={vehicle.district || vehicle.discrict}
               />
-              <Info label="Passengers" value={vehicle.passengers} />
+              <Info
+                label="Passengers"
+                value={vehicle.passagngers ?? vehicle.passengers ?? "N/A"}
+              />
 
               <Info
                 label="WhatsApp Number"

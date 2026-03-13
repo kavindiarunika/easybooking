@@ -10,7 +10,9 @@ const vehicleSchema = new mongoose.Schema({
   passagngers: { type: Number },
   facilities: { type: [String] },
   mainImage: { type: String, required: true },
+  mainImageId: { type: String },
   otherImages: { type: [String] },
+  otherImagesIds: { type: [String] },
   whatsapp: { type: String, required: true },
   ownerEmail: { type: String },
 });
